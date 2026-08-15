@@ -48,7 +48,7 @@ export function AnalyticsTrendChart({
       <CardHeader className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-            <TrendingUp className="size-4 text-sky-500" />
+            <TrendingUp className="size-4 text-primary" />
             Scan &amp; Conversion Trends
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground">
@@ -74,7 +74,7 @@ export function AnalyticsTrendChart({
               onClick={() => setActiveMetric("scans")}
               className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                 activeMetric === "scans"
-                  ? "bg-sky-500 text-white shadow-2xs font-semibold"
+                  ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -123,8 +123,8 @@ export function AnalyticsTrendChart({
               <AreaChart data={timeSeries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="scansGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#FA5D29" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#FA5D29" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="sessionsGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
@@ -166,7 +166,7 @@ export function AnalyticsTrendChart({
                     type="monotone"
                     dataKey="scans"
                     name="Scans"
-                    stroke="#0ea5e9"
+                    stroke="#FA5D29"
                     strokeWidth={2}
                     fillOpacity={1}
                     fill="url(#scansGradient)"

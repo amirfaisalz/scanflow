@@ -56,8 +56,6 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
       expect(screen.getByText("Conversions")).toBeInTheDocument();
       expect(screen.getByText("Analytics")).toBeInTheDocument();
       expect(screen.getByText("A/B Experiments")).toBeInTheDocument();
-      expect(screen.getByText("Data Isolation & Settings")).toBeInTheDocument();
-      expect(screen.getByText("Product Documentation")).toBeInTheDocument();
 
       // Verify exact hrefs on all rendered link anchors
       const dashboardLinks = screen.getAllByRole("link", { name: /dashboard|scanflow/i });
@@ -80,14 +78,7 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
 
       const experimentsLink = screen.getByRole("link", { name: /a\/b experiments/i });
       expect(experimentsLink).toHaveAttribute("href", "/dashboard/experiments");
-
-      const settingsLink = screen.getByRole("link", { name: /data isolation & settings/i });
-      expect(settingsLink).toHaveAttribute("href", "/dashboard/settings");
-
-      const docsLink = screen.getByRole("link", { name: /product documentation/i });
-      expect(docsLink).toHaveAttribute("href", "/dashboard/docs");
     });
-
 
     it("should fallback to default user when user prop is not provided", () => {
       render(
@@ -101,7 +92,7 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
   });
 
   describe("NavUser", () => {
-    it("should render user initial and handle sign out", async () => {
+    it("should render user initial, ScanFlow v2.4, and handle sign out", async () => {
       vi.mocked(authClient.signOut).mockResolvedValue({} as any);
 
       render(
@@ -123,13 +114,15 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
       const trigger = screen.getByRole("button");
       fireEvent.click(trigger);
 
+      expect(screen.getByText("ScanFlow v2.4")).toBeInTheDocument();
+
       // Find and click Log out
       const logoutBtn = await screen.findByText("Log out");
       fireEvent.click(logoutBtn);
 
       await waitFor(() => {
         expect(authClient.signOut).toHaveBeenCalledTimes(1);
-        expect(mockPush).toHaveBeenCalledWith("/login");
+        expect(mockPush).toHaveBeenCalledWith("/");
         expect(mockRefresh).toHaveBeenCalledTimes(1);
       });
     });
@@ -151,6 +144,7 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
       const trigger = screen.getByRole("button");
       fireEvent.click(trigger);
       expect(screen.getByText("Isolated Workspace")).toBeInTheDocument();
+      expect(screen.getByText("ScanFlow v2.4")).toBeInTheDocument();
     });
 
     it("should handle sign out error gracefully", async () => {

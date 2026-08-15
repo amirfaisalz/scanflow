@@ -32,7 +32,7 @@ export function AnnouncementBar() {
         {/* Right Star pill & Close button */}
         <div className="hidden md:flex items-center gap-3">
           <a
-            href="https://github.com"
+            href="https://github.com/amirfaisalz/scanflow"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1.5 rounded-full bg-black/20 hover:bg-black/30 px-2.5 py-1 text-xs font-medium transition-colors text-white"

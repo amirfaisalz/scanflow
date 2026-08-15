@@ -101,7 +101,7 @@ describe("DashboardHeader", () => {
 
     await waitFor(() => {
       expect(authClient.signOut).toHaveBeenCalledTimes(1);
-      expect(mockPush).toHaveBeenCalledWith("/login");
+      expect(mockPush).toHaveBeenCalledWith("/");
       expect(mockRefresh).toHaveBeenCalledTimes(1);
     });
   });

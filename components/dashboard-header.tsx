@@ -33,7 +33,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     setIsLoggingOut(true);
     try {
       await authClient.signOut();
-      router.push("/login");
+      router.push("/");
       router.refresh();
     } catch (err) {
       console.error("Sign out error:", err);

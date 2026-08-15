@@ -48,7 +48,7 @@ export function NavUser({
     setIsLoggingOut(true);
     try {
       await authClient.signOut();
-      router.push("/login");
+      router.push("/");
       router.refresh();
     } catch (err) {
       console.error("Sign out failed:", err);
@@ -113,7 +113,7 @@ export function NavUser({
               </DropdownMenuItem>
               <DropdownMenuItem className="gap-2">
                 <Sparkles className="size-4 text-primary" />
-                <span>ScanFlow v1.0</span>
+                <span>ScanFlow v2.4</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
