@@ -1,8 +1,11 @@
+import Link from "next/link";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
 import { getCurrentUser } from "@/lib/auth-helpers";
-import { ShieldCheck, Sparkles } from "lucide-react";
+import { QrCode, ArrowRight } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import data from "./data.json";
 
 export default async function DashboardPage() {
@@ -19,8 +22,9 @@ export default async function DashboardPage() {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-sm font-semibold text-foreground">
-                {user?.name}'s Workspace
+                {user?.name}&apos;s Workspace
               </h2>
+
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                 <span className="size-1 rounded-full bg-emerald-500 animate-pulse" />
                 Isolated Tenant
@@ -32,9 +36,12 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <ShieldCheck className="size-4 text-emerald-500" />
-          <span>PostgreSQL Multi-Tenant Scoped</span>
+        <div className="flex items-center gap-2">
+          <Button size="sm" render={<Link href="/dashboard/qr-codes" />} className="gap-1.5 text-xs shadow-xs">
+            <QrCode className="size-3.5" />
+            Manage Dynamic QR Codes
+            <ArrowRight className="size-3.5" />
+          </Button>
         </div>
       </div>
 

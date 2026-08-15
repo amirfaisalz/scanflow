@@ -11,9 +11,9 @@ import {
   GitBranch,
   FolderGit2,
   LogOut,
-  User as UserIcon,
   ShieldCheck,
 } from "lucide-react";
+
 import { useState } from "react";
 
 interface DashboardHeaderProps {

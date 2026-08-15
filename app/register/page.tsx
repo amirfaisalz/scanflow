@@ -44,11 +44,12 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const { data, error: authError } = await authClient.signUp.email({
+      const { error: authError } = await authClient.signUp.email({
         email,
         password,
         name,
       });
+
 
       if (authError) {
         setError(authError.message || "Failed to create account. Please check your details.");

@@ -56,7 +56,33 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
       expect(screen.getByText("A/B Experiments")).toBeInTheDocument();
       expect(screen.getByText("Data Isolation & Settings")).toBeInTheDocument();
       expect(screen.getByText("Product Documentation")).toBeInTheDocument();
+
+      // Verify exact hrefs on all rendered link anchors
+      const dashboardLinks = screen.getAllByRole("link", { name: /dashboard|scanflow/i });
+      expect(dashboardLinks.some((l) => l.getAttribute("href") === "/dashboard")).toBe(true);
+
+      const qrCodesLink = screen.getByRole("link", { name: /qr codes/i });
+      expect(qrCodesLink).toHaveAttribute("href", "/dashboard/qr-codes");
+
+      const campaignsLink = screen.getByRole("link", { name: /campaigns/i });
+      expect(campaignsLink).toHaveAttribute("href", "/dashboard/campaigns");
+
+      const analyticsLink = screen.getByRole("link", { name: /analytics & journeys/i });
+      expect(analyticsLink).toHaveAttribute("href", "/dashboard/analytics");
+
+      const experimentsLink = screen.getByRole("link", { name: /a\/b experiments/i });
+      expect(experimentsLink).toHaveAttribute("href", "/dashboard/experiments");
+
+      const settingsLink = screen.getByRole("link", { name: /data isolation & settings/i });
+      expect(settingsLink).toHaveAttribute("href", "/dashboard/settings");
+
+      const docsLink = screen.getByRole("link", { name: /product documentation/i });
+      expect(docsLink).toHaveAttribute("href", "/dashboard/docs");
+
+      const quickCreateLink = screen.getByRole("link", { name: /create dynamic qr/i });
+      expect(quickCreateLink).toHaveAttribute("href", "/dashboard/qr-codes");
     });
+
 
     it("should fallback to default user when user prop is not provided", () => {
       render(

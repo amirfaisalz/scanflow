@@ -4,15 +4,13 @@ import { getCurrentUser } from "@/lib/auth-helpers";
 import {
   QrCode,
   ArrowRight,
-  TrendingUp,
   GitBranch,
   ShieldCheck,
   Zap,
   Activity,
-  Layers,
   Sparkles,
-  CheckCircle2,
 } from "lucide-react";
+
 
 export default async function Home() {
   const user = await getCurrentUser();

@@ -25,11 +25,11 @@ import {
 } from "@/components/ui/sidebar";
 import {
   EllipsisVerticalIcon,
-  CircleUserRoundIcon,
   LogOutIcon,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+
 
 export function NavUser({
   user,

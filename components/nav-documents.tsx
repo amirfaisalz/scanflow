@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,10 +35,11 @@ export function NavDocuments({
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton render={<a href={item.url} />}>
+            <SidebarMenuButton render={<Link href={item.url} />}>
               {item.icon}
               <span>{item.name}</span>
             </SidebarMenuButton>
+
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={

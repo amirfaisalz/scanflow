@@ -34,7 +34,7 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
-      const { data, error: authError } = await authClient.signIn.email({
+      const { error: authError } = await authClient.signIn.email({
         email,
         password,
       });
@@ -85,10 +85,12 @@ function LoginForm() {
       router.push(callbackUrl);
       router.refresh();
     } catch (err) {
+      console.error("Demo sign-in error:", err);
       setError("Failed to initialize demo session. Please try again.");
       setIsDemoLoading(false);
     }
   };
+
 
   return (
     <Card className="border shadow-lg">
@@ -187,9 +189,10 @@ function LoginForm() {
 
       <CardFooter className="flex justify-center border-t border-border/50 pt-4">
         <p className="text-xs text-muted-foreground text-center">
-          Don't have an account yet?{" "}
+          Don&apos;t have an account yet?{" "}
           <Link
             href="/register"
+
             className="font-medium text-foreground hover:underline underline-offset-4"
           >
             Create an account

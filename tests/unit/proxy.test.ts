@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { proxy, config } from "@/proxy";
 import { NextRequest } from "next/server";
+
 
 describe("proxy.ts (Next.js 16 Route Protection)", () => {
   function createMockRequest(pathname: string, cookies: Record<string, string> = {}) {
