@@ -70,7 +70,7 @@ export function SiteNav({ user }: SiteNavProps) {
         <div className="flex items-center gap-3">
           {/* GitHub Star Pill */}
           <a
-            href="https://github.com"
+            href="https://github.com/amirfaisalz/scanflow"
             target="_blank"
             rel="noreferrer"
             className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/80 px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
@@ -94,26 +94,15 @@ export function SiteNav({ user }: SiteNavProps) {
               </Button>
             </Link>
           ) : (
-            <>
-              <Link href="/login" className="hidden sm:inline-flex">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
-                >
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button
-                  size="sm"
-                  className="font-semibold gap-1.5 bg-fire hover:bg-fire-hover text-white shadow-md shadow-fire/25 hover:scale-[1.02] active:scale-[0.98] transition-all px-4"
-                >
-                  <span>Get Started</span>
-                  <ArrowRight className="size-3.5" />
-                </Button>
-              </Link>
-            </>
+            <Link href="/login">
+              <Button
+                size="sm"
+                className="font-semibold gap-1.5 bg-fire hover:bg-fire-hover text-white shadow-md shadow-fire/25 hover:scale-[1.02] active:scale-[0.98] transition-all px-4"
+              >
+                <span>Create Free QR</span>
+                <ArrowRight className="size-3.5" />
+              </Button>
+            </Link>
           )}
 
           {/* Mobile menu toggle */}
@@ -149,19 +138,12 @@ export function SiteNav({ user }: SiteNavProps) {
           </nav>
           <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex flex-col gap-2">
             {!user ? (
-              <>
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full justify-center">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full justify-center gap-1.5 bg-fire hover:bg-fire-hover text-white">
-                    Start for Free
-                    <ArrowRight className="size-4" />
-                  </Button>
-                </Link>
-              </>
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                <Button className="w-full justify-center gap-1.5 bg-fire hover:bg-fire-hover text-white">
+                  Create Free QR
+                  <ArrowRight className="size-4" />
+                </Button>
+              </Link>
             ) : (
               <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                 <Button className="w-full justify-center gap-1.5 bg-fire hover:bg-fire-hover text-white">

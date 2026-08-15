@@ -1,39 +1,39 @@
 "use client";
 
-import { ShieldCheck, Zap, Activity, TrendingUp } from "lucide-react";
+import { ShieldCheck, Zap, TrendingUp, Sparkles } from "lucide-react";
 
 const metrics = [
   {
     value: "< 12ms",
-    label: "Global Edge Latency",
-    sublabel: "Sub-millisecond rule resolution",
+    label: "Global Edge Redirects",
+    sublabel: "Instant sub-millisecond rule evaluation",
     icon: Zap,
     color: "text-fire",
-    badge: "307 Edge FastPath",
+    badge: "307 FastPath",
   },
   {
     value: "99.99%",
-    label: "Enterprise Uptime SLA",
-    sublabel: "Multi-region fallback cluster",
+    label: "Zero-Downtime SLA",
+    sublabel: "Multi-region global fallback cluster",
     icon: ShieldCheck,
     color: "text-emerald-500",
-    badge: "Zero Downtime",
+    badge: "Always Online",
   },
   {
     value: "50M+",
-    label: "Scans Dispatched",
-    sublabel: "Real-time analytical telemetry",
-    icon: Activity,
+    label: "Scans Delivered",
+    sublabel: "Real-time analytics and geo-telemetry",
+    icon: TrendingUp,
     color: "text-amber-500",
-    badge: "+120% YoY",
+    badge: "Enterprise Scale",
   },
   {
     value: "4.8x",
     label: "Average Conversion Lift",
-    sublabel: "Context-aware dynamic routing",
-    icon: TrendingUp,
+    sublabel: "Smart OS routing & A/B testing",
+    icon: Sparkles,
     color: "text-rose-500",
-    badge: "A/B Proven",
+    badge: "Proven ROI",
   },
 ];
 
@@ -70,7 +70,7 @@ export function MetricsBanner() {
                 </div>
 
                 {/* Subtitle */}
-                <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                <div className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                   {m.sublabel}
                 </div>
               </div>
