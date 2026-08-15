@@ -8,22 +8,19 @@ import { MetricsBanner } from "@/components/home/metrics-banner";
 import { RoutingVisualizer } from "@/components/home/routing-visualizer";
 import { SiteFooter } from "@/components/home/site-footer";
 import { SiteNav } from "@/components/home/site-nav";
-import { getCurrentUser } from "@/lib/auth-helpers";
 
-export default async function Home() {
-  const user = await getCurrentUser();
-
+export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col antialiased selection:bg-fire/20 selection:text-fire">
       {/* Top Firecrawl-style announcement bar */}
       {/*<AnnouncementBar />*/}
 
       {/* Sticky Header with Flame/QR branding */}
-      <SiteNav user={user} />
+      <SiteNav />
 
       <main className="flex-1">
         {/* Signature Firecrawl-style Hero Section with Live Interactive QR Sandbox */}
-        <HeroPlayground user={user} />
+        <HeroPlayground />
 
         {/* Key Metrics & Edge Performance Banner */}
         <MetricsBanner />

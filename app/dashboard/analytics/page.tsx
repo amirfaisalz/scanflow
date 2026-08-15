@@ -325,18 +325,6 @@ export default function AnalyticsDashboardPage() {
             </p>
           </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={fetchOverview}
-            variant="outline"
-            size="sm"
-            className="gap-1.5 h-8 text-xs"
-          >
-            <RotateCw className={`size-3.5 ${loading ? "animate-spin text-primary" : ""}`} />
-            <span>Refresh</span>
-          </Button>
-        </div>
       </div>
 
       {/* Dimensional Filter Controls */}

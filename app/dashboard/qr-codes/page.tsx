@@ -31,9 +31,18 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import dynamic from "next/dynamic";
 import { QRCard } from "@/components/qr/qr-card";
-import { QRBuilderDialog } from "@/components/qr/qr-builder-dialog";
-import { QRExportDialog } from "@/components/qr/qr-export-dialog";
+
+const QRBuilderDialog = dynamic(
+  () => import("@/components/qr/qr-builder-dialog").then((m) => m.QRBuilderDialog),
+  { ssr: false }
+);
+
+const QRExportDialog = dynamic(
+  () => import("@/components/qr/qr-export-dialog").then((m) => m.QRExportDialog),
+  { ssr: false }
+);
 import {
   Table,
   TableBody,

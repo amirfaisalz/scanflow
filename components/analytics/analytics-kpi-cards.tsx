@@ -58,29 +58,29 @@ export function AnalyticsKpiCards({ kpis }: AnalyticsKpiCardsProps) {
   const cards = [
     {
       title: "Total Scans",
-      value: formatCompactNumber(safeKpis.totalScans),
+      value: safeKpis.totalScans.toLocaleString(),
+      subtitle: `${safeKpis.uniqueVisitors.toLocaleString()} unique visitors`,
       trendValue: "+147%",
-      trendLabel: "VS PREV. PERIOD",
       isPositive: true,
       icon: QrCode,
       iconColor: "text-rose-500 dark:text-rose-400",
       iconBg: "bg-rose-500/10 dark:bg-rose-500/15",
     },
     {
-      title: "Unique Sessions",
-      value: formatCompactNumber(safeKpis.totalSessions),
+      title: "Total Sessions",
+      value: safeKpis.totalSessions.toLocaleString(),
+      subtitle: `${safeKpis.bounceRate}% bounce rate`,
       trendValue: "+84%",
-      trendLabel: "VS PREV. PERIOD",
       isPositive: true,
       icon: Activity,
       iconColor: "text-sky-500 dark:text-sky-400",
       iconBg: "bg-sky-500/10 dark:bg-sky-500/15",
     },
     {
-      title: "Goal Conversions",
-      value: formatCompactNumber(safeKpis.conversions),
+      title: "Conversions",
+      value: safeKpis.conversions.toLocaleString(),
+      subtitle: `${safeKpis.conversionRate}% conv. rate`,
       trendValue: "+32%",
-      trendLabel: "VS PREV. PERIOD",
       isPositive: true,
       icon: Sparkles,
       iconColor: "text-emerald-500 dark:text-emerald-400",
@@ -89,8 +89,8 @@ export function AnalyticsKpiCards({ kpis }: AnalyticsKpiCardsProps) {
     {
       title: "Avg. Duration",
       value: formatDuration(safeKpis.avgDurationSeconds),
+      subtitle: "Avg. Engagement",
       trendValue: "+18%",
-      trendLabel: "VS PREV. PERIOD",
       isPositive: true,
       icon: Clock,
       iconColor: "text-amber-500 dark:text-amber-400",
@@ -122,14 +122,17 @@ export function AnalyticsKpiCards({ kpis }: AnalyticsKpiCardsProps) {
               </div>
             </div>
 
-            {/* Middle: Big Metric Value */}
-            <div className="my-3">
+            {/* Middle: Big Metric Value & Subtitle */}
+            <div className="my-3 space-y-1">
               <div className="text-3xl font-bold tracking-tight text-foreground font-sans">
                 {card.value}
               </div>
+              <div className="text-xs text-muted-foreground font-medium">
+                {card.subtitle}
+              </div>
             </div>
 
-            {/* Bottom: Trend Arrow + Percentage + Comparison Label */}
+            {/* Bottom: Trend Arrow + Percentage */}
             <div className="flex items-center gap-1.5 text-xs">
               <div className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
                 {card.isPositive ? (
@@ -140,7 +143,7 @@ export function AnalyticsKpiCards({ kpis }: AnalyticsKpiCardsProps) {
                 <span>{card.trendValue}</span>
               </div>
               <span className="text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
-                {card.trendLabel}
+                VS PREV. PERIOD
               </span>
             </div>
           </div>

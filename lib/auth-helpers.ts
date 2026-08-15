@@ -87,7 +87,18 @@ export async function getCurrentSession(request?: Request | Headers | { headers?
     }
 
     return null;
-  } catch (error) {
+  } catch (error: any) {
+    // If it's a Next.js dynamic bail-out, redirect, or prerender signal, rethrow it
+    if (
+      error?.digest?.startsWith("NEXT_") ||
+      error?.digest?.startsWith("DYNAMIC") ||
+      error?.digest === "HANGING_PROMISE_REJECTION" ||
+      error?.message?.includes("DYNAMIC_SERVER_USAGE") ||
+      error?.message?.includes("prerendering") ||
+      error?.message?.includes("headers()")
+    ) {
+      throw error;
+    }
     console.error("getCurrentSession error:", error);
     return null;
   }

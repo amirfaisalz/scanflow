@@ -42,7 +42,14 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ data: overviewData });
-  } catch (error) {
+  } catch (error: any) {
+    if (
+      error?.digest?.startsWith("NEXT_") ||
+      error?.digest?.startsWith("DYNAMIC") ||
+      error?.message?.includes("prerendering")
+    ) {
+      throw error;
+    }
     console.error("GET /api/analytics/overview error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

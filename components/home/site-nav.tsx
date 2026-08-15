@@ -9,7 +9,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 interface SiteNavProps {
@@ -20,8 +20,20 @@ interface SiteNavProps {
   } | null;
 }
 
-export function SiteNav({ user }: SiteNavProps) {
+export function SiteNav({ user }: SiteNavProps = {}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(Boolean(user));
+
+  useEffect(() => {
+    if (user) {
+      setIsLoggedIn(true);
+    } else if (typeof document !== "undefined") {
+      const hasSession = document.cookie.includes("better-auth.session_token");
+      if (hasSession) {
+        setIsLoggedIn(true);
+      }
+    }
+  }, [user]);
 
   const navLinks = [
     { name: "Features", href: "#features" },
@@ -82,7 +94,7 @@ export function SiteNav({ user }: SiteNavProps) {
             </span>
           </a>
 
-          {user ? (
+          {isLoggedIn ? (
             <Link href="/dashboard">
               <Button
                 size="sm"
@@ -137,7 +149,7 @@ export function SiteNav({ user }: SiteNavProps) {
             ))}
           </nav>
           <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex flex-col gap-2">
-            {!user ? (
+            {!isLoggedIn ? (
               <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                 <Button className="w-full justify-center gap-1.5 bg-fire hover:bg-fire-hover text-white">
                   Create Free QR

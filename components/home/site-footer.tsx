@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ExternalLink, QrCode } from "lucide-react";
 
@@ -55,7 +57,7 @@ export function SiteFooter() {
 
             <div className="hidden sm:block h-3.5 w-px bg-zinc-200 dark:bg-zinc-800" />
 
-            <span>&copy; {new Date().getFullYear()} ScanFlow. All rights reserved.</span>
+            <span>&copy; 2026 ScanFlow. All rights reserved.</span>
           </div>
         </div>
       </div>
