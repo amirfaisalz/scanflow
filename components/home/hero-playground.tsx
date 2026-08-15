@@ -4,10 +4,8 @@ import {
   Activity,
   ArrowRight,
   Check,
-  Code2,
   Copy,
   Download,
-  Flame,
   Globe,
   Laptop,
   Layers,
@@ -15,7 +13,9 @@ import {
   RotateCw,
   Sliders,
   Smartphone,
+  Sparkles,
   Split,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import QRCode from "qrcode";
@@ -347,50 +347,65 @@ main();`;
         <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-12 sm:mb-16">
           {/* Top Pill */}
           <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-4 py-1.5 text-xs sm:text-sm font-semibold text-fire shadow-xs backdrop-blur-sm hover:border-fire/40 transition-colors">
-            <span className="flex size-2 rounded-full bg-fire animate-ping" />
-            <span>The Programmable QR &amp; Traffic Routing Engine</span>
+            <Sparkles className="size-3.5 text-fire" />
+            <span>The Intelligent Dynamic QR &amp; Traffic Routing Platform</span>
             <span className="text-zinc-400 dark:text-zinc-500">|</span>
             <span className="font-mono text-[11px] text-zinc-600 dark:text-zinc-300">
-              Live QR Engine
+              Live Sandbox
             </span>
           </div>
 
           {/* Main Hero Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-zinc-950 dark:text-white leading-[1.18] sm:leading-[1.14] text-balance pb-1">
-            Turn static QR codes into{" "}
+          <h1 className="text-3.5xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-zinc-950 dark:text-white leading-[1.12] sm:leading-[1.10] text-balance pb-1">
+            Smart QR codes that{" "}
             <span className="relative inline-block pt-0.5 pb-1.5 sm:pb-2.5 text-transparent bg-clip-text bg-linear-to-r from-fire via-[#FF6B35] to-fire-hover">
-              programmable entry points
+              route, test, and convert.
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-xl text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto leading-relaxed font-normal mt-4 sm:mt-5">
-            Route scans dynamically by device OS, geo-location, and time of day.
-            Track sub-millisecond edge redirects, visitor journeys, and
-            multi-variant A/B experiments with a single platform.
+          <p className="text-base sm:text-lg md:text-xl text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto leading-relaxed font-normal mt-4 sm:mt-5">
+            Direct visitors dynamically by device (iOS vs Android), location, and time. Change destinations anytime without reprinting, A/B test landing pages, and track full-funnel scan ROI in sub-12ms.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2 w-full sm:w-auto">
-            <Link href="/register" className="w-full sm:w-auto">
+            <Link href="/login" className="w-full sm:w-auto">
               <Button
                 size="lg"
                 className="w-full sm:w-auto h-12 px-7 text-base font-semibold bg-fire hover:bg-fire-hover text-white shadow-lg shadow-fire/25 hover:shadow-xl hover:shadow-fire/30 hover:scale-[1.02] active:scale-[0.98] transition-all gap-2"
               >
-                <span>Start Building Free</span>
+                <span>Create Free Dynamic QR</span>
                 <ArrowRight className="size-4" />
               </Button>
             </Link>
-            <a href="#routing" className="w-full sm:w-auto">
+            <a href="#playground" className="w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="lg"
                 className="w-full sm:w-auto h-12 px-6 text-base font-medium border-zinc-300 dark:border-zinc-700 bg-white/80 dark:bg-zinc-900/80 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all gap-2"
               >
-                <Code2 className="size-4 text-fire" />
-                <span>Explore Smart Routing</span>
+                <Zap className="size-4 text-fire" />
+                <span>Explore Live Sandbox</span>
               </Button>
             </a>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-3 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+            <span className="flex items-center gap-1.5">
+              <Check className="size-3.5 text-emerald-500" />
+              <span>No credit card required</span>
+            </span>
+            <span className="hidden sm:inline text-zinc-300 dark:text-zinc-700">•</span>
+            <span className="flex items-center gap-1.5">
+              <Check className="size-3.5 text-emerald-500" />
+              <span>Instant 60s setup</span>
+            </span>
+            <span className="hidden sm:inline text-zinc-300 dark:text-zinc-700">•</span>
+            <span className="flex items-center gap-1.5">
+              <Check className="size-3.5 text-emerald-500" />
+              <span>Free forever tier</span>
+            </span>
           </div>
         </div>
 
@@ -479,7 +494,7 @@ main();`;
                   </>
                 ) : (
                   <>
-                    <Flame className="size-4 fill-white" />
+                    <Zap className="size-4 fill-current text-white" />
                     <span>Simulate Scan</span>
                   </>
                 )}
@@ -600,7 +615,7 @@ main();`;
                   </div>
                 )}
                 <div className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full bg-fire text-white shadow-sm">
-                  <Flame className="size-3.5 fill-white" />
+                  <Sparkles className="size-3.5 text-white" />
                 </div>
               </div>
 
@@ -710,7 +725,7 @@ main();`;
                 {isLoading ? (
                   <div className="absolute inset-0 bg-[#0D0E11]/90 flex flex-col items-center justify-center space-y-4 z-10">
                     <div className="relative flex size-12 items-center justify-center rounded-xl bg-fire/20 text-fire">
-                      <Flame className="size-6 animate-pulse" />
+                      <Activity className="size-6 animate-pulse text-fire" />
                       <span className="absolute inset-0 rounded-xl border border-fire animate-ping opacity-30" />
                     </div>
                     <div className="text-center space-y-1">

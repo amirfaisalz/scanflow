@@ -3,14 +3,16 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { HeroPlayground } from "@/components/home/hero-playground";
 
 describe("HeroPlayground Component", () => {
-  it("renders hero headline, subtitle, and primary call to action", () => {
+  it("renders high-converting hero headline, subtitle, and primary call to action", () => {
     render(<HeroPlayground user={null} />);
 
     expect(
-      screen.getByRole("heading", { level: 1, name: /programmable entry points/i })
+      screen.getByRole("heading", { level: 1, name: /route, test, and convert/i })
     ).toBeInTheDocument();
-    expect(screen.getByText(/Start Building Free/i)).toBeInTheDocument();
-    expect(screen.getByText(/Live QR Engine/i)).toBeInTheDocument();
+    expect(screen.getByText(/Create Free Dynamic QR/i)).toBeInTheDocument();
+    expect(screen.getByText("Live Sandbox")).toBeInTheDocument();
+    expect(screen.getByText(/Explore Live Sandbox/i)).toBeInTheDocument();
+    expect(screen.getByText(/No credit card required/i)).toBeInTheDocument();
   });
 
   it("allows typing custom destination URL and updates the live configurator", () => {
