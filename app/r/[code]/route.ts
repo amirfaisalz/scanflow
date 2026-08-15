@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { db } from "@/lib/db";
-import { qrCodes, routingRules, sessions, sessionEvents } from "@/lib/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { qrCodes, routingRules, sessions, sessionEvents, experiments } from "@/lib/db/schema";
+import { and, eq, sql } from "drizzle-orm";
 import { parseVisitorContext, evaluateRoutingRules } from "@/lib/routing/engine";
+import { selectExperimentVariant } from "@/lib/experiments/engine";
 
 export async function GET(
   request: NextRequest,
@@ -117,22 +118,66 @@ export async function GET(
       );
     }
 
-    // 4. Active Status: Parse visitor context & evaluate rules
+    // 4. Active Status: Parse visitor context & evaluate experiments / routing rules
     const visitorContext = parseVisitorContext(request.headers);
 
-    const rules = await db.query.routingRules.findMany({
-      where: eq(routingRules.qrCodeId, qrCode.id),
+    // Check for active experiment on this QR code
+    const activeExperiment = await db.query.experiments.findFirst({
+      where: and(
+        eq(experiments.qrCodeId, qrCode.id),
+        eq(experiments.status, "active")
+      ),
+      with: {
+        variants: true,
+      },
     });
 
-    const routingResult = evaluateRoutingRules(
-      visitorContext,
-      rules,
-      qrCode.destinationUrl
-    );
+    let destinationUrl = qrCode.destinationUrl;
+    let matchedRuleId: string | null = null;
+    let conditionMatched: string | null = null;
+    let experimentId: string | null = null;
+    let experimentVariantId: string | null = null;
+
+    if (
+      activeExperiment &&
+      activeExperiment.variants &&
+      activeExperiment.variants.length > 0
+    ) {
+      const cookieVariantId = request.cookies.get(
+        `sf_exp_${activeExperiment.id}`
+      )?.value;
+
+      const { selectedVariant } = selectExperimentVariant(
+        activeExperiment.variants,
+        cookieVariantId,
+        visitorContext.ipHash
+      );
+
+      destinationUrl = selectedVariant.destinationUrl;
+      experimentId = activeExperiment.id;
+      experimentVariantId = selectedVariant.id;
+    } else {
+      // No active experiment -> evaluate standard dynamic routing rules
+      const rules = await db.query.routingRules.findMany({
+        where: eq(routingRules.qrCodeId, qrCode.id),
+      });
+
+      const routingResult = evaluateRoutingRules(
+        visitorContext,
+        rules,
+        qrCode.destinationUrl
+      );
+
+      destinationUrl = routingResult.destinationUrl;
+      matchedRuleId = routingResult.matchedRuleId;
+      conditionMatched = routingResult.conditionMatched || null;
+    }
 
     // 5. Session Identification & Cookie Management
     const existingCookieSid = request.cookies.get("sf_sid")?.value;
-    const sessionId = existingCookieSid || `sess_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`;
+    const sessionId =
+      existingCookieSid ||
+      `sess_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`;
     const isNewSession = !existingCookieSid;
 
     // 6. Asynchronous / Background Ingestion
@@ -143,6 +188,8 @@ export async function GET(
           qrCodeId: qrCode.id,
           userId: qrCode.userId,
           campaignId: qrCode.campaignId || null,
+          experimentId: experimentId || null,
+          experimentVariantId: experimentVariantId || null,
           ipHash: visitorContext.ipHash,
           userAgent: visitorContext.userAgent,
           deviceType: visitorContext.deviceType,
@@ -151,8 +198,8 @@ export async function GET(
           country: visitorContext.country,
           city: visitorContext.city,
           referrer: visitorContext.referrer,
-          matchedRuleId: routingResult.matchedRuleId,
-          initialDestination: routingResult.destinationUrl,
+          matchedRuleId: matchedRuleId || null,
+          initialDestination: destinationUrl,
           startedAt: new Date(),
           endedAt: new Date(),
           durationSeconds: 0,
@@ -176,11 +223,15 @@ export async function GET(
         sessionId,
         qrCodeId: qrCode.id,
         userId: qrCode.userId,
+        experimentId: experimentId || null,
+        experimentVariantId: experimentVariantId || null,
         eventType: "QR_SCAN",
         eventData: {
-          destinationUrl: routingResult.destinationUrl,
-          matchedRuleId: routingResult.matchedRuleId,
-          conditionMatched: routingResult.conditionMatched || null,
+          destinationUrl,
+          matchedRuleId: matchedRuleId || null,
+          conditionMatched: conditionMatched || null,
+          experimentId: experimentId || null,
+          experimentVariantId: experimentVariantId || null,
           device: visitorContext.deviceType,
           os: visitorContext.os,
           browser: visitorContext.browser,
@@ -202,8 +253,8 @@ export async function GET(
       console.error("Scan ingestion non-blocking error:", err);
     }
 
-    // 7. Return 307 Temporary Redirect with Session Cookie
-    const response = NextResponse.redirect(routingResult.destinationUrl, {
+    // 7. Return 307 Temporary Redirect with Session Cookie & Sticky Experiment Cookie
+    const response = NextResponse.redirect(destinationUrl, {
       status: 307,
     });
 
@@ -213,6 +264,15 @@ export async function GET(
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 30, // 30 days
     });
+
+    if (experimentId && experimentVariantId) {
+      response.cookies.set(`sf_exp_${experimentId}`, experimentVariantId, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+    }
 
     return response;
   } catch (error) {

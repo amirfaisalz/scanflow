@@ -8,6 +8,7 @@ vi.mock("@/lib/db", () => ({
     query: {
       qrCodes: { findFirst: vi.fn() },
       routingRules: { findMany: vi.fn() },
+      experiments: { findFirst: vi.fn() },
       sessions: { findFirst: vi.fn() },
     },
     insert: vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue([]) }),
@@ -22,6 +23,7 @@ vi.mock("@/lib/db", () => ({
 describe("GET /r/[code] Redirect Route", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (db.query.experiments.findFirst as any).mockResolvedValue(null);
   });
 
   it("should return 404 HTML/Response when QR code is not found", async () => {
@@ -128,5 +130,137 @@ describe("GET /r/[code] Redirect Route", () => {
     expect(res.status).toBe(307);
     expect(res.headers.get("location")).toBe("https://restaurant.com/menu");
     expect(res.headers.get("set-cookie")).toContain("sf_sid=existing_session_xyz123");
+  });
+
+  it("should route to experiment variant and set sticky cookie when active experiment exists", async () => {
+    (db.query.qrCodes.findFirst as any).mockResolvedValue({
+      id: "qr-ab",
+      userId: "user-1",
+      campaignId: "camp-1",
+      slug: "ab-landing",
+      name: "A/B Test Campaign",
+      destinationUrl: "https://example.com/original",
+      status: "active",
+      scanCount: 0,
+    });
+
+    (db.query.experiments.findFirst as any).mockResolvedValue({
+      id: "exp-1",
+      qrCodeId: "qr-ab",
+      status: "active",
+      variants: [
+        {
+          id: "var-control",
+          name: "Control A",
+          destinationUrl: "https://example.com/variant-a",
+          trafficWeight: 100,
+          isControl: true,
+        },
+        {
+          id: "var-b",
+          name: "Variant B",
+          destinationUrl: "https://example.com/variant-b",
+          trafficWeight: 0,
+          isControl: false,
+        },
+      ],
+    });
+
+    const insertValuesSpy = vi.fn().mockResolvedValue([]);
+    (db.insert as any).mockReturnValue({ values: insertValuesSpy });
+
+    const req = new NextRequest("http://localhost:3000/r/ab-landing", {
+      headers: {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      },
+    });
+
+    const res = await GET(req, { params: Promise.resolve({ code: "ab-landing" }) });
+
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("https://example.com/variant-a");
+    expect(res.headers.get("set-cookie")).toContain("sf_exp_exp-1=var-control");
+
+    // Verify sessions insert received experimentId and experimentVariantId
+    expect(insertValuesSpy).toHaveBeenCalled();
+    const sessionInsertCall = insertValuesSpy.mock.calls[0][0];
+    expect(sessionInsertCall.experimentId).toBe("exp-1");
+    expect(sessionInsertCall.experimentVariantId).toBe("var-control");
+  });
+
+  it("should honor sticky cookie sf_exp_<experimentId> for returning visitors", async () => {
+    (db.query.qrCodes.findFirst as any).mockResolvedValue({
+      id: "qr-ab",
+      userId: "user-1",
+      slug: "ab-landing",
+      name: "A/B Test Campaign",
+      destinationUrl: "https://example.com/original",
+      status: "active",
+      scanCount: 5,
+    });
+
+    (db.query.experiments.findFirst as any).mockResolvedValue({
+      id: "exp-1",
+      qrCodeId: "qr-ab",
+      status: "active",
+      variants: [
+        {
+          id: "var-control",
+          name: "Control A",
+          destinationUrl: "https://example.com/variant-a",
+          trafficWeight: 100,
+          isControl: true,
+        },
+        {
+          id: "var-b",
+          name: "Variant B",
+          destinationUrl: "https://example.com/variant-b",
+          trafficWeight: 0,
+          isControl: false,
+        },
+      ],
+    });
+
+    const insertValuesSpy = vi.fn().mockResolvedValue([]);
+    (db.insert as any).mockReturnValue({ values: insertValuesSpy });
+
+    const req = new NextRequest("http://localhost:3000/r/ab-landing", {
+      headers: {
+        cookie: "sf_exp_exp-1=var-b",
+      },
+    });
+
+    const res = await GET(req, { params: Promise.resolve({ code: "ab-landing" }) });
+
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("https://example.com/variant-b");
+    expect(res.headers.get("set-cookie")).toContain("sf_exp_exp-1=var-b");
+
+    const sessionInsertCall = insertValuesSpy.mock.calls[0][0];
+    expect(sessionInsertCall.experimentId).toBe("exp-1");
+    expect(sessionInsertCall.experimentVariantId).toBe("var-b");
+  });
+
+  it("should fallback to routing rules if experiment is paused or has no variants", async () => {
+    (db.query.qrCodes.findFirst as any).mockResolvedValue({
+      id: "qr-ab",
+      userId: "user-1",
+      slug: "ab-landing",
+      name: "A/B Test Campaign",
+      destinationUrl: "https://example.com/original",
+      status: "active",
+      scanCount: 5,
+    });
+
+    // Experiment query returns null (e.g. paused or no active experiment)
+    (db.query.experiments.findFirst as any).mockResolvedValue(null);
+    (db.query.routingRules.findMany as any).mockResolvedValue([]);
+
+    const req = new NextRequest("http://localhost:3000/r/ab-landing");
+    const res = await GET(req, { params: Promise.resolve({ code: "ab-landing" }) });
+
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("https://example.com/original");
+    expect(res.headers.get("set-cookie")).not.toContain("sf_exp_");
   });
 });

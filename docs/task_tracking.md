@@ -8,9 +8,9 @@ This document tracks the implementation progress of all features outlined in [do
 
 | Phase | Total Features | Completed | In Progress | Pending |
 | :--- | :---: | :---: | :---: | :---: |
-| **Phase 1 (MVP)** | 12 | 11 | 0 | 1 |
+| **Phase 1 (MVP)** | 12 | 12 | 0 | 0 |
 | **Phase 2 (Advanced)** | 13 | 0 | 0 | 13 |
-| **Total** | **25** | **11** | **0** | **14** |
+| **Total** | **25** | **12** | **0** | **13** |
 
 ---
 
@@ -153,11 +153,16 @@ This document tracks the implementation progress of all features outlined in [do
 ---
 
 ### 12. A/B Testing Engine
-- **Status**: ⚪ Pending
+- **Status**: 🟢 Completed
 - **Tasks**:
-  - [ ] Traffic split configuration (e.g., 50/50 Variant A vs Variant B)
-  - [ ] Variant assignment & persistence
-  - [ ] Statistical comparison & winner determination
+  - [x] Database tables `experiments` and `experiment_variants` with PostgreSQL schema relations (`lib/db/schema.ts`)
+  - [x] A/B Testing split assignment and statistical significance calculation engine (`lib/experiments/engine.ts`)
+  - [x] QR redirect engine integration with sticky visitor cookies (`sf_exp_<id>`) and variant routing (`app/r/[code]/route.ts`)
+  - [x] Multi-tenant REST API endpoints (`app/api/experiments/route.ts` & `app/api/experiments/[id]/route.ts`)
+  - [x] Real-time conversion rate, conversion lift percentage ($((B - A)/A) * 100$), and Chi-Square $p$-value statistical confidence calculations
+  - [x] Dedicated A/B Testing Dashboard page (`app/dashboard/experiments/page.tsx`) with search, status filters, and KPI cards
+  - [x] Interactive Experiment Cards & experiment creation/editing dialogs with split weight presets (`components/experiments/experiment-card.tsx`, `components/experiments/experiment-dialog.tsx`)
+  - [x] Comprehensive test suites with 100% pass rate (`tests/unit/schema.test.ts`, `tests/unit/experiments-engine.test.ts`, `tests/unit/redirect.test.ts`, `tests/unit/experiments-api.test.ts`, `tests/unit/experiments-components.test.tsx`, `tests/unit/experiments-page.test.tsx`)
 
 ---
 

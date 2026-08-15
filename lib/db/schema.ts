@@ -106,6 +106,42 @@ export const routingRules = pgTable("routing_rules", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const experiments = pgTable("experiments", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  qrCodeId: text("qr_code_id")
+    .notNull()
+    .references(() => qrCodes.id, { onDelete: "cascade" }),
+  campaignId: text("campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  status: text("status").default("draft").notNull(), // 'draft', 'active', 'paused', 'ended'
+  trafficAllocation: integer("traffic_allocation").default(100).notNull(), // % of total traffic in test (1-100)
+  winnerVariantId: text("winner_variant_id"),
+  startedAt: timestamp("started_at"),
+  endedAt: timestamp("ended_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const experimentVariants = pgTable("experiment_variants", {
+  id: text("id").primaryKey(),
+  experimentId: text("experiment_id")
+    .notNull()
+    .references(() => experiments.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  destinationUrl: text("destination_url").notNull(),
+  trafficWeight: integer("traffic_weight").default(50).notNull(),
+  isControl: boolean("is_control").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),
   qrCodeId: text("qr_code_id")
@@ -115,6 +151,8 @@ export const sessions = pgTable("sessions", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   campaignId: text("campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
+  experimentId: text("experiment_id").references(() => experiments.id, { onDelete: "set null" }),
+  experimentVariantId: text("experiment_variant_id").references(() => experimentVariants.id, { onDelete: "set null" }),
   ipHash: text("ip_hash").notNull(), // SHA-256 anonymized hash
   userAgent: text("user_agent"),
   deviceType: text("device_type").notNull(), // 'mobile', 'tablet', 'desktop', 'bot', 'other'
@@ -146,6 +184,8 @@ export const sessionEvents = pgTable("session_events", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  experimentId: text("experiment_id").references(() => experiments.id, { onDelete: "set null" }),
+  experimentVariantId: text("experiment_variant_id").references(() => experimentVariants.id, { onDelete: "set null" }),
   eventType: text("event_type").notNull(), // 'QR_SCAN', 'PAGE_VIEW', 'BUTTON_CLICK', 'LINK_CLICK', 'FORM_SUBMIT', 'CONVERSION', 'EXTERNAL_REDIRECT'
   eventData: jsonb("event_data").$type<Record<string, unknown>>(),
   timestamp: timestamp("timestamp").defaultNow().notNull(),
@@ -182,6 +222,8 @@ export const userRelations = relations(user, ({ many }) => ({
   visitorSessions: many(sessions),
   sessionEvents: many(sessionEvents),
   conversionGoals: many(conversionGoals),
+  experiments: many(experiments),
+  experimentVariants: many(experimentVariants),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -206,6 +248,7 @@ export const campaignsRelations = relations(campaigns, ({ one, many }) => ({
   qrCodes: many(qrCodes),
   sessions: many(sessions),
   conversionGoals: many(conversionGoals),
+  experiments: many(experiments),
 }));
 
 export const qrCodesRelations = relations(qrCodes, ({ one, many }) => ({
@@ -221,6 +264,7 @@ export const qrCodesRelations = relations(qrCodes, ({ one, many }) => ({
   sessions: many(sessions),
   sessionEvents: many(sessionEvents),
   conversionGoals: many(conversionGoals),
+  experiments: many(experiments),
 }));
 
 export const routingRulesRelations = relations(routingRules, ({ one }) => ({
@@ -232,6 +276,41 @@ export const routingRulesRelations = relations(routingRules, ({ one }) => ({
     fields: [routingRules.userId],
     references: [user.id],
   }),
+}));
+
+export const experimentsRelations = relations(experiments, ({ one, many }) => ({
+  user: one(user, {
+    fields: [experiments.userId],
+    references: [user.id],
+  }),
+  qrCode: one(qrCodes, {
+    fields: [experiments.qrCodeId],
+    references: [qrCodes.id],
+  }),
+  campaign: one(campaigns, {
+    fields: [experiments.campaignId],
+    references: [campaigns.id],
+  }),
+  winnerVariant: one(experimentVariants, {
+    fields: [experiments.winnerVariantId],
+    references: [experimentVariants.id],
+  }),
+  variants: many(experimentVariants),
+  sessions: many(sessions),
+  sessionEvents: many(sessionEvents),
+}));
+
+export const experimentVariantsRelations = relations(experimentVariants, ({ one, many }) => ({
+  experiment: one(experiments, {
+    fields: [experimentVariants.experimentId],
+    references: [experiments.id],
+  }),
+  user: one(user, {
+    fields: [experimentVariants.userId],
+    references: [user.id],
+  }),
+  sessions: many(sessions),
+  sessionEvents: many(sessionEvents),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one, many }) => ({
@@ -251,6 +330,14 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
     fields: [sessions.matchedRuleId],
     references: [routingRules.id],
   }),
+  experiment: one(experiments, {
+    fields: [sessions.experimentId],
+    references: [experiments.id],
+  }),
+  experimentVariant: one(experimentVariants, {
+    fields: [sessions.experimentVariantId],
+    references: [experimentVariants.id],
+  }),
   events: many(sessionEvents),
 }));
 
@@ -266,6 +353,14 @@ export const sessionEventsRelations = relations(sessionEvents, ({ one }) => ({
   user: one(user, {
     fields: [sessionEvents.userId],
     references: [user.id],
+  }),
+  experiment: one(experiments, {
+    fields: [sessionEvents.experimentId],
+    references: [experiments.id],
+  }),
+  experimentVariant: one(experimentVariants, {
+    fields: [sessionEvents.experimentVariantId],
+    references: [experimentVariants.id],
   }),
 }));
 
@@ -300,5 +395,9 @@ export type SessionEvent = typeof sessionEvents.$inferSelect;
 export type NewSessionEvent = typeof sessionEvents.$inferInsert;
 export type ConversionGoal = typeof conversionGoals.$inferSelect;
 export type NewConversionGoal = typeof conversionGoals.$inferInsert;
+export type Experiment = typeof experiments.$inferSelect;
+export type NewExperiment = typeof experiments.$inferInsert;
+export type ExperimentVariant = typeof experimentVariants.$inferSelect;
+export type NewExperimentVariant = typeof experimentVariants.$inferInsert;
 
 
