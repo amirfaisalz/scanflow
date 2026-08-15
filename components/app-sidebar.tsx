@@ -97,7 +97,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
               className="data-[slot=sidebar-menu-button]:p-2 hover:bg-sidebar-accent"
               render={<Link href="/dashboard" />}
             >
-              <div className="size-8 rounded-lg bg-gradient-to-br from-[#FA5D29] to-[#E04818] text-white flex items-center justify-center shadow-xs">
+              <div className="size-8 rounded-lg bg-linear-to-br from-fire to-fire-hover text-white flex items-center justify-center shadow-xs">
                 <QrCode className="size-4 text-white" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">

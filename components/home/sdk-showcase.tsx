@@ -144,7 +144,7 @@ export function SdkShowcase() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/25 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 px-3.5 py-1 text-xs font-semibold text-[#FA5D29] mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
             <Code2 className="size-3.5" />
             <span>Developer First</span>
           </div>
@@ -167,11 +167,10 @@ export function SdkShowcase() {
                   key={lang}
                   type="button"
                   onClick={() => setActiveLang(lang)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    activeLang === lang
-                      ? "bg-[#FA5D29] text-white font-semibold"
-                      : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${activeLang === lang
+                    ? "bg-fire text-white font-semibold"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"
+                    }`}
                 >
                   {SDK_SNIPPETS[lang].title}
                 </button>
@@ -199,8 +198,8 @@ export function SdkShowcase() {
           </div>
 
           {/* Code Body */}
-          <div className="p-5 sm:p-6 overflow-x-auto code-scroll leading-relaxed min-h-[300px]">
-            <pre className="text-zinc-200 font-mono text-xs sm:text-[13px] whitespace-pre selection:bg-[#FA5D29]/30">
+          <div className="p-5 sm:p-6 overflow-x-auto code-scroll leading-relaxed min-h-75">
+            <pre className="text-zinc-200 font-mono text-xs sm:text-[13px] whitespace-pre selection:bg-fire/30">
               {current.code}
             </pre>
           </div>

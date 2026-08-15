@@ -57,7 +57,7 @@ const PRESET_CAMPAIGNS = [
   },
 ];
 
-export function HeroPlayground({}: HeroPlaygroundProps = {}) {
+export function HeroPlayground({ }: HeroPlaygroundProps = {}) {
   const [activeMode, setActiveMode] = useState<ModeType>("routing");
   const [targetUrl, setTargetUrl] = useState(
     "https://scanflow.dev/r/mobile-app",
@@ -328,7 +328,7 @@ main();`;
 
   const colorPalette = [
     { name: "Obsidian", value: "#09090b", bg: "bg-zinc-900" },
-    { name: "Fiery Orange", value: "#FA5D29", bg: "bg-[#FA5D29]" },
+    { name: "Fiery Orange", value: "#FA5D29", bg: "bg-fire" },
     { name: "Indigo Tech", value: "#4f46e5", bg: "bg-indigo-600" },
     { name: "Emerald Pro", value: "#059669", bg: "bg-emerald-600" },
   ];
@@ -339,15 +339,15 @@ main();`;
       className="relative pt-8 pb-20 sm:pt-14 sm:pb-28 overflow-hidden bg-dot-pattern"
     >
       {/* Background ambient fiery glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] sm:w-[1000px] h-[400px] bg-gradient-to-b from-[#FA5D29]/15 via-[#FA5D29]/5 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute top-1/3 right-1/4 w-[350px] h-[350px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-162.5 sm:w-250 h-100 bg-linear-to-b from-fire/15 via-fire/5 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/3 right-1/4 w-87.5 h-87.5 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         {/* Top Hero Text */}
         <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto mb-12 sm:mb-16">
           {/* Top Pill */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/25 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 px-4 py-1.5 text-xs sm:text-sm font-semibold text-[#FA5D29] shadow-xs backdrop-blur-sm hover:border-[#FA5D29]/40 transition-colors">
-            <span className="flex size-2 rounded-full bg-[#FA5D29] animate-ping" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-4 py-1.5 text-xs sm:text-sm font-semibold text-fire shadow-xs backdrop-blur-sm hover:border-fire/40 transition-colors">
+            <span className="flex size-2 rounded-full bg-fire animate-ping" />
             <span>The Programmable QR &amp; Traffic Routing Engine</span>
             <span className="text-zinc-400 dark:text-zinc-500">|</span>
             <span className="font-mono text-[11px] text-zinc-600 dark:text-zinc-300">
@@ -358,7 +358,7 @@ main();`;
           {/* Main Hero Headline */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-zinc-950 dark:text-white leading-[1.18] sm:leading-[1.14] text-balance pb-1">
             Turn static QR codes into{" "}
-            <span className="relative inline-block pt-0.5 pb-1.5 sm:pb-2.5 text-transparent bg-clip-text bg-gradient-to-r from-[#FA5D29] via-[#FF6B35] to-[#E04818]">
+            <span className="relative inline-block pt-0.5 pb-1.5 sm:pb-2.5 text-transparent bg-clip-text bg-linear-to-r from-fire via-[#FF6B35] to-fire-hover">
               programmable entry points
             </span>
           </h1>
@@ -375,7 +375,7 @@ main();`;
             <Link href="/register" className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="w-full sm:w-auto h-12 px-7 text-base font-semibold bg-[#FA5D29] hover:bg-[#E04818] text-white shadow-lg shadow-[#FA5D29]/25 hover:shadow-xl hover:shadow-[#FA5D29]/30 hover:scale-[1.02] active:scale-[0.98] transition-all gap-2"
+                className="w-full sm:w-auto h-12 px-7 text-base font-semibold bg-fire hover:bg-fire-hover text-white shadow-lg shadow-fire/25 hover:shadow-xl hover:shadow-fire/30 hover:scale-[1.02] active:scale-[0.98] transition-all gap-2"
               >
                 <span>Start Building Free</span>
                 <ArrowRight className="size-4" />
@@ -387,7 +387,7 @@ main();`;
                 size="lg"
                 className="w-full sm:w-auto h-12 px-6 text-base font-medium border-zinc-300 dark:border-zinc-700 bg-white/80 dark:bg-zinc-900/80 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all gap-2"
               >
-                <Code2 className="size-4 text-[#FA5D29]" />
+                <Code2 className="size-4 text-fire" />
                 <span>Explore Smart Routing</span>
               </Button>
             </a>
@@ -433,7 +433,7 @@ main();`;
                     type="button"
                     onClick={() => setActiveMode(mode.id)}
                     className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${isActive
-                      ? "bg-[#FA5D29] text-white shadow-sm shadow-[#FA5D29]/20"
+                      ? "bg-fire text-white shadow-sm shadow-fire/20"
                       : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-zinc-800"
                       }`}
                   >
@@ -463,14 +463,14 @@ main();`;
                   value={targetUrl}
                   onChange={(e) => setTargetUrl(e.target.value)}
                   placeholder="Enter target URL or campaign slug..."
-                  className="pl-9 h-11 text-sm font-mono bg-zinc-50/80 dark:bg-zinc-900/80 border-zinc-300 dark:border-zinc-700 focus-visible:ring-[#FA5D29]"
+                  className="pl-9 h-11 text-sm font-mono bg-zinc-50/80 dark:bg-zinc-900/80 border-zinc-300 dark:border-zinc-700 focus-visible:ring-fire"
                 />
               </div>
               <Button
                 type="button"
                 onClick={() => handleSimulateScan(selectedDevice)}
                 disabled={isLoading}
-                className="h-11 px-6 font-semibold bg-[#FA5D29] hover:bg-[#E04818] text-white shadow-md shadow-[#FA5D29]/20 transition-all gap-2 whitespace-nowrap"
+                className="h-11 px-6 font-semibold bg-fire hover:bg-fire-hover text-white shadow-md shadow-fire/20 transition-all gap-2 whitespace-nowrap"
               >
                 {isLoading ? (
                   <>
@@ -500,7 +500,7 @@ main();`;
                     setActiveMode(preset.mode);
                   }}
                   className={`text-xs px-2.5 py-1 rounded-md border font-mono transition-colors ${targetUrl === preset.url
-                    ? "border-[#FA5D29]/40 bg-[#FA5D29]/10 text-[#FA5D29] font-medium"
+                    ? "border-fire/40 bg-fire/10 text-fire font-medium"
                     : "border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-white"
                     }`}
                 >
@@ -511,7 +511,7 @@ main();`;
 
             {/* If A/B mode is selected, show split pill indicator */}
             {activeMode === "ab" && (
-              <div className="flex items-center gap-2 text-xs font-mono text-[#FA5D29] bg-[#FA5D29]/10 p-2 rounded-lg border border-[#FA5D29]/20">
+              <div className="flex items-center gap-2 text-xs font-mono text-fire bg-fire/10 p-2 rounded-lg border border-fire/20">
                 <Split className="size-3.5" />
                 <span className="font-semibold">
                   50% / 50% Traffic Allocation Active
@@ -529,7 +529,7 @@ main();`;
                     type="button"
                     onClick={() => handleSimulateScan("ios")}
                     className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${selectedDevice === "ios"
-                      ? "bg-[#FA5D29] text-white font-semibold"
+                      ? "bg-fire text-white font-semibold"
                       : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                       }`}
                   >
@@ -540,7 +540,7 @@ main();`;
                     type="button"
                     onClick={() => handleSimulateScan("android")}
                     className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${selectedDevice === "android"
-                      ? "bg-[#FA5D29] text-white font-semibold"
+                      ? "bg-fire text-white font-semibold"
                       : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                       }`}
                   >
@@ -551,7 +551,7 @@ main();`;
                     type="button"
                     onClick={() => handleSimulateScan("desktop")}
                     className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${selectedDevice === "desktop"
-                      ? "bg-[#FA5D29] text-white font-semibold"
+                      ? "bg-fire text-white font-semibold"
                       : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                       }`}
                   >
@@ -571,7 +571,7 @@ main();`;
                       type="button"
                       onClick={() => setQrColor(c.value)}
                       className={`size-5 rounded-full ${c.bg} transition-transform ${qrColor === c.value
-                        ? "ring-2 ring-[#FA5D29] ring-offset-2 scale-110"
+                        ? "ring-2 ring-fire ring-offset-2 scale-110"
                         : "hover:scale-105 opacity-80"
                         }`}
                       title={c.name}
@@ -599,7 +599,7 @@ main();`;
                     <RotateCw className="size-6 animate-spin text-zinc-400" />
                   </div>
                 )}
-                <div className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full bg-[#FA5D29] text-white shadow-sm">
+                <div className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full bg-fire text-white shadow-sm">
                   <Flame className="size-3.5 fill-white" />
                 </div>
               </div>
@@ -609,7 +609,7 @@ main();`;
                   <span className="size-2 rounded-full bg-emerald-400" />
                   <span>Dynamic Edge Endpoint</span>
                 </div>
-                <div className="text-[11px] text-zinc-400 font-mono break-all max-w-[200px]">
+                <div className="text-[11px] text-zinc-400 font-mono break-all max-w-50">
                   {targetUrl}
                 </div>
               </div>
@@ -619,7 +619,7 @@ main();`;
                 <a
                   href={qrDataUrl}
                   download="scanflow-qr.png"
-                  className="inline-flex items-center gap-1.5 text-xs text-[#FA5D29] hover:text-[#FF8C42] transition-colors font-sans font-medium"
+                  className="inline-flex items-center gap-1.5 text-xs text-fire hover:text-[#FF8C42] transition-colors font-sans font-medium"
                 >
                   <Download className="size-3.5" />
                   <span>Download High-Res PNG</span>
@@ -643,7 +643,7 @@ main();`;
                       type="button"
                       onClick={() => setOutputView("trace")}
                       className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors ${outputView === "trace"
-                        ? "bg-[#FA5D29] text-white"
+                        ? "bg-fire text-white"
                         : "text-zinc-400 hover:text-zinc-200"
                         }`}
                     >
@@ -653,7 +653,7 @@ main();`;
                       type="button"
                       onClick={() => setOutputView("json")}
                       className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors ${outputView === "json"
-                        ? "bg-[#FA5D29] text-white"
+                        ? "bg-fire text-white"
                         : "text-zinc-400 hover:text-zinc-200"
                         }`}
                     >
@@ -663,7 +663,7 @@ main();`;
                       type="button"
                       onClick={() => setOutputView("code")}
                       className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors ${outputView === "code"
-                        ? "bg-[#FA5D29] text-white"
+                        ? "bg-fire text-white"
                         : "text-zinc-400 hover:text-zinc-200"
                         }`}
                     >
@@ -706,12 +706,12 @@ main();`;
               </div>
 
               {/* Terminal Body */}
-              <div className="relative p-4 sm:p-5 min-h-[300px] max-h-[380px] overflow-y-auto code-scroll leading-relaxed">
+              <div className="relative p-4 sm:p-5 min-h-75 max-h-95 overflow-y-auto code-scroll leading-relaxed">
                 {isLoading ? (
                   <div className="absolute inset-0 bg-[#0D0E11]/90 flex flex-col items-center justify-center space-y-4 z-10">
-                    <div className="relative flex size-12 items-center justify-center rounded-xl bg-[#FA5D29]/20 text-[#FA5D29]">
+                    <div className="relative flex size-12 items-center justify-center rounded-xl bg-fire/20 text-fire">
                       <Flame className="size-6 animate-pulse" />
-                      <span className="absolute inset-0 rounded-xl border border-[#FA5D29] animate-ping opacity-30" />
+                      <span className="absolute inset-0 rounded-xl border border-fire animate-ping opacity-30" />
                     </div>
                     <div className="text-center space-y-1">
                       <p className="text-sm font-medium text-white">
@@ -723,7 +723,7 @@ main();`;
                     </div>
                   </div>
                 ) : (
-                  <pre className="text-zinc-200 text-xs sm:text-[13px] font-mono whitespace-pre-wrap selection:bg-[#FA5D29]/30">
+                  <pre className="text-zinc-200 text-xs sm:text-[13px] font-mono whitespace-pre-wrap selection:bg-fire/30">
                     {getOutputContent()}
                   </pre>
                 )}

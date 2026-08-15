@@ -48,7 +48,7 @@ export function FAQSection() {
       <div className="container mx-auto max-w-4xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/25 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 px-3.5 py-1 text-xs font-semibold text-[#FA5D29] mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
             <HelpCircle className="size-3.5" />
             <span>Frequently Asked Questions</span>
           </div>
@@ -67,11 +67,10 @@ export function FAQSection() {
             return (
               <div
                 key={faq.question}
-                className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
-                  isOpen
-                    ? "border-[#FA5D29]/40 bg-zinc-50/80 dark:bg-zinc-900/70 shadow-md"
+                className={`rounded-2xl border transition-all duration-200 overflow-hidden ${isOpen
+                    ? "border-fire/40 bg-zinc-50/80 dark:bg-zinc-900/70 shadow-md"
                     : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-700"
-                }`}
+                  }`}
               >
                 <button
                   type="button"
@@ -80,9 +79,8 @@ export function FAQSection() {
                 >
                   <span>{faq.question}</span>
                   <div
-                    className={`size-7 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ${
-                      isOpen ? "rotate-180 bg-[#FA5D29]/10 text-[#FA5D29]" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
-                    }`}
+                    className={`size-7 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180 bg-fire/10 text-fire" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
+                      }`}
                   >
                     <ChevronDown className="size-4" />
                   </div>

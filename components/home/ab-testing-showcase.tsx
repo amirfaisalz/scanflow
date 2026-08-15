@@ -14,7 +14,7 @@ export function ABTestingShowcase() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/25 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 px-3.5 py-1 text-xs font-semibold text-[#FA5D29] mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
             <Split className="size-3.5" />
             <span>A/B Traffic Splitting</span>
           </div>
@@ -32,7 +32,7 @@ export function ABTestingShowcase() {
           <div className="mb-8 space-y-3 bg-white dark:bg-zinc-950 p-5 rounded-xl border border-zinc-200 dark:border-zinc-800">
             <div className="flex items-center justify-between text-xs sm:text-sm font-semibold">
               <span className="text-zinc-700 dark:text-zinc-300">Traffic Distribution:</span>
-              <span className="font-mono text-[#FA5D29]">
+              <span className="font-mono text-fire">
                 Variant A: {splitRatio}% | Variant B: {100 - splitRatio}%
               </span>
             </div>
@@ -42,7 +42,7 @@ export function ABTestingShowcase() {
               max="90"
               value={splitRatio}
               onChange={(e) => setSplitRatio(Number(e.target.value))}
-              className="w-full accent-[#FA5D29] cursor-pointer"
+              className="w-full accent-fire cursor-pointer"
             />
           </div>
 
@@ -69,13 +69,13 @@ export function ABTestingShowcase() {
             </div>
 
             {/* Variant B (Winner) */}
-            <div className="rounded-xl border border-[#FA5D29]/40 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 p-6 space-y-4 relative">
+            <div className="rounded-xl border border-fire/40 bg-fire/5 dark:bg-fire/10 p-6 space-y-4 relative">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#FA5D29]">
+                <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-fire">
                   <Trophy className="size-3.5 text-amber-500 fill-amber-500" />
                   <span>VARIANT B (WINNER)</span>
                 </div>
-                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#FA5D29] text-white">
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-fire text-white">
                   {100 - splitRatio}% Traffic
                 </span>
               </div>
@@ -85,7 +85,7 @@ export function ABTestingShowcase() {
               <p className="text-xs text-zinc-500 leading-relaxed font-mono">
                 https://scanflow.dev/landing-v2-video
               </p>
-              <div className="pt-2 border-t border-[#FA5D29]/20 flex items-center justify-between text-xs">
+              <div className="pt-2 border-t border-fire/20 flex items-center justify-between text-xs">
                 <span className="text-zinc-600 dark:text-zinc-400">Conversion Rate:</span>
                 <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                   7.8% (+143% Lift)

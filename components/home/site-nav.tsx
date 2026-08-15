@@ -32,7 +32,7 @@ export function SiteNav({ user }: SiteNavProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-950/60 transition-colors">
+    <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md supports-backdrop-filter:bg-white/60 dark:supports-backdrop-filter:bg-zinc-950/60 transition-colors">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         {/* Brand Logo */}
         <div className="flex items-center gap-8">
@@ -41,9 +41,9 @@ export function SiteNav({ user }: SiteNavProps) {
             className="group flex items-center gap-2.5 font-bold tracking-tight"
           >
             {/* Custom Fiery Gradient QR Logo Emblem */}
-            <div className="relative flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#FA5D29] via-[#FF6A3D] to-[#E04818] text-white shadow-md shadow-[#FA5D29]/25 transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-[#FA5D29]/35">
+            <div className="relative flex size-9 items-center justify-center rounded-xl bg-linear-to-br from-fire via-[#FF6A3D] to-fire-hover text-white shadow-md shadow-fire/25 transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-fire/35">
               <QrCode className="size-5 text-white" />
-              <div className="absolute -inset-0.5 rounded-xl bg-[#FA5D29]/30 blur-xs -z-10 opacity-70 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute -inset-0.5 rounded-xl bg-fire/30 blur-xs -z-10 opacity-70 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 font-sans">
@@ -86,7 +86,7 @@ export function SiteNav({ user }: SiteNavProps) {
             <Link href="/dashboard">
               <Button
                 size="sm"
-                className="font-medium gap-1.5 bg-[#FA5D29] hover:bg-[#E04818] text-white shadow-sm shadow-[#FA5D29]/20"
+                className="font-medium gap-1.5 bg-fire hover:bg-fire-hover text-white shadow-sm shadow-fire/20"
               >
                 <LayoutDashboard className="size-4" />
                 <span>Go to Dashboard</span>
@@ -107,7 +107,7 @@ export function SiteNav({ user }: SiteNavProps) {
               <Link href="/register">
                 <Button
                   size="sm"
-                  className="font-semibold gap-1.5 bg-[#FA5D29] hover:bg-[#E04818] text-white shadow-md shadow-[#FA5D29]/25 hover:scale-[1.02] active:scale-[0.98] transition-all px-4"
+                  className="font-semibold gap-1.5 bg-fire hover:bg-fire-hover text-white shadow-md shadow-fire/25 hover:scale-[1.02] active:scale-[0.98] transition-all px-4"
                 >
                   <span>Get Started</span>
                   <ArrowRight className="size-3.5" />
@@ -156,7 +156,7 @@ export function SiteNav({ user }: SiteNavProps) {
                   </Button>
                 </Link>
                 <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full justify-center gap-1.5 bg-[#FA5D29] hover:bg-[#E04818] text-white">
+                  <Button className="w-full justify-center gap-1.5 bg-fire hover:bg-fire-hover text-white">
                     Start for Free
                     <ArrowRight className="size-4" />
                   </Button>
@@ -164,7 +164,7 @@ export function SiteNav({ user }: SiteNavProps) {
               </>
             ) : (
               <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="w-full justify-center gap-1.5 bg-[#FA5D29] hover:bg-[#E04818] text-white">
+                <Button className="w-full justify-center gap-1.5 bg-fire hover:bg-fire-hover text-white">
                   <LayoutDashboard className="size-4" />
                   Go to Dashboard
                 </Button>

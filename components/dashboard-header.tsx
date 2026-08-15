@@ -50,12 +50,12 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         {/* Brand */}
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="flex items-center gap-2.5 font-bold text-lg tracking-tight">
-            <div className="size-8 rounded-lg bg-gradient-to-br from-[#FA5D29] to-[#E04818] text-white flex items-center justify-center shadow-sm">
+            <div className="size-8 rounded-lg bg-linear-to-br from-fire to-fire-hover text-white flex items-center justify-center shadow-sm">
               <QrCode className="size-4 text-white" />
             </div>
             <span>ScanFlow</span>
@@ -70,11 +70,10 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-secondary text-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive
+                    ? "bg-secondary text-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
                 >
                   <Icon className="size-4" />
                   {item.label}
@@ -93,7 +92,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             </div>
             <div className="hidden sm:flex flex-col text-left">
               <span className="font-medium text-foreground leading-tight">{user.name}</span>
-              <span className="text-[10px] text-muted-foreground truncate max-w-[140px]">{user.email}</span>
+              <span className="text-[10px] text-muted-foreground truncate max-w-35">{user.email}</span>
             </div>
             <div title="Multi-tenant Isolated Workspace">
               <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-400 ml-1" />

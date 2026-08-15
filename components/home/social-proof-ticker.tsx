@@ -28,7 +28,7 @@ export function SocialProofTicker() {
               key={company.name}
               className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 font-semibold tracking-tight text-sm sm:text-base grayscale hover:grayscale-0 transition-all duration-200"
             >
-              <div className="size-2 rounded-full bg-[#FA5D29]/70" />
+              <div className="size-2 rounded-full bg-fire/70" />
               <span>{company.label}</span>
             </div>
           ))}

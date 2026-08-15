@@ -12,11 +12,11 @@ export function CtaBanner() {
   return (
     <section className="relative py-20 sm:py-28 overflow-hidden border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-950 text-white">
       {/* Fiery ambient background light */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] h-[350px] bg-gradient-to-r from-[#FA5D29]/30 via-[#FF6B35]/20 to-[#E04818]/30 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 sm:w-175 h-150 bg-linear-to-r from-fire/30 via-[#FF6B35]/20 to-fire-hover/30 rounded-full blur-3xl pointer-events-none -z-10" />
 
       <div className="container mx-auto max-w-4xl px-4 sm:px-6 text-center relative">
         {/* Top Flame Pill */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/40 bg-[#FA5D29]/20 px-4 py-1.5 text-xs font-semibold text-[#FF8C42] mb-6 shadow-sm">
+        <div className="inline-flex items-center gap-2 rounded-full border border-fire/40 bg-fire/20 px-4 py-1.5 text-xs font-semibold text-[#FF8C42] mb-6 shadow-sm">
           <Flame className="size-3.5 fill-[#FF8C42]" />
           <span>Start Scaling Your Conversions</span>
         </div>
@@ -36,7 +36,7 @@ export function CtaBanner() {
           <Link href="/register" className="w-full sm:w-auto">
             <Button
               size="lg"
-              className="w-full sm:w-auto h-12 px-8 text-base font-bold bg-[#FA5D29] hover:bg-[#E04818] text-white shadow-xl shadow-[#FA5D29]/30 hover:scale-[1.02] active:scale-[0.98] transition-all gap-2"
+              className="w-full sm:w-auto h-12 px-8 text-base font-bold bg-fire hover:bg-fire-hover text-white shadow-xl shadow-fire/30 hover:scale-[1.02] active:scale-[0.98] transition-all gap-2"
             >
               <span>Create Free Account</span>
               <ArrowRight className="size-4" />
@@ -56,15 +56,15 @@ export function CtaBanner() {
         {/* Trust Badges */}
         <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-xs sm:text-sm text-zinc-400">
           <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="size-4 text-[#FA5D29]" />
+            <CheckCircle2 className="size-4 text-fire" />
             <span>No credit card required</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="size-4 text-[#FA5D29]" />
+            <CheckCircle2 className="size-4 text-fire" />
             <span>Sub-12ms global edge redirects</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="size-4 text-[#FA5D29]" />
+            <CheckCircle2 className="size-4 text-fire" />
             <span>100% open source &amp; self-hostable</span>
           </div>
         </div>

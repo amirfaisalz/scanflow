@@ -17,7 +17,7 @@ const journeySteps = [
     desc: "Visitor scans physical QR code on retail poster. Handled at local edge node in 9.8ms.",
     icon: QrCode,
     badge: "Edge 307",
-    color: "border-[#FA5D29] text-[#FA5D29] bg-[#FA5D29]/10",
+    color: "border-fire text-fire bg-fire/10",
   },
   {
     step: 2,
@@ -56,7 +56,7 @@ export function JourneyVisualizer() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/25 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 px-3.5 py-1 text-xs font-semibold text-[#FA5D29] mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
             <Layers className="size-3.5" />
             <span>Visitor Journey Analytics</span>
           </div>
@@ -77,11 +77,10 @@ export function JourneyVisualizer() {
               <div
                 key={step.step}
                 onClick={() => setActiveStep(step.step)}
-                className={`group relative p-6 rounded-2xl border transition-all duration-300 cursor-pointer ${
-                  isSelected
-                    ? "border-[#FA5D29] bg-white dark:bg-zinc-900 shadow-xl shadow-[#FA5D29]/10 ring-1 ring-[#FA5D29]"
+                className={`group relative p-6 rounded-2xl border transition-all duration-300 cursor-pointer ${isSelected
+                    ? "border-fire bg-white dark:bg-zinc-900 shadow-xl shadow-fire/10 ring-1 ring-fire"
                     : "border-zinc-200 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-700"
-                }`}
+                  }`}
               >
                 {/* Step Top */}
                 <div className="flex items-center justify-between mb-4">
@@ -93,7 +92,7 @@ export function JourneyVisualizer() {
                   </span>
                 </div>
 
-                <div className="text-xs font-mono font-bold text-[#FA5D29] mb-1">
+                <div className="text-xs font-mono font-bold text-fire mb-1">
                   {step.badge}
                 </div>
 

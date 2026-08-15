@@ -8,7 +8,7 @@ const metrics = [
     label: "Global Edge Latency",
     sublabel: "Sub-millisecond rule resolution",
     icon: Zap,
-    color: "text-[#FA5D29]",
+    color: "text-fire",
     badge: "307 Edge FastPath",
   },
   {
@@ -47,7 +47,7 @@ export function MetricsBanner() {
             return (
               <div
                 key={m.label}
-                className="group relative p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/60 dark:bg-zinc-900/40 hover:border-[#FA5D29]/40 hover:shadow-xl hover:shadow-[#FA5D29]/5 transition-all duration-300 hover:-translate-y-0.5"
+                className="group relative p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/60 dark:bg-zinc-900/40 hover:border-fire/40 hover:shadow-xl hover:shadow-fire/5 transition-all duration-300 hover:-translate-y-0.5"
               >
                 {/* Top Row: Icon & Badge */}
                 <div className="flex items-center justify-between mb-4">

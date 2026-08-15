@@ -59,7 +59,7 @@ export function ComparisonMatrix() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/25 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 px-3.5 py-1 text-xs font-semibold text-[#FA5D29] mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
             <span>Why Developers Choose ScanFlow</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white text-balance">
@@ -72,7 +72,7 @@ export function ComparisonMatrix() {
 
         {/* Comparison Table */}
         <div className="mx-auto max-w-5xl overflow-x-auto code-scroll pb-2">
-          <table className="w-full min-w-[580px] text-left border-collapse rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-xl">
+          <table className="w-full min-w-145 text-left border-collapse rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-xl">
             <thead>
               <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
                 <th className="p-4 sm:p-5 text-sm font-bold text-zinc-900 dark:text-white">
@@ -84,9 +84,9 @@ export function ComparisonMatrix() {
                 <th className="p-4 sm:p-5 text-xs sm:text-sm font-semibold text-zinc-500 text-center">
                   Legacy Shortlinks
                 </th>
-                <th className="p-4 sm:p-5 text-xs sm:text-sm font-bold text-[#FA5D29] bg-[#FA5D29]/10 text-center rounded-t-xl border-x border-[#FA5D29]/20">
+                <th className="p-4 sm:p-5 text-xs sm:text-sm font-bold text-fire bg-fire/10 text-center rounded-t-xl border-x border-fire/20">
                   <div className="flex items-center justify-center gap-1.5">
-                    <Flame className="size-4 fill-[#FA5D29]" />
+                    <Flame className="size-4 fill-fire" />
                     <span>ScanFlow</span>
                   </div>
                 </th>
@@ -116,8 +116,8 @@ export function ComparisonMatrix() {
                       <X className="size-5 text-zinc-300 dark:text-zinc-600 mx-auto" />
                     )}
                   </td>
-                  <td className="p-4 sm:p-5 text-center bg-[#FA5D29]/5 border-x border-[#FA5D29]/20 font-bold text-zinc-900 dark:text-white">
-                    <div className="flex items-center justify-center text-[#FA5D29]">
+                  <td className="p-4 sm:p-5 text-center bg-fire/5 border-x border-fire/20 font-bold text-zinc-900 dark:text-white">
+                    <div className="flex items-center justify-center text-fire">
                       <Check className="size-5 stroke-[2.5]" />
                     </div>
                   </td>

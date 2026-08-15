@@ -52,7 +52,7 @@ export function RoutingVisualizer() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/25 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 px-3.5 py-1 text-xs font-semibold text-[#FA5D29] mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
             <Sliders className="size-3.5" />
             <span>Smart Routing Engine</span>
           </div>
@@ -76,11 +76,10 @@ export function RoutingVisualizer() {
                   key={d.id}
                   type="button"
                   onClick={() => setActiveDevice(d.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                    isSelected
-                      ? "bg-[#FA5D29] text-white shadow-md shadow-[#FA5D29]/25 scale-[1.02]"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${isSelected
+                      ? "bg-fire text-white shadow-md shadow-fire/25 scale-[1.02]"
                       : "bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-700/60"
-                  }`}
+                    }`}
                 >
                   <Icon className="size-4" />
                   <span>{d.label}</span>
@@ -94,11 +93,11 @@ export function RoutingVisualizer() {
             {/* Step 1: Scan Source */}
             <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-[#FA5D29] font-bold">STEP 01</span>
+                <span className="text-xs font-mono text-fire font-bold">STEP 01</span>
                 <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
               <div className="font-semibold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
-                <QrCode className="size-4 text-[#FA5D29]" />
+                <QrCode className="size-4 text-fire" />
                 <span>Physical QR Scan</span>
               </div>
               <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono bg-zinc-100 dark:bg-zinc-900 p-2 rounded-md">
@@ -110,18 +109,18 @@ export function RoutingVisualizer() {
             </div>
 
             {/* Step 2: Edge Evaluation */}
-            <div className="rounded-xl border border-[#FA5D29]/40 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 p-5 space-y-3 relative">
+            <div className="rounded-xl border border-fire/40 bg-fire/5 dark:bg-fire/10 p-5 space-y-3 relative">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-[#FA5D29] font-bold">STEP 02 (EDGE)</span>
-                <span className="text-[11px] font-mono text-zinc-600 dark:text-zinc-300 bg-[#FA5D29]/10 px-2 py-0.5 rounded-full font-bold">
+                <span className="text-xs font-mono text-fire font-bold">STEP 02 (EDGE)</span>
+                <span className="text-[11px] font-mono text-zinc-600 dark:text-zinc-300 bg-fire/10 px-2 py-0.5 rounded-full font-bold">
                   ⚡ {result.edgeTime}
                 </span>
               </div>
               <div className="font-semibold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
-                <Zap className="size-4 text-[#FA5D29]" />
+                <Zap className="size-4 text-fire" />
                 <span>Rule Evaluator</span>
               </div>
-              <div className="text-xs text-zinc-700 dark:text-zinc-300 font-mono bg-white dark:bg-zinc-950 p-2 rounded-md border border-[#FA5D29]/20 break-all">
+              <div className="text-xs text-zinc-700 dark:text-zinc-300 font-mono bg-white dark:bg-zinc-950 p-2 rounded-md border border-fire/20 break-all">
                 {result.rule}
               </div>
               <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">

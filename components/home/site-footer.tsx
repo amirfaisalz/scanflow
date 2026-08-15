@@ -52,7 +52,7 @@ export function SiteFooter() {
           {/* Brand Column */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
             <Link href="/" className="flex items-center gap-2.5 font-bold">
-              <div className="size-8 rounded-xl bg-gradient-to-br from-[#FA5D29] to-[#E04818] text-white flex items-center justify-center shadow-md shadow-[#FA5D29]/20">
+              <div className="size-8 rounded-xl bg-linear-to-br from-fire to-fire-hover text-white flex items-center justify-center shadow-md shadow-fire/20">
                 <QrCode className="size-4 text-white" />
               </div>
               <span className="text-lg font-extrabold tracking-tight text-zinc-900 dark:text-white font-sans">
@@ -81,7 +81,7 @@ export function SiteFooter() {
                   <li key={link.name}>
                     <a
                       href={link.href}
-                      className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 hover:text-[#FA5D29] dark:hover:text-[#FA5D29] transition-colors"
+                      className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 hover:text-fire dark:hover:text-fire transition-colors"
                     >
                       {link.name}
                     </a>

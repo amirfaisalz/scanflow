@@ -77,8 +77,8 @@ export function PricingSection() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/25 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 px-3.5 py-1 text-xs font-semibold text-[#FA5D29] mb-4">
-            <Flame className="size-3.5 fill-[#FA5D29]" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
+            <Flame className="size-3.5 fill-fire" />
             <span>Transparent Pricing</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white text-balance">
@@ -97,22 +97,20 @@ export function PricingSection() {
           <button
             type="button"
             onClick={() => setIsAnnual(!isAnnual)}
-            className={`relative w-12 h-6 rounded-full transition-colors ${
-              isAnnual ? "bg-[#FA5D29]" : "bg-zinc-300 dark:bg-zinc-700"
-            }`}
+            className={`relative w-12 h-6 rounded-full transition-colors ${isAnnual ? "bg-fire" : "bg-zinc-300 dark:bg-zinc-700"
+              }`}
             aria-label="Toggle annual billing"
           >
             <span
-              className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow-sm transition-transform ${
-                isAnnual ? "translate-x-6" : "translate-x-0"
-              }`}
+              className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow-sm transition-transform ${isAnnual ? "translate-x-6" : "translate-x-0"
+                }`}
             />
           </button>
           <div className="flex items-center gap-1.5">
             <span className={`text-sm font-semibold ${isAnnual ? "text-zinc-900 dark:text-white" : "text-zinc-500"}`}>
               Annual Billing
             </span>
-            <span className="inline-flex items-center rounded-full bg-[#FA5D29]/10 text-[#FA5D29] border border-[#FA5D29]/20 px-2 py-0.5 text-[11px] font-bold">
+            <span className="inline-flex items-center rounded-full bg-fire/10 text-fire border border-fire/20 px-2 py-0.5 text-[11px] font-bold">
               Save 20%
             </span>
           </div>
@@ -125,15 +123,14 @@ export function PricingSection() {
             return (
               <div
                 key={tier.name}
-                className={`relative flex flex-col justify-between p-7 sm:p-8 rounded-2xl transition-all duration-300 ${
-                  tier.featured
-                    ? "border-2 border-[#FA5D29] bg-white dark:bg-zinc-900 shadow-2xl shadow-[#FA5D29]/10 ring-1 ring-[#FA5D29] -translate-y-1"
-                    : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-lg hover:border-zinc-300 dark:hover:border-zinc-700"
-                }`}
+                className={`relative flex flex-col justify-between p-7 sm:p-8 rounded-2xl transition-all duration-300 ${tier.featured
+                  ? "border-2 border-fire bg-white dark:bg-zinc-900 shadow-2xl shadow-fire/10 ring-1 ring-fire -translate-y-1"
+                  : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-lg hover:border-zinc-300 dark:hover:border-zinc-700"
+                  }`}
               >
                 {/* Featured Badge */}
                 {tier.featured && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 rounded-full bg-[#FA5D29] text-white px-3 py-0.5 text-xs font-bold shadow-md">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 rounded-full bg-fire text-white px-3 py-0.5 text-xs font-bold shadow-md">
                     <Flame className="size-3 fill-white" />
                     <span>{tier.badge}</span>
                   </div>
@@ -151,7 +148,7 @@ export function PricingSection() {
                     )}
                   </div>
 
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 min-h-[36px] leading-relaxed">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 min-h-9 leading-relaxed">
                     {tier.description}
                   </p>
 
@@ -180,7 +177,7 @@ export function PricingSection() {
                   <ul className="space-y-3 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300">
                     {tier.features.map((feat) => (
                       <li key={feat} className="flex items-start gap-2.5">
-                        <CheckCircle2 className="size-4 text-[#FA5D29] shrink-0 mt-0.5" />
+                        <CheckCircle2 className="size-4 text-fire shrink-0 mt-0.5" />
                         <span>{feat}</span>
                       </li>
                     ))}
@@ -191,11 +188,10 @@ export function PricingSection() {
                 <div className="pt-8">
                   <Link href="/register">
                     <Button
-                      className={`w-full h-11 font-bold text-sm gap-2 transition-all ${
-                        tier.featured
-                          ? "bg-[#FA5D29] hover:bg-[#E04818] text-white shadow-lg shadow-[#FA5D29]/25 hover:scale-[1.02]"
-                          : "bg-zinc-900 dark:bg-zinc-800 text-white hover:bg-zinc-800 dark:hover:bg-zinc-700"
-                      }`}
+                      className={`w-full h-11 font-bold text-sm gap-2 transition-all ${tier.featured
+                        ? "bg-fire hover:bg-fire-hover text-white shadow-lg shadow-fire/25 hover:scale-[1.02]"
+                        : "bg-zinc-900 dark:bg-zinc-800 text-white hover:bg-zinc-800 dark:hover:bg-zinc-700"
+                        }`}
                     >
                       <span>{tier.cta}</span>
                       <ArrowRight className="size-4" />

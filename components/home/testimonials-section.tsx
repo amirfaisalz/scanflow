@@ -35,7 +35,7 @@ export function TestimonialsSection() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#FA5D29]/25 bg-[#FA5D29]/5 dark:bg-[#FA5D29]/10 px-3.5 py-1 text-xs font-semibold text-[#FA5D29] mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
             <Sparkles className="size-3.5" />
             <span>Wall of Love</span>
           </div>
@@ -52,7 +52,7 @@ export function TestimonialsSection() {
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="p-6 sm:p-7 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/60 dark:bg-zinc-900/40 flex flex-col justify-between space-y-4 hover:border-[#FA5D29]/40 hover:shadow-xl hover:shadow-[#FA5D29]/5 transition-all duration-300"
+              className="p-6 sm:p-7 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/60 dark:bg-zinc-900/40 flex flex-col justify-between space-y-4 hover:border-fire/40 hover:shadow-xl hover:shadow-fire/5 transition-all duration-300"
             >
               <div className="space-y-3">
                 {/* Stars */}
@@ -70,7 +70,7 @@ export function TestimonialsSection() {
 
               {/* Author */}
               <div className="flex items-center gap-3 pt-4 border-t border-zinc-200/80 dark:border-zinc-800">
-                <div className="size-10 rounded-full bg-[#FA5D29]/10 text-[#FA5D29] font-bold flex items-center justify-center text-xs">
+                <div className="size-10 rounded-full bg-fire/10 text-fire font-bold flex items-center justify-center text-xs">
                   {t.avatar}
                 </div>
                 <div>

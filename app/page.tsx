@@ -14,7 +14,7 @@ export default async function Home() {
   const user = await getCurrentUser();
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col antialiased selection:bg-[#FA5D29]/20 selection:text-[#FA5D29]">
+    <div className="min-h-screen bg-background text-foreground flex flex-col antialiased selection:bg-fire/20 selection:text-fire">
       {/* Top Firecrawl-style announcement bar */}
       {/*<AnnouncementBar />*/}
 

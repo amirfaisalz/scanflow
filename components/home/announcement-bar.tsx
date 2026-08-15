@@ -9,7 +9,7 @@ export function AnnouncementBar() {
   if (!isVisible) return null;
 
   return (
-    <div className="relative z-50 bg-[#FA5D29] text-white px-4 py-2 text-xs sm:text-sm font-medium transition-all duration-300">
+    <div className="relative z-50 bg-fire text-white px-4 py-2 text-xs sm:text-sm font-medium transition-all duration-300">
       <div className="container mx-auto max-w-7xl flex items-center justify-between gap-4">
         {/* Left / Center Announcement */}
         <div className="flex-1 flex items-center justify-center gap-2 sm:gap-3 flex-wrap text-center">
