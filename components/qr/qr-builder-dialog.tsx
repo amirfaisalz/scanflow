@@ -534,7 +534,7 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
           <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
             Target Destination
           </div>
-          <div className="font-mono text-xs text-foreground truncate max-w-[210px] mx-auto font-medium" title={destinationUrl}>
+          <div className="font-mono text-xs text-foreground truncate max-w-52.5 mx-auto font-medium" title={destinationUrl}>
             {destinationUrl || "https://..."}
           </div>
         </div>
