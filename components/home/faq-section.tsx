@@ -56,7 +56,7 @@ export function FAQSection() {
             Everything You Need to Know
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 mt-3 text-base sm:text-lg leading-relaxed">
-            Quick answers to common questions about dynamic QR routing, edge redirects, and telemetry.
+            Everything you need to know about dynamic QR routing, edge redirects, custom domains, and print safety.
           </p>
         </div>
 
@@ -67,10 +67,11 @@ export function FAQSection() {
             return (
               <div
                 key={faq.question}
-                className={`rounded-2xl border transition-all duration-200 overflow-hidden ${isOpen
+                className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                  isOpen
                     ? "border-fire/40 bg-zinc-50/80 dark:bg-zinc-900/70 shadow-md"
                     : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-700"
-                  }`}
+                }`}
               >
                 <button
                   type="button"
@@ -79,15 +80,16 @@ export function FAQSection() {
                 >
                   <span>{faq.question}</span>
                   <div
-                    className={`size-7 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180 bg-fire/10 text-fire" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
-                      }`}
+                    className={`size-7 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ${
+                      isOpen ? "rotate-180 bg-fire/10 text-fire" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
+                    }`}
                   >
                     <ChevronDown className="size-4" />
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed border-t border-zinc-100 dark:border-zinc-800/80 pt-4">
+                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed border-t border-zinc-100 dark:border-zinc-800/80 pt-4">
                     {faq.answer}
                   </div>
                 )}

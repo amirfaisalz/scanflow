@@ -61,10 +61,10 @@ export function JourneyVisualizer() {
             <span>Visitor Journey Analytics</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white text-balance">
-            Stitch Physical Scans to Digital Conversions
+            Turn Physical Scans into Verified Revenue
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 mt-3 text-base sm:text-lg leading-relaxed">
-            Stop losing visibility once a visitor scans. Track the entire lifecycle from initial offline scan to completed checkout.
+            Connect offline billboards, packaging, and tabletop displays directly to digital conversions with transparent attribution.
           </p>
         </div>
 
@@ -77,10 +77,11 @@ export function JourneyVisualizer() {
               <div
                 key={step.step}
                 onClick={() => setActiveStep(step.step)}
-                className={`group relative p-6 rounded-2xl border transition-all duration-300 cursor-pointer ${isSelected
+                className={`group relative p-6 rounded-2xl border transition-all duration-300 cursor-pointer ${
+                  isSelected
                     ? "border-fire bg-white dark:bg-zinc-900 shadow-xl shadow-fire/10 ring-1 ring-fire"
                     : "border-zinc-200 dark:border-zinc-800/80 bg-white/60 dark:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-700"
-                  }`}
+                }`}
               >
                 {/* Step Top */}
                 <div className="flex items-center justify-between mb-4">
@@ -100,7 +101,7 @@ export function JourneyVisualizer() {
                   {step.title}
                 </h3>
 
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                   {step.desc}
                 </p>
               </div>

@@ -19,10 +19,10 @@ export function ABTestingShowcase() {
             <span>A/B Traffic Splitting</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white text-balance">
-            Find High-Converting Pages with Split Testing
+            A/B Split Test Your QR Campaigns in Real Time
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 mt-3 text-base sm:text-lg leading-relaxed">
-            Distribute incoming QR traffic across multiple landing page variants with deterministic hash-based split routing.
+            Eliminate guesswork by splitting scan traffic across multiple landing page variants to double your conversion rate.
           </p>
         </div>
 
@@ -59,10 +59,10 @@ export function ABTestingShowcase() {
               <h3 className="font-bold text-base text-zinc-900 dark:text-white">
                 Original Landing Page
               </h3>
-              <p className="text-xs text-zinc-500 leading-relaxed font-mono">
+              <p className="text-sm text-zinc-500 leading-relaxed font-mono">
                 https://scanflow.dev/landing-v1
               </p>
-              <div className="pt-2 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between text-xs">
+              <div className="pt-2 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between text-sm">
                 <span className="text-zinc-500">Conversion Rate:</span>
                 <span className="font-mono font-bold text-zinc-900 dark:text-white">3.2%</span>
               </div>
@@ -82,10 +82,10 @@ export function ABTestingShowcase() {
               <h3 className="font-bold text-base text-zinc-900 dark:text-white">
                 Interactive Video Hero Page
               </h3>
-              <p className="text-xs text-zinc-500 leading-relaxed font-mono">
+              <p className="text-sm text-zinc-500 leading-relaxed font-mono">
                 https://scanflow.dev/landing-v2-video
               </p>
-              <div className="pt-2 border-t border-fire/20 flex items-center justify-between text-xs">
+              <div className="pt-2 border-t border-fire/20 flex items-center justify-between text-sm">
                 <span className="text-zinc-600 dark:text-zinc-400">Conversion Rate:</span>
                 <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                   7.8% (+143% Lift)
