@@ -396,6 +396,9 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
     const actionButtons = screen.getAllByRole("button", { name: /actions/i });
     fireEvent.click(actionButtons[0]);
 
+    await waitFor(() => {
+      expect(screen.getByText(/Edit Goal/i)).toBeInTheDocument();
+    });
     const editBtn = screen.getByText(/Edit Goal/i);
     fireEvent.click(editBtn);
 
@@ -430,6 +433,9 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
     const actionButtons = screen.getAllByRole("button", { name: /actions/i });
     fireEvent.click(actionButtons[0]);
 
+    await waitFor(() => {
+      expect(screen.getByText(/Deactivate Goal/i)).toBeInTheDocument();
+    });
     const toggleBtn = screen.getByText(/Deactivate Goal/i);
     fireEvent.click(toggleBtn);
 
@@ -457,6 +463,9 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
     const actionButtons = screen.getAllByRole("button", { name: /actions/i });
     fireEvent.click(actionButtons[0]);
 
+    await waitFor(() => {
+      expect(screen.getByText(/Delete Goal/i)).toBeInTheDocument();
+    });
     const deleteBtn = screen.getByText(/Delete Goal/i);
     fireEvent.click(deleteBtn);
 
