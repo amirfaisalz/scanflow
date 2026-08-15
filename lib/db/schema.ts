@@ -151,6 +151,24 @@ export const sessionEvents = pgTable("session_events", {
   timestamp: timestamp("timestamp").defaultNow().notNull(),
 });
 
+export const conversionGoals = pgTable("conversion_goals", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  eventType: text("event_type").notNull(), // 'BUTTON_CLICK', 'LINK_CLICK', 'FORM_SUBMIT', 'PAGE_VIEW', 'CONVERSION'
+  targetPattern: text("target_pattern"),
+  qrCodeId: text("qr_code_id").references(() => qrCodes.id, { onDelete: "set null" }),
+  campaignId: text("campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
+  monetaryValue: integer("monetary_value").default(0).notNull(), // in cents (e.g. $15.00 -> 1500)
+  currency: text("currency").default("USD").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // ---------------------------------------------------------------------------
 // Relations
 // ---------------------------------------------------------------------------
@@ -163,6 +181,7 @@ export const userRelations = relations(user, ({ many }) => ({
   routingRules: many(routingRules),
   visitorSessions: many(sessions),
   sessionEvents: many(sessionEvents),
+  conversionGoals: many(conversionGoals),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -186,6 +205,7 @@ export const campaignsRelations = relations(campaigns, ({ one, many }) => ({
   }),
   qrCodes: many(qrCodes),
   sessions: many(sessions),
+  conversionGoals: many(conversionGoals),
 }));
 
 export const qrCodesRelations = relations(qrCodes, ({ one, many }) => ({
@@ -200,6 +220,7 @@ export const qrCodesRelations = relations(qrCodes, ({ one, many }) => ({
   routingRules: many(routingRules),
   sessions: many(sessions),
   sessionEvents: many(sessionEvents),
+  conversionGoals: many(conversionGoals),
 }));
 
 export const routingRulesRelations = relations(routingRules, ({ one }) => ({
@@ -248,6 +269,21 @@ export const sessionEventsRelations = relations(sessionEvents, ({ one }) => ({
   }),
 }));
 
+export const conversionGoalsRelations = relations(conversionGoals, ({ one }) => ({
+  user: one(user, {
+    fields: [conversionGoals.userId],
+    references: [user.id],
+  }),
+  qrCode: one(qrCodes, {
+    fields: [conversionGoals.qrCodeId],
+    references: [qrCodes.id],
+  }),
+  campaign: one(campaigns, {
+    fields: [conversionGoals.campaignId],
+    references: [campaigns.id],
+  }),
+}));
+
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 export type Session = typeof session.$inferSelect;
@@ -262,4 +298,7 @@ export type VisitorSession = typeof sessions.$inferSelect;
 export type NewVisitorSession = typeof sessions.$inferInsert;
 export type SessionEvent = typeof sessionEvents.$inferSelect;
 export type NewSessionEvent = typeof sessionEvents.$inferInsert;
+export type ConversionGoal = typeof conversionGoals.$inferSelect;
+export type NewConversionGoal = typeof conversionGoals.$inferInsert;
+
 

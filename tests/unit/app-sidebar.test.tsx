@@ -53,6 +53,7 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
       expect(screen.getByText("QR Codes")).toBeInTheDocument();
       expect(screen.getByText("Scan Journeys")).toBeInTheDocument();
       expect(screen.getByText("Campaigns")).toBeInTheDocument();
+      expect(screen.getByText("Conversions")).toBeInTheDocument();
       expect(screen.getByText("Analytics")).toBeInTheDocument();
       expect(screen.getByText("A/B Experiments")).toBeInTheDocument();
       expect(screen.getByText("Data Isolation & Settings")).toBeInTheDocument();
@@ -70,6 +71,9 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
 
       const campaignsLink = screen.getByRole("link", { name: /campaigns/i });
       expect(campaignsLink).toHaveAttribute("href", "/dashboard/campaigns");
+
+      const conversionsLink = screen.getByRole("link", { name: /conversions/i });
+      expect(conversionsLink).toHaveAttribute("href", "/dashboard/conversions");
 
       const analyticsLink = screen.getByRole("link", { name: /analytics/i });
       expect(analyticsLink).toHaveAttribute("href", "/dashboard/analytics");
@@ -232,6 +236,7 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
         { path: "/dashboard/qr-codes", expected: "QR Code Management" },
         { path: "/dashboard/journeys", expected: "Scan Journeys Explorer" },
         { path: "/dashboard/campaigns", expected: "Campaigns" },
+        { path: "/dashboard/conversions", expected: "Conversion Goals" },
         { path: "/dashboard/analytics", expected: "Scan Analytics & Journeys" },
         { path: "/dashboard/experiments", expected: "A/B Experiments" },
       ];

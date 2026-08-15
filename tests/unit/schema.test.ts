@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { routingRules, sessions, sessionEvents } from "@/lib/db/schema";
+import { routingRules, sessions, sessionEvents, conversionGoals } from "@/lib/db/schema";
 
 describe("Database Schema - Routing and Sessions", () => {
   it("should export routingRules table with required columns", () => {
@@ -38,4 +38,22 @@ describe("Database Schema - Routing and Sessions", () => {
     expect(sessionEvents.eventType).toBeDefined();
     expect(sessionEvents.eventData).toBeDefined();
   });
+
+  it("should export conversionGoals table with required columns", () => {
+    expect(conversionGoals).toBeDefined();
+    expect(conversionGoals.id).toBeDefined();
+    expect(conversionGoals.userId).toBeDefined();
+    expect(conversionGoals.name).toBeDefined();
+    expect(conversionGoals.description).toBeDefined();
+    expect(conversionGoals.eventType).toBeDefined();
+    expect(conversionGoals.targetPattern).toBeDefined();
+    expect(conversionGoals.qrCodeId).toBeDefined();
+    expect(conversionGoals.campaignId).toBeDefined();
+    expect(conversionGoals.monetaryValue).toBeDefined();
+    expect(conversionGoals.currency).toBeDefined();
+    expect(conversionGoals.isActive).toBeDefined();
+    expect(conversionGoals.createdAt).toBeDefined();
+    expect(conversionGoals.updatedAt).toBeDefined();
+  });
 });
+

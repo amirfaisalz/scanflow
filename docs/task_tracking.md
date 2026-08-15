@@ -8,9 +8,9 @@ This document tracks the implementation progress of all features outlined in [do
 
 | Phase | Total Features | Completed | In Progress | Pending |
 | :--- | :---: | :---: | :---: | :---: |
-| **Phase 1 (MVP)** | 12 | 10 | 0 | 2 |
+| **Phase 1 (MVP)** | 12 | 11 | 0 | 1 |
 | **Phase 2 (Advanced)** | 13 | 0 | 0 | 13 |
-| **Total** | **25** | **10** | **0** | **15** |
+| **Total** | **25** | **11** | **0** | **14** |
 
 ---
 
@@ -138,10 +138,17 @@ This document tracks the implementation progress of all features outlined in [do
 ---
 
 ### 11. Conversion Tracking
-- **Status**: ⚪ Pending
+- **Status**: 🟢 Completed
 - **Tasks**:
-  - [ ] Custom conversion event definitions (e.g. Order Now, Form Submit)
-  - [ ] Conversion rate calculations (`Conversions / Sessions * 100`)
+  - [x] Database table `conversion_goals` & relations in PostgreSQL (`lib/db/schema.ts`)
+  - [x] Automatic real-time conversion evaluation engine in session tracker (`lib/analytics/tracker.ts`)
+  - [x] Multi-tenant REST API endpoints (`app/api/conversions/route.ts` & `app/api/conversions/[id]/route.ts`)
+  - [x] Conversion rate (`(Conversions / Sessions) * 100`) & attributed revenue calculations
+  - [x] Dedicated Conversion Goals Dashboard page (`app/dashboard/conversions/page.tsx`) with search, status & scope filters, and Grid/List view
+  - [x] Interactive Goal Cards & Goal creation/editing modal dialogs (`components/conversions/conversion-card.tsx`, `components/conversions/conversion-dialog.tsx`)
+  - [x] Client-side JavaScript/HTML snippet generation modal (`components/conversions/snippet-dialog.tsx`)
+  - [x] Navigation update in dashboard sidebar (`components/app-sidebar.tsx`)
+  - [x] Comprehensive test suites with 100% pass rate (`tests/unit/schema.test.ts`, `tests/unit/conversion-tracker.test.ts`, `tests/unit/conversions-api.test.ts`, `tests/unit/conversions-components.test.tsx`, `tests/unit/conversions-page.test.tsx`)
 
 ---
 

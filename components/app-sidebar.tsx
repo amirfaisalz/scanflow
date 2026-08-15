@@ -20,6 +20,7 @@ import {
   QrCode,
   Compass,
   FolderGit2,
+  Target,
   BarChart3,
   GitBranch,
   Settings2Icon,
@@ -68,6 +69,12 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       url: "/dashboard/campaigns",
       icon: <FolderGit2 className="size-4" />,
       isActive: pathname.startsWith("/dashboard/campaigns"),
+    },
+    {
+      title: "Conversions",
+      url: "/dashboard/conversions",
+      icon: <Target className="size-4" />,
+      isActive: pathname.startsWith("/dashboard/conversions"),
     },
     {
       title: "Analytics",
