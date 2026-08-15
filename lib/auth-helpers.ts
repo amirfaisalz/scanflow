@@ -6,8 +6,16 @@ import { redirect } from "next/navigation";
  * Retrieve the current authenticated session on the server.
  * Returns null if the user is not authenticated.
  */
-export async function getCurrentSession() {
-  const reqHeaders = await headers();
+export async function getCurrentSession(request?: Request | Headers | { headers?: Headers }) {
+  let reqHeaders: Headers;
+  if (request instanceof Headers) {
+    reqHeaders = request;
+  } else if (request && "headers" in request && request.headers instanceof Headers) {
+    reqHeaders = request.headers;
+  } else {
+    reqHeaders = await headers();
+  }
+
   const session = await auth.api.getSession({
     headers: reqHeaders,
   });
@@ -18,8 +26,8 @@ export async function getCurrentSession() {
  * Retrieve the current authenticated user on the server.
  * Returns null if the user is not authenticated.
  */
-export async function getCurrentUser() {
-  const session = await getCurrentSession();
+export async function getCurrentUser(request?: Request | Headers | { headers?: Headers }) {
+  const session = await getCurrentSession(request);
   return session?.user ?? null;
 }
 

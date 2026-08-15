@@ -42,3 +42,11 @@ if (typeof HTMLCanvasElement !== "undefined") {
   }) as any;
 }
 
+// Mock ResizeObserver for jsdom environment (required by Recharts)
+if (typeof ResizeObserver === "undefined") {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
