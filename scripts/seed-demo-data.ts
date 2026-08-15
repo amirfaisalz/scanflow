@@ -1,3 +1,6 @@
+import * as dotenv from "dotenv";
+dotenv.config();
+
 import { db } from "../lib/db";
 import {
   user,
@@ -10,20 +13,10 @@ import {
 } from "../lib/db/schema";
 import { eq } from "drizzle-orm";
 
-async function main() {
-  console.log("Seeding demo data for Admin Demo User...");
-
-  // 1. Find or verify Admin user
-  let adminUser = await db.query.user.findFirst({
-    where: eq(user.email, "admin@scanflow.io"),
-  });
-
-  if (!adminUser) {
-    console.error("Admin user not found!");
-    process.exit(1);
-  }
-
-  const userId = adminUser.id;
+async function seedUser(targetUser: { id: string; email: string; name: string }) {
+  const userId = targetUser.id;
+  const userTag = userId.slice(0, 6);
+  console.log(`\n🌱 Seeding demo data for: ${targetUser.email} (${targetUser.name}, ID: ${userId})...`);
 
   // Clean existing data for this user
   await db.delete(sessionEvents).where(eq(sessionEvents.userId, userId));
@@ -33,10 +26,10 @@ async function main() {
   await db.delete(campaigns).where(eq(campaigns.userId, userId));
   await db.delete(conversionGoals).where(eq(conversionGoals.userId, userId));
 
-  // 2. Create Campaigns
-  const campaign1Id = "cmp_app_launch_2026";
-  const campaign2Id = "cmp_global_retail_q3";
-  const campaign3Id = "cmp_conference_summit";
+  // 1. Create Campaigns
+  const campaign1Id = `cmp_app_launch_${userTag}`;
+  const campaign2Id = `cmp_global_retail_${userTag}`;
+  const campaign3Id = `cmp_conference_${userTag}`;
 
   await db.insert(campaigns).values([
     {
@@ -65,11 +58,13 @@ async function main() {
     },
   ]);
 
-  // 3. Create Dynamic QR Codes
-  const qr1Id = "qr_mobile_app_universal";
-  const qr2Id = "qr_retail_box_packaging";
-  const qr3Id = "qr_summer_flash_sale";
-  const qr4Id = "qr_bistro_smart_menu";
+  // 2. Create Dynamic QR Codes with unique slugs per user
+  const qr1Id = `qr_app_${userTag}`;
+  const qr2Id = `qr_box_${userTag}`;
+  const qr3Id = `qr_summer_${userTag}`;
+  const qr4Id = `qr_bistro_${userTag}`;
+
+  const slugSuffix = targetUser.email === "admin@scanflow.io" ? "" : `-${userTag}`;
 
   await db.insert(qrCodes).values([
     {
@@ -77,7 +72,7 @@ async function main() {
       userId,
       campaignId: campaign1Id,
       name: "App Launch Universal QR",
-      slug: "mobile-app",
+      slug: `mobile-app${slugSuffix}`,
       destinationUrl: "https://scanflow.dev/download",
       status: "active",
       foregroundColor: "#FA5D29",
@@ -91,7 +86,7 @@ async function main() {
       userId,
       campaignId: campaign2Id,
       name: "Product Packaging Insert QR",
-      slug: "packaging-v2",
+      slug: `packaging-v2${slugSuffix}`,
       destinationUrl: "https://example.com/product/registration",
       status: "active",
       foregroundColor: "#09090b",
@@ -105,7 +100,7 @@ async function main() {
       userId,
       campaignId: campaign3Id,
       name: "Global 50% Promo Billboard",
-      slug: "summer-deal",
+      slug: `summer-deal${slugSuffix}`,
       destinationUrl: "https://example.com/offers/summer",
       status: "active",
       foregroundColor: "#4f46e5",
@@ -119,7 +114,7 @@ async function main() {
       userId,
       campaignId: null,
       name: "Downtown Bistro Live Menu",
-      slug: "bistro-menu",
+      slug: `bistro-menu${slugSuffix}`,
       destinationUrl: "https://bistromenu.com/today",
       status: "active",
       foregroundColor: "#059669",
@@ -130,10 +125,10 @@ async function main() {
     },
   ]);
 
-  // 4. Create Smart Routing Rules
-  const rule1Id = "rule_ios_routing";
-  const rule2Id = "rule_android_routing";
-  const rule3Id = "rule_geo_apac";
+  // 3. Create Smart Routing Rules
+  const rule1Id = `rule_ios_${userTag}`;
+  const rule2Id = `rule_android_${userTag}`;
+  const rule3Id = `rule_geo_${userTag}`;
 
   await db.insert(routingRules).values([
     {
@@ -168,12 +163,12 @@ async function main() {
     },
   ]);
 
-  // 5. Generate realistic Time Series Sessions & Events over the last 90 days
+  // 4. Generate realistic Time Series Sessions & Events over the last 60 days
   const sessionRows: any[] = [];
   const eventRows: any[] = [];
 
   const now = Date.now();
-  const days = 90;
+  const days = 60;
   const qrIds = [qr1Id, qr2Id, qr3Id, qr4Id];
   const countries = ["US", "US", "ID", "GB", "DE", "SG", "JP", "CA", "AU"];
   const devices = [
@@ -188,8 +183,7 @@ async function main() {
 
   for (let d = days; d >= 0; d--) {
     const dayTimestamp = now - d * 24 * 3600 * 1000;
-    // Growth trend over time + weekly seasonality
-    const baseDailyScans = Math.floor(40 + (90 - d) * 1.5 + Math.sin(d / 7) * 15);
+    const baseDailyScans = Math.floor(25 + (60 - d) * 1.2 + Math.sin(d / 7) * 10);
 
     for (let s = 0; s < baseDailyScans; s++) {
       const qrId = qrIds[Math.floor(Math.random() * qrIds.length)];
@@ -206,8 +200,8 @@ async function main() {
       }
 
       const scanTime = new Date(dayTimestamp + Math.floor(Math.random() * 24 * 3600 * 1000));
-      const sessionId = `sess_${d}_${s}_${Math.random().toString(36).substring(2, 7)}`;
-      const isConverted = Math.random() < 0.18; // 18% conversion rate
+      const sessionId = `sess_${userTag}_${d}_${s}_${Math.random().toString(36).substring(2, 6)}`;
+      const isConverted = Math.random() < 0.18;
 
       totalScans++;
       if (isConverted) totalConverted++;
@@ -232,7 +226,7 @@ async function main() {
         startedAt: scanTime,
         endedAt: new Date(scanTime.getTime() + Math.floor(Math.random() * 180 + 20) * 1000),
         durationSeconds: Math.floor(Math.random() * 180 + 20),
-        eventsCount: isConverted ? 3 : 1,
+        eventsCount: isConverted ? 2 : 1,
         converted: isConverted,
         conversionEvent: isConverted ? "APP_INSTALL_CONFIRMED" : null,
         createdAt: scanTime,
@@ -257,30 +251,87 @@ async function main() {
           qrCodeId: qrId,
           userId,
           eventType: "CONVERSION",
-          eventData: { goal: "App Install / Onboarding Started" },
-          timestamp: new Date(scanTime.getTime() + 15000),
+          eventData: { goal: "App Install / Registration" },
+          timestamp: new Date(scanTime.getTime() + 12000),
         });
       }
     }
   }
 
-  console.log(`Inserting ${sessionRows.length} sessions in batches...`);
   // Batch insert sessions
   const batchSize = 250;
   for (let i = 0; i < sessionRows.length; i += batchSize) {
     await db.insert(sessions).values(sessionRows.slice(i, i + batchSize));
   }
 
-  console.log(`Inserting ${eventRows.length} events in batches...`);
+  // Batch insert events
   for (let i = 0; i < eventRows.length; i += batchSize) {
     await db.insert(sessionEvents).values(eventRows.slice(i, i + batchSize));
   }
 
-  console.log(`Seed completed successfully! Total scans: ${totalScans}, Converted: ${totalConverted}`);
+  console.log(`✅ Seeded ${targetUser.email}: 3 campaigns, 4 QRs, ${sessionRows.length} sessions, ${eventRows.length} events.`);
+}
+
+async function main() {
+  const rawDbUrl = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/scanflow";
+  const maskedDbUrl = rawDbUrl.replace(/:[^:@]+@/, ":***@");
+  console.log(`\n🔗 Connecting to database: ${maskedDbUrl}`);
+
+  const arg = process.env.SEED_EMAIL || process.argv[2];
+
+  // Fetch all existing users from database
+  let usersList = await db.select().from(user);
+
+  if (usersList.length === 0) {
+    // If database is brand new with 0 users, create admin demo user
+    console.log("✨ No users found in database. Creating admin@scanflow.io...");
+    const [createdAdmin] = await db
+      .insert(user)
+      .values({
+        id: "usr_admin_scanflow_prod",
+        name: "Admin Demo User",
+        email: "admin@scanflow.io",
+        emailVerified: true,
+      })
+      .onConflictDoNothing()
+      .returning();
+
+    usersList = [createdAdmin || (await db.query.user.findFirst({ where: eq(user.email, "admin@scanflow.io") })) as any];
+  }
+
+  if (arg && arg !== "all") {
+    // Target specific user by email
+    let matchedUser = usersList.find((u) => u.email.toLowerCase() === arg.toLowerCase());
+    if (!matchedUser) {
+      console.log(`✨ Creating user '${arg}'...`);
+      const [newUser] = await db
+        .insert(user)
+        .values({
+          id: `usr_${Math.random().toString(36).substring(2, 10)}`,
+          name: arg.split("@")[0],
+          email: arg,
+          emailVerified: true,
+        })
+        .onConflictDoNothing()
+        .returning();
+      matchedUser = newUser || (await db.query.user.findFirst({ where: eq(user.email, arg) }));
+    }
+    if (matchedUser) {
+      await seedUser(matchedUser);
+    }
+  } else {
+    // Seed all users in the database
+    console.log(`👥 Seeding demo data for all ${usersList.length} users in the database...`);
+    for (const u of usersList) {
+      await seedUser(u);
+    }
+  }
+
+  console.log("\n🎉 All requested demo data seeded successfully!\n");
   process.exit(0);
 }
 
 main().catch((err) => {
-  console.error(err);
+  console.error("❌ Seed error:", err);
   process.exit(1);
 });
