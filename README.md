@@ -4,6 +4,7 @@
 
 **Next-Generation Dynamic QR Management, Smart Context Routing & Visitor Journey Analytics Platform**
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-scanflow--pi.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://scanflow-pi.vercel.app/)
 [![Next.js](https://img.shields.io/badge/Next.js-16.3.1-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.8-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -15,12 +16,19 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
 <p align="center">
+  <a href="https://scanflow-pi.vercel.app/"><strong>🌐 Live Demo</strong></a> •
   <a href="#key-features">Key Features</a> •
   <a href="#system-architecture">Architecture</a> •
   <a href="#quickstart--local-setup">Quickstart</a> •
   <a href="#tech-stack">Tech Stack</a> •
   <a href="#database-schema">Database Schema</a> •
   <a href="#testing">Testing</a>
+</p>
+
+<br />
+
+<p align="center">
+  🔗 <strong>Live Application:</strong> <a href="https://scanflow-pi.vercel.app/">https://scanflow-pi.vercel.app/</a>
 </p>
 
 <br />
@@ -36,6 +44,8 @@
 ---
 
 ## Overview
+
+> 🚀 **Live Demo**: Experience the platform in action at [https://scanflow-pi.vercel.app/](https://scanflow-pi.vercel.app/) (use the 1-Click Recruiter Demo Sign-In to test all features instantly).
 
 **ScanFlow** transforms static QR codes into **programmable, intelligent entry points**. 
 
