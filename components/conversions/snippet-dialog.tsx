@@ -16,7 +16,7 @@ import type { ConversionGoalData } from "./conversion-card";
 export interface SnippetDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  goal: ConversionGoalData | any | null;
+  goal: ConversionGoalData | null;
 }
 
 export function SnippetDialog({ open, onOpenChange, goal }: SnippetDialogProps) {

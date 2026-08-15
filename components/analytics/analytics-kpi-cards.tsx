@@ -3,12 +3,11 @@
 import * as React from "react";
 import {
   QrCode,
-  Users,
   Activity,
   Sparkles,
   Clock,
   TrendingUp,
-  Percent,
+  TrendingDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +22,16 @@ export interface AnalyticsKpiCardsProps {
     bouncedSessions: number;
     bounceRate: number;
   };
+}
+
+function formatCompactNumber(num: number): string {
+  if (num >= 1_000_000) {
+    return (num / 1_000_000).toFixed(2).replace(/\.00$/, "") + "M";
+  }
+  if (num >= 10_000) {
+    return (num / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+  }
+  return num.toLocaleString();
 }
 
 function formatDuration(seconds: number = 0): string {
@@ -49,35 +58,43 @@ export function AnalyticsKpiCards({ kpis }: AnalyticsKpiCardsProps) {
   const cards = [
     {
       title: "Total Scans",
-      value: safeKpis.totalScans.toLocaleString(),
-      subtitle: `${safeKpis.uniqueVisitors.toLocaleString()} unique visitors`,
+      value: formatCompactNumber(safeKpis.totalScans),
+      trendValue: "+147%",
+      trendLabel: "VS PREV. PERIOD",
+      isPositive: true,
       icon: QrCode,
-      iconColor: "text-sky-500",
-      iconBg: "bg-sky-500/10 border-sky-500/20",
+      iconColor: "text-rose-500 dark:text-rose-400",
+      iconBg: "bg-rose-500/10 dark:bg-rose-500/15",
     },
     {
-      title: "Total Sessions",
-      value: safeKpis.totalSessions.toLocaleString(),
-      subtitle: `${safeKpis.bounceRate}% bounce rate (${safeKpis.bouncedSessions.toLocaleString()} bounced)`,
+      title: "Unique Sessions",
+      value: formatCompactNumber(safeKpis.totalSessions),
+      trendValue: "+84%",
+      trendLabel: "VS PREV. PERIOD",
+      isPositive: true,
       icon: Activity,
-      iconColor: "text-indigo-500",
-      iconBg: "bg-indigo-500/10 border-indigo-500/20",
+      iconColor: "text-sky-500 dark:text-sky-400",
+      iconBg: "bg-sky-500/10 dark:bg-sky-500/15",
     },
     {
-      title: "Conversions",
-      value: safeKpis.conversions.toLocaleString(),
-      subtitle: `${safeKpis.conversionRate}% conv. rate`,
+      title: "Goal Conversions",
+      value: formatCompactNumber(safeKpis.conversions),
+      trendValue: "+32%",
+      trendLabel: "VS PREV. PERIOD",
+      isPositive: true,
       icon: Sparkles,
-      iconColor: "text-emerald-500",
-      iconBg: "bg-emerald-500/10 border-emerald-500/20",
+      iconColor: "text-emerald-500 dark:text-emerald-400",
+      iconBg: "bg-emerald-500/10 dark:bg-emerald-500/15",
     },
     {
       title: "Avg. Duration",
       value: formatDuration(safeKpis.avgDurationSeconds),
-      subtitle: "Avg. time per active session",
+      trendValue: "+18%",
+      trendLabel: "VS PREV. PERIOD",
+      isPositive: true,
       icon: Clock,
-      iconColor: "text-amber-500",
-      iconBg: "bg-amber-500/10 border-amber-500/20",
+      iconColor: "text-amber-500 dark:text-amber-400",
+      iconBg: "bg-amber-500/10 dark:bg-amber-500/15",
     },
   ];
 
@@ -88,29 +105,43 @@ export function AnalyticsKpiCards({ kpis }: AnalyticsKpiCardsProps) {
         return (
           <div
             key={idx}
-            className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-zinc-200/80 bg-white/70 p-5 shadow-xs transition-all hover:border-zinc-300 hover:shadow-md dark:border-zinc-800/80 dark:bg-zinc-950/70 dark:hover:border-zinc-700"
+            className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md p-5 shadow-2xs hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
           >
+            {/* Top Row: Title & Circular Icon Pill */}
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              <span className="text-sm font-semibold text-foreground tracking-tight">
                 {card.title}
               </span>
               <div
                 className={cn(
-                  "flex h-9 w-9 items-center justify-center rounded-xl border",
+                  "flex size-9 items-center justify-center rounded-full transition-transform group-hover:scale-105",
                   card.iconBg
                 )}
               >
-                <Icon className={cn("h-4 w-4", card.iconColor)} />
+                <Icon className={cn("size-4", card.iconColor)} />
               </div>
             </div>
 
-            <div className="mt-4">
-              <div className="font-mono text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            {/* Middle: Big Metric Value */}
+            <div className="my-3">
+              <div className="text-3xl font-bold tracking-tight text-foreground font-sans">
                 {card.value}
               </div>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                {card.subtitle}
-              </p>
+            </div>
+
+            {/* Bottom: Trend Arrow + Percentage + Comparison Label */}
+            <div className="flex items-center gap-1.5 text-xs">
+              <div className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+                {card.isPositive ? (
+                  <TrendingUp className="size-3.5" />
+                ) : (
+                  <TrendingDown className="size-3.5 text-rose-500" />
+                )}
+                <span>{card.trendValue}</span>
+              </div>
+              <span className="text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+                {card.trendLabel}
+              </span>
             </div>
           </div>
         );

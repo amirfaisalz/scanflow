@@ -91,7 +91,7 @@ export function QRCard({
 
   return (
     <>
-      <div className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5 shadow-2xs hover:shadow-md transition-all hover:border-primary/40">
+      <div className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md p-5 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 hover:border-primary/40">
         {/* Top bar: Title, status, actions menu */}
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1">

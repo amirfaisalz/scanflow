@@ -12,7 +12,6 @@ import {
   Sparkles,
   Layers,
   ArrowUpRight,
-  FolderGit2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -58,14 +57,14 @@ export function CampaignCard({
       case "active":
         return (
           <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[10px] font-semibold gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Active
           </Badge>
         );
       case "paused":
         return (
           <Badge variant="outline" className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] font-semibold gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+            <span className="size-1.5 rounded-full bg-amber-500" />
             Paused
           </Badge>
         );
@@ -80,12 +79,12 @@ export function CampaignCard({
   };
 
   return (
-    <div className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5 shadow-xs transition-all hover:border-primary/40 hover:shadow-md">
+    <div className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md p-5 shadow-2xs transition-all duration-200 hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5">
       {/* Header with Title, Status & Actions Menu */}
       <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1.5 min-w-0">
+        <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-bold text-base text-foreground group-hover:text-primary transition-colors truncate">
+            <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">
               {campaign.name}
             </h3>
             {getStatusBadge(campaign.status)}
@@ -101,14 +100,14 @@ export function CampaignCard({
           <DropdownMenuTrigger
             data-slot="dropdown-menu-trigger"
             render={
-              <Button variant="ghost" size="icon" aria-label="Actions" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted">
-                <MoreVertical className="h-4 w-4" />
+              <Button variant="ghost" size="icon-sm" aria-label="Actions" className="size-8 text-muted-foreground hover:text-foreground hover:bg-muted">
+                <MoreVertical className="size-4" />
               </Button>
             }
           />
           <DropdownMenuContent align="end" className="w-44">
             <DropdownMenuItem onClick={() => onEdit(campaign)} className="text-xs gap-2 cursor-pointer">
-              <Edit className="h-3.5 w-3.5" />
+              <Edit className="size-3.5" />
               Edit Details
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -122,12 +121,12 @@ export function CampaignCard({
             >
               {campaign.status === "active" ? (
                 <>
-                  <Pause className="h-3.5 w-3.5 text-amber-500" />
+                  <Pause className="size-3.5 text-amber-500" />
                   Pause Campaign
                 </>
               ) : (
                 <>
-                  <Play className="h-3.5 w-3.5 text-emerald-500" />
+                  <Play className="size-3.5 text-emerald-500" />
                   Activate Campaign
                 </>
               )}
@@ -137,7 +136,7 @@ export function CampaignCard({
               onClick={() => onDelete(campaign.id)}
               className="text-xs text-destructive focus:text-destructive focus:bg-destructive/10 gap-2 cursor-pointer"
             >
-              <Trash2 className="h-3.5 w-3.5" />
+              <Trash2 className="size-3.5" />
               Delete Campaign
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -145,14 +144,14 @@ export function CampaignCard({
       </div>
 
       {/* Aggregate Metrics Grid */}
-      <div className="my-5 grid grid-cols-3 gap-2 rounded-xl border border-border/60 bg-muted/40 p-3">
+      <div className="my-4 grid grid-cols-3 gap-2 rounded-xl border border-border/60 bg-muted/30 p-3">
         {/* Assigned QR codes */}
         <div className="flex flex-col">
           <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-            <QrCode className="h-3 w-3" />
+            <QrCode className="size-3" />
             QR Codes
           </span>
-          <span className="mt-1 font-mono text-base font-bold text-foreground">
+          <span className="mt-1 font-mono text-sm font-bold text-foreground">
             {campaign.qrCodesCount || 0}
           </span>
         </div>
@@ -160,10 +159,10 @@ export function CampaignCard({
         {/* Total Scans */}
         <div className="flex flex-col border-l border-border/60 pl-3">
           <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-            <BarChart2 className="h-3 w-3 text-sky-500" />
+            <BarChart2 className="size-3 text-sky-500" />
             Total Scans
           </span>
-          <span className="mt-1 font-mono text-base font-bold text-foreground">
+          <span className="mt-1 font-mono text-sm font-bold text-foreground">
             {(campaign.totalScans || 0).toLocaleString()}
           </span>
         </div>
@@ -171,10 +170,10 @@ export function CampaignCard({
         {/* Conversion Rate */}
         <div className="flex flex-col border-l border-border/60 pl-3">
           <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-            <Sparkles className="h-3 w-3 text-purple-500" />
+            <Sparkles className="size-3 text-purple-500" />
             Conv. Rate
           </span>
-          <span className="mt-1 font-mono text-base font-bold text-purple-600 dark:text-purple-400">
+          <span className="mt-1 font-mono text-sm font-bold text-purple-600 dark:text-purple-400">
             {campaign.conversionRate || 0}%
           </span>
         </div>
@@ -194,11 +193,11 @@ export function CampaignCard({
             className="h-7 text-xs text-primary hover:text-primary gap-1 px-2"
           >
             <span>View QRs</span>
-            <ArrowUpRight className="h-3.5 w-3.5" />
+            <ArrowUpRight className="size-3.5" />
           </Button>
         ) : (
           <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-            <Layers className="h-3 w-3" />
+            <Layers className="size-3" />
             <span>Group Active</span>
           </div>
         )}

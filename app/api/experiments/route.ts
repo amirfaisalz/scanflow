@@ -30,9 +30,9 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    const enrichedExperiments = userExperiments.map((exp: any) => {
+    const enrichedExperiments = userExperiments.map((exp) => {
       const relevantSessions = userSessions.filter(
-        (s: any) => s.experimentId === exp.id
+        (s) => s.experimentId === exp.id
       );
 
       const stats = computeExperimentMetrics(
@@ -50,18 +50,18 @@ export async function GET(request: NextRequest) {
 
     const totalExperiments = enrichedExperiments.length;
     const activeExperiments = enrichedExperiments.filter(
-      (e: any) => e.status === "active"
+      (e) => e.status === "active"
     ).length;
     const totalVariants = enrichedExperiments.reduce(
-      (sum: number, e: any) => sum + (e.variants?.length || 0),
+      (sum, e) => sum + (e.variants?.length || 0),
       0
     );
     const totalConversions = enrichedExperiments.reduce(
-      (sum: number, e: any) => sum + (e.stats?.totalConversions || 0),
+      (sum, e) => sum + (e.stats?.totalConversions || 0),
       0
     );
     const totalSessions = enrichedExperiments.reduce(
-      (sum: number, e: any) => sum + (e.stats?.totalSessions || 0),
+      (sum, e) => sum + (e.stats?.totalSessions || 0),
       0
     );
     const overallConversionRate =
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
         ? Number(((totalConversions / totalSessions) * 100).toFixed(1))
         : 0;
     const significantWinnersCount = enrichedExperiments.filter(
-      (e: any) => e.stats?.hasSignificantWinner || Boolean(e.winnerVariantId)
+      (e) => e.stats?.hasSignificantWinner || Boolean(e.winnerVariantId)
     ).length;
 
     return NextResponse.json({
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
 
     // Validate traffic weights sum to 100%
     const totalWeight = variants.reduce(
-      (sum: number, v: any) => sum + (Number(v.trafficWeight) || 0),
+      (sum: number, v: { trafficWeight?: number }) => sum + (Number(v.trafficWeight) || 0),
       0
     );
     if (Math.round(totalWeight) !== 100) {
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
         ? Math.min(100, Math.max(1, Math.round(trafficAllocation)))
         : 100;
 
-    const hasExplicitControl = variants.some((v: any) => Boolean(v.isControl));
+    const hasExplicitControl = variants.some((v: { isControl?: boolean }) => Boolean(v.isControl));
 
     const [createdExp] = await db
       .insert(experiments)
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    const variantRecords = variants.map((v: any, index: number) => {
+    const variantRecords = variants.map((v: { name: string; destinationUrl: string; trafficWeight?: number; isControl?: boolean }, index: number) => {
       const isControl = hasExplicitControl ? Boolean(v.isControl) : index === 0;
       return {
         id: `var_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`,

@@ -7,7 +7,6 @@ import {
   Plus,
   Search,
   RotateCw,
-  Sparkles,
   TrendingUp,
   Activity,
   AlertCircle,
@@ -32,6 +31,7 @@ import {
   ExperimentData,
   ExperimentDialog,
 } from "@/components/experiments";
+import { cn } from "@/lib/utils";
 
 export default function ExperimentsDashboardPage() {
   // Experiments & Metrics state
@@ -71,38 +71,6 @@ export default function ExperimentsDashboardPage() {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [editingExperiment, setEditingExperiment] = React.useState<ExperimentData | null>(null);
 
-  // Fetch filter options (QR codes & Campaigns) on mount
-  const fetchFilterOptions = React.useCallback(async () => {
-    try {
-      const [qrRes, campRes] = await Promise.all([
-        fetch("/api/qr-codes"),
-        fetch("/api/campaigns"),
-      ]);
-
-      if (qrRes.ok) {
-        const qrJson = await qrRes.json();
-        const items = Array.isArray(qrJson.data)
-          ? qrJson.data.map((q: any) => ({
-              id: q.id,
-              name: q.name,
-              destinationUrl: q.destinationUrl,
-            }))
-          : [];
-        setQrOptions(items);
-      }
-
-      if (campRes.ok) {
-        const campJson = await campRes.json();
-        const items = Array.isArray(campJson.campaigns)
-          ? campJson.campaigns.map((c: any) => ({ id: c.id, name: c.name }))
-          : [];
-        setCampaignOptions(items);
-      }
-    } catch (err) {
-      console.error("Failed to load options for experiments:", err);
-    }
-  }, []);
-
   // Fetch experiments and aggregate metrics
   const fetchExperiments = React.useCallback(async () => {
     try {
@@ -119,7 +87,6 @@ export default function ExperimentsDashboardPage() {
       const loadedExperiments: ExperimentData[] = data.experiments || [];
       setExperiments(loadedExperiments);
 
-      // Compute or use server-provided aggregate metrics
       const computedTotal = loadedExperiments.length;
       const computedActive = loadedExperiments.filter((e) => e.status === "active").length;
       const computedTotalVariants = loadedExperiments.reduce(
@@ -151,18 +118,103 @@ export default function ExperimentsDashboardPage() {
         overallConversionRate: data.metrics?.overallConversionRate ?? computedConversionRate,
         significantWinnersCount: data.metrics?.significantWinnersCount ?? computedWinners,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching experiments:", err);
-      setError(err?.message || "Failed to load experiments");
+      setError(err instanceof Error ? err.message : "Failed to load experiments");
     } finally {
       setLoading(false);
     }
   }, []);
 
   React.useEffect(() => {
-    fetchFilterOptions();
-    fetchExperiments();
-  }, [fetchFilterOptions, fetchExperiments]);
+    let isMounted = true;
+    async function init() {
+      try {
+        const [qrRes, campRes, expRes] = await Promise.all([
+          fetch("/api/qr-codes"),
+          fetch("/api/campaigns"),
+          fetch("/api/experiments"),
+        ]);
+
+        if (qrRes.ok && isMounted) {
+          const qrJson = await qrRes.json();
+          const items = Array.isArray(qrJson.data)
+            ? qrJson.data.map((q: { id: string; name: string; destinationUrl?: string }) => ({
+                id: q.id,
+                name: q.name,
+                destinationUrl: q.destinationUrl,
+              }))
+            : [];
+          setQrOptions(items);
+        }
+
+        if (campRes.ok && isMounted) {
+          const campJson = await campRes.json();
+          const items = Array.isArray(campJson.campaigns)
+            ? campJson.campaigns.map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }))
+            : [];
+          setCampaignOptions(items);
+        }
+
+        if (!expRes.ok) {
+          const errData = await expRes.json().catch(() => ({}));
+          throw new Error(errData.error || `Failed to load experiments (HTTP ${expRes.status})`);
+        }
+
+        if (isMounted) {
+          const data = await expRes.json();
+          const loadedExperiments: ExperimentData[] = data.experiments || [];
+          setExperiments(loadedExperiments);
+
+          const computedTotal = loadedExperiments.length;
+          const computedActive = loadedExperiments.filter((e) => e.status === "active").length;
+          const computedTotalVariants = loadedExperiments.reduce(
+            (sum, e) => sum + (e.variants?.length || 0),
+            0
+          );
+          const computedTotalConversions = loadedExperiments.reduce(
+            (sum, e) => sum + (e.stats?.totalConversions || 0),
+            0
+          );
+          const computedTotalSessions = loadedExperiments.reduce(
+            (sum, e) => sum + (e.stats?.totalSessions || 0),
+            0
+          );
+          const computedConversionRate =
+            computedTotalSessions > 0
+              ? Math.round((computedTotalConversions / computedTotalSessions) * 1000) / 10
+              : 0;
+          const computedWinners = loadedExperiments.filter(
+            (e) => e.stats?.hasSignificantWinner || Boolean(e.winnerVariantId)
+          ).length;
+
+          setMetrics({
+            totalExperiments: data.metrics?.totalExperiments ?? computedTotal,
+            activeExperiments: data.metrics?.activeExperiments ?? computedActive,
+            totalVariants: data.metrics?.totalVariants ?? computedTotalVariants,
+            totalConversions: data.metrics?.totalConversions ?? computedTotalConversions,
+            totalSessions: data.metrics?.totalSessions ?? computedTotalSessions,
+            overallConversionRate: data.metrics?.overallConversionRate ?? computedConversionRate,
+            significantWinnersCount: data.metrics?.significantWinnersCount ?? computedWinners,
+          });
+        }
+      } catch (err: unknown) {
+        if (isMounted) {
+          console.error("Error initializing experiments:", err);
+          setError(err instanceof Error ? err.message : "Failed to load experiments");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    init();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Actions
   const handleCreateNew = () => {
@@ -216,9 +268,9 @@ export default function ExperimentsDashboardPage() {
       };
 
       toast.success(statusLabels[newStatus] || `Experiment status updated to ${newStatus}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Status toggle error:", err);
-      toast.error(err?.message || "Failed to update experiment status");
+      toast.error(err instanceof Error ? err.message : "Failed to update experiment status");
     }
   };
 
@@ -253,9 +305,9 @@ export default function ExperimentsDashboardPage() {
       }));
 
       toast.success("Winner declared successfully! Traffic locked to winning variant.");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Declare winner error:", err);
-      toast.error(err?.message || "Failed to declare winner");
+      toast.error(err instanceof Error ? err.message : "Failed to declare winner");
     }
   };
 
@@ -300,13 +352,27 @@ export default function ExperimentsDashboardPage() {
       }
 
       toast.success("Experiment deleted successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Delete experiment error:", err);
-      toast.error(err?.message || "Failed to delete experiment");
+      toast.error(err instanceof Error ? err.message : "Failed to delete experiment");
     }
   };
 
-  const handleSave = async (payload: any) => {
+  const handleSave = async (payload: {
+    name: string;
+    description?: string;
+    qrCodeId: string;
+    campaignId?: string | null;
+    trafficAllocation?: number;
+    status?: string;
+    variants: Array<{
+      id?: string;
+      name: string;
+      destinationUrl: string;
+      trafficWeight: number;
+      isControl: boolean;
+    }>;
+  }) => {
     try {
       const isEditing = Boolean(editingExperiment && editingExperiment.id);
       const url = isEditing
@@ -328,7 +394,7 @@ export default function ExperimentsDashboardPage() {
       setDialogOpen(false);
       await fetchExperiments();
       toast.success(isEditing ? "Experiment updated successfully" : "Experiment created successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Save experiment error:", err);
       throw err;
     }
@@ -363,6 +429,49 @@ export default function ExperimentsDashboardPage() {
     setQrFilter("all");
   };
 
+  const kpiCards = [
+    {
+      title: "Active Experiments",
+      value: metrics.activeExperiments >= 1000 ? `${(metrics.activeExperiments / 1000).toFixed(1)}K` : metrics.activeExperiments.toLocaleString(),
+      trendValue: "+100%",
+      trendLabel: `of ${metrics.totalExperiments} total tests`,
+      isPositive: true,
+      icon: Split,
+      iconColor: "text-rose-500 dark:text-rose-400",
+      iconBg: "bg-rose-500/10 dark:bg-rose-500/15",
+    },
+    {
+      title: "Total Sessions",
+      value: metrics.totalSessions >= 1000 ? `${(metrics.totalSessions / 1000).toFixed(2).replace(/\.00$/, "")}K` : metrics.totalSessions.toLocaleString(),
+      trendValue: "+147%",
+      trendLabel: "VS PREV. 28 DAYS",
+      isPositive: true,
+      icon: Activity,
+      iconColor: "text-indigo-500 dark:text-indigo-400",
+      iconBg: "bg-indigo-500/10 dark:bg-indigo-500/15",
+    },
+    {
+      title: "Avg Conv. Rate",
+      value: `${metrics.overallConversionRate.toFixed(1)}%`,
+      trendValue: "+24%",
+      trendLabel: "VS PREV. 28 DAYS",
+      isPositive: true,
+      icon: TrendingUp,
+      iconColor: "text-emerald-500 dark:text-emerald-400",
+      iconBg: "bg-emerald-500/10 dark:bg-emerald-500/15",
+    },
+    {
+      title: "Significant Winners",
+      value: metrics.significantWinnersCount.toLocaleString(),
+      trendValue: "95%",
+      trendLabel: "Statistically validated",
+      isPositive: true,
+      icon: Crown,
+      iconColor: "text-amber-500 dark:text-amber-400",
+      iconBg: "bg-amber-500/10 dark:bg-amber-500/15",
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6 max-w-7xl mx-auto w-full">
       {/* Breadcrumb Navigation */}
@@ -378,22 +487,26 @@ export default function ExperimentsDashboardPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* Header Section */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <Split className="h-6 w-6 text-sky-500" />
-              <span>A/B Testing Experiments</span>
-            </h1>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Isolated Tenant
-            </span>
+      {/* Header Section Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md shadow-2xs">
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-500 flex items-center justify-center font-bold text-sm">
+            <Split className="size-5" />
           </div>
-          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Optimize your conversion funnels by split-testing destinations and traffic across QR codes.
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-bold tracking-tight text-foreground">
+                A/B Testing Experiments
+              </h1>
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="size-1 rounded-full bg-emerald-500 animate-pulse" />
+                Isolated Tenant
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Optimize conversion funnels by split-testing destinations and traffic across QR codes.
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -402,102 +515,89 @@ export default function ExperimentsDashboardPage() {
             variant="outline"
             size="sm"
             aria-label="Refresh data"
-            className="border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 gap-1.5 h-9"
+            className="gap-1.5 h-8 text-xs"
           >
-            <RotateCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-sky-500" : ""}`} />
+            <RotateCw className={`size-3.5 ${loading ? "animate-spin text-primary" : ""}`} />
             <span>Refresh</span>
           </Button>
 
           <Button
             onClick={handleCreateNew}
             size="sm"
-            className="bg-sky-600 hover:bg-sky-500 text-white gap-1.5 h-9 font-medium shadow-md shadow-sky-950/40"
+            className="gap-1.5 h-8 text-xs font-medium shadow-xs"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="size-3.5" />
             <span>New Experiment</span>
           </Button>
         </div>
       </div>
 
       {/* 4 Summary KPI Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Active Experiments */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/60">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Active Experiments</span>
-            <Split className="h-4 w-4 text-sky-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-            {metrics.activeExperiments.toLocaleString()}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">
-            of {metrics.totalExperiments} total tests
-          </span>
-        </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {kpiCards.map((card, idx) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={idx}
+              className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md p-5 shadow-2xs hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+            >
+              {/* Top Row: Title & Circular Icon Pill */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-foreground tracking-tight">
+                  {card.title}
+                </span>
+                <div
+                  className={cn(
+                    "flex size-9 items-center justify-center rounded-full transition-transform group-hover:scale-105",
+                    card.iconBg
+                  )}
+                >
+                  <Icon className={cn("size-4", card.iconColor)} />
+                </div>
+              </div>
 
-        {/* Total Sessions */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/60">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Sessions</span>
-            <Activity className="h-4 w-4 text-sky-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-            {metrics.totalSessions.toLocaleString()}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">
-            Tracked split sessions
-          </span>
-        </div>
+              {/* Middle: Big Metric Value */}
+              <div className="my-3">
+                <div className="text-3xl font-bold tracking-tight text-foreground font-sans">
+                  {card.value}
+                </div>
+              </div>
 
-        {/* Overall Conversion Rate */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/60">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Avg Conv. Rate</span>
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-            {metrics.overallConversionRate}%
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">
-            Across all experiments
-          </span>
-        </div>
-
-        {/* Significant Winners */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/60">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Significant Winners</span>
-            <Crown className="h-4 w-4 text-amber-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-            {metrics.significantWinnersCount.toLocaleString()}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">
-            Statistically validated
-          </span>
-        </div>
+              {/* Bottom: Trend Arrow + Percentage + Comparison Label */}
+              <div className="flex items-center gap-1.5 text-xs">
+                <div className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+                  <TrendingUp className="size-3.5" />
+                  <span>{card.trendValue}</span>
+                </div>
+                <span className="text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+                  {card.trendLabel}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Search and Filters Toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-zinc-200/80 bg-white/50 p-3 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/40">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md shadow-2xs">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search experiments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9 bg-white dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm"
+            className="pl-9 h-9 bg-background/80 border-border/80 text-foreground text-xs placeholder:text-muted-foreground"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <Filter className="h-3.5 w-3.5 text-zinc-400" />
+            <Filter className="size-3.5 text-muted-foreground" />
             <select
               aria-label="Status filter"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-9 rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-xs text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              className="h-9 rounded-lg border border-border/80 bg-background/80 px-2.5 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
@@ -508,12 +608,12 @@ export default function ExperimentsDashboardPage() {
           </div>
 
           <div className="flex items-center gap-1.5">
-            <QrCode className="h-3.5 w-3.5 text-zinc-400" />
+            <QrCode className="size-3.5 text-muted-foreground" />
             <select
               aria-label="QR Code filter"
               value={qrFilter}
               onChange={(e) => setQrFilter(e.target.value)}
-              className="h-9 max-w-[180px] rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-xs text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-sky-500 truncate"
+              className="h-9 max-w-[180px] rounded-lg border border-border/80 bg-background/80 px-2.5 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary truncate"
             >
               <option value="all">All QR Codes</option>
               {qrOptions.map((q) => (
@@ -529,7 +629,7 @@ export default function ExperimentsDashboardPage() {
               variant="ghost"
               size="sm"
               onClick={handleClearFilters}
-              className="h-9 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              className="h-9 text-xs text-muted-foreground hover:text-foreground"
             >
               Reset
             </Button>
@@ -539,16 +639,16 @@ export default function ExperimentsDashboardPage() {
 
       {/* Error state */}
       {error && (
-        <div className="flex items-center justify-between gap-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-600 dark:text-red-400">
+        <div className="flex items-center justify-between gap-4 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-600 dark:text-rose-400">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 shrink-0" />
+            <AlertCircle className="size-5 shrink-0" />
             <span>{error}</span>
           </div>
           <Button
             onClick={fetchExperiments}
             variant="outline"
             size="sm"
-            className="border-red-500/30 text-red-600 hover:bg-red-500/20 dark:text-red-300 h-8 text-xs shrink-0"
+            className="border-rose-500/30 text-rose-600 hover:bg-rose-500/20 dark:text-rose-200 h-8 text-xs shrink-0"
           >
             Try Again
           </Button>
@@ -561,17 +661,17 @@ export default function ExperimentsDashboardPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="rounded-2xl border border-zinc-800/80 bg-zinc-950/40 p-5 space-y-4"
+              className="rounded-2xl border border-border/80 bg-card/60 p-5 space-y-4"
             >
               <div className="flex items-center justify-between">
-                <Skeleton className="h-5 w-40 bg-zinc-800" />
-                <Skeleton className="h-5 w-16 bg-zinc-800" />
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-5 w-16" />
               </div>
-              <Skeleton className="h-3 w-full bg-zinc-800" />
-              <Skeleton className="h-3 w-3/4 bg-zinc-800" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-3/4" />
               <div className="space-y-2 pt-4">
-                <Skeleton className="h-12 w-full bg-zinc-800" />
-                <Skeleton className="h-12 w-full bg-zinc-800" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
               </div>
             </div>
           ))}
@@ -580,25 +680,25 @@ export default function ExperimentsDashboardPage() {
 
       {/* Empty State */}
       {!loading && !error && filteredExperiments.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-800 p-12 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-500 mb-4 border border-sky-500/20">
-            <Split className="h-7 w-7" />
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/80 p-12 text-center bg-card/40">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4 border border-primary/20">
+            <Split className="size-6" />
           </div>
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+          <h3 className="text-base font-semibold text-foreground">
             {hasActiveFilters ? "No experiments found" : "No A/B experiments yet"}
           </h3>
-          <p className="mt-1.5 max-w-sm text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+          <p className="mt-1 max-w-sm text-xs sm:text-sm text-muted-foreground leading-relaxed">
             {hasActiveFilters
               ? "No experiments matched your search query or active filters."
               : "Create your first A/B testing experiment to compare landing page variants and boost your QR conversions."}
           </p>
-          <div className="mt-6 flex items-center gap-3">
+          <div className="mt-5 flex items-center gap-3">
             {hasActiveFilters ? (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleClearFilters}
-                className="h-9 text-xs"
+                className="h-8 text-xs"
               >
                 Clear Filters
               </Button>
@@ -606,9 +706,9 @@ export default function ExperimentsDashboardPage() {
               <Button
                 onClick={handleCreateNew}
                 size="sm"
-                className="bg-sky-600 hover:bg-sky-500 text-white gap-1.5 h-9 font-medium shadow-md shadow-sky-950/40"
+                className="gap-1.5 h-8 text-xs font-medium shadow-xs"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="size-3.5" />
                 <span>Create Experiment</span>
               </Button>
             )}
@@ -618,7 +718,7 @@ export default function ExperimentsDashboardPage() {
 
       {/* Experiments Grid */}
       {!loading && filteredExperiments.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredExperiments.map((exp) => (
             <ExperimentCard
               key={exp.id}

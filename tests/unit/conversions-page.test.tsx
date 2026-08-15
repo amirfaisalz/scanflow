@@ -174,9 +174,9 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
           ok: true,
           json: async () => ({
             goal: {
-              id: "goal-1",
               ...mockGoals[0],
               ...body,
+              id: "goal-1",
               updatedAt: new Date().toISOString(),
             },
           }),

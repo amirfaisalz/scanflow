@@ -3,7 +3,6 @@ import {
   selectExperimentVariant,
   calculateStatisticalSignificance,
   computeExperimentMetrics,
-  type VariantWithStats,
   type ExperimentStats,
 } from "@/lib/experiments/engine";
 

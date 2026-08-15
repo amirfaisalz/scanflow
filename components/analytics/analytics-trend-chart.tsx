@@ -9,9 +9,8 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Legend,
 } from "recharts";
-import { TrendingUp, BarChart2, QrCode, Sparkles, Activity } from "lucide-react";
+import { TrendingUp, BarChart2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -19,7 +18,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 export interface AnalyticsTrendChartProps {
   timeSeries: Array<{
@@ -44,37 +42,29 @@ export function AnalyticsTrendChart({
     () => timeSeries.reduce((acc, curr) => acc + (curr.scans || 0), 0),
     [timeSeries]
   );
-  const totalSessions = React.useMemo(
-    () => timeSeries.reduce((acc, curr) => acc + (curr.sessions || 0), 0),
-    [timeSeries]
-  );
-  const totalConversions = React.useMemo(
-    () => timeSeries.reduce((acc, curr) => acc + (curr.conversions || 0), 0),
-    [timeSeries]
-  );
 
   return (
-    <Card className="rounded-2xl border border-zinc-200/80 bg-white/70 shadow-sm backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/70">
+    <Card className="rounded-2xl border border-border/80 bg-card/60 shadow-2xs backdrop-blur-md">
       <CardHeader className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-sky-500" />
-            Scan & Conversion Trends
+          <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+            <TrendingUp className="size-4 text-sky-500" />
+            Scan &amp; Conversion Trends
           </CardTitle>
-          <CardDescription className="text-xs text-zinc-500 dark:text-zinc-400">
+          <CardDescription className="text-xs text-muted-foreground">
             Performance over time ({period}) • {totalScans.toLocaleString()} total scans
           </CardDescription>
         </div>
 
         {!isEmpty && (
-          <div className="flex flex-wrap items-center gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900">
+          <div className="flex flex-wrap items-center gap-1 rounded-xl bg-muted/60 p-1">
             <button
               type="button"
               onClick={() => setActiveMetric("all")}
               className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                 activeMetric === "all"
-                  ? "bg-white text-zinc-900 shadow-xs dark:bg-zinc-800 dark:text-zinc-100"
-                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  ? "bg-background text-foreground shadow-2xs font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               All Metrics
@@ -84,8 +74,8 @@ export function AnalyticsTrendChart({
               onClick={() => setActiveMetric("scans")}
               className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                 activeMetric === "scans"
-                  ? "bg-sky-500 text-white shadow-xs"
-                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  ? "bg-sky-500 text-white shadow-2xs font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Scans
@@ -95,8 +85,8 @@ export function AnalyticsTrendChart({
               onClick={() => setActiveMetric("sessions")}
               className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                 activeMetric === "sessions"
-                  ? "bg-indigo-500 text-white shadow-xs"
-                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  ? "bg-indigo-500 text-white shadow-2xs font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Sessions
@@ -106,8 +96,8 @@ export function AnalyticsTrendChart({
               onClick={() => setActiveMetric("conversions")}
               className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                 activeMetric === "conversions"
-                  ? "bg-emerald-500 text-white shadow-xs"
-                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  ? "bg-emerald-500 text-white shadow-2xs font-semibold"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Conversions
@@ -118,12 +108,12 @@ export function AnalyticsTrendChart({
 
       <CardContent className="pt-2">
         {isEmpty ? (
-          <div className="flex h-64 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-200 p-6 text-center dark:border-zinc-800">
-            <BarChart2 className="h-8 w-8 text-zinc-400 dark:text-zinc-600" />
-            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <div className="flex h-64 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/80 p-6 text-center bg-card/40">
+            <BarChart2 className="size-8 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">
               No scan data available for this time period
             </p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-500">
+            <p className="text-xs text-muted-foreground">
               Generate QR scans to visualize time series curves and conversion trends.
             </p>
           </div>
@@ -145,7 +135,7 @@ export function AnalyticsTrendChart({
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-zinc-200 dark:text-zinc-800" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-border/60" />
                 <XAxis
                   dataKey="label"
                   stroke="#888888"

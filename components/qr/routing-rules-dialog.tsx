@@ -23,12 +23,10 @@ import {
   GitFork,
   Plus,
   Trash2,
-  ExternalLink,
   Smartphone,
   Globe,
   Languages,
   Clock,
-  Layers,
 } from "lucide-react";
 import type { QRCode, RoutingRule } from "@/lib/db/schema";
 
@@ -54,29 +52,30 @@ export function RoutingRulesDialog({
   const [priority, setPriority] = React.useState("1");
   const [formError, setFormError] = React.useState("");
 
-  const fetchRules = React.useCallback(async () => {
-    if (!qrCode?.id) return;
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/qr-codes/${qrCode.id}/rules`);
-      if (res.ok) {
-        const data = await res.json();
-        setRules(data.rules || []);
-      }
-    } catch (err) {
-      console.error("Failed to load routing rules:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [qrCode?.id]);
+  const qrCodeId = qrCode?.id;
 
   React.useEffect(() => {
-    if (open && qrCode?.id) {
-      fetchRules();
-      setFormError("");
-      setDestinationUrl("");
+    if (!open || !qrCodeId) return;
+    let isMounted = true;
+    async function load() {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/qr-codes/${qrCodeId}/rules`);
+        if (res.ok && isMounted) {
+          const data = await res.json();
+          setRules(data.rules || []);
+        }
+      } catch (err) {
+        console.error("Failed to load routing rules:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     }
-  }, [open, qrCode?.id, fetchRules]);
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, [open, qrCodeId]);
 
   const handleAddRule = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,8 +116,8 @@ export function RoutingRulesDialog({
       setRules((prev) => [...prev, data.rule].sort((a, b) => a.priority - b.priority));
       setDestinationUrl("");
       setFormError("");
-    } catch (err: any) {
-      setFormError(err.message || "Failed to add rule");
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : "Failed to add rule");
     } finally {
       setAddingRule(false);
     }
@@ -253,6 +252,7 @@ export function RoutingRulesDialog({
               <Select
                 value={conditionType}
                 onValueChange={(val) => {
+                  if (!val) return;
                   setConditionType(val);
                   if (val === "os") setConditionValue("ios");
                   else if (val === "device") setConditionValue("mobile");

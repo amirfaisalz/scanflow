@@ -259,7 +259,8 @@ export function computeExperimentMetrics(
   const totalSessions = sessions.length;
   let totalScans = 0;
   for (const s of sessions) {
-    const scanEvts = (s as any).events?.filter((e: any) => e.eventType === "QR_SCAN")?.length;
+    const sEvents = (s as unknown as { events?: Array<{ eventType?: string }> }).events;
+    const scanEvts = sEvents?.filter((e) => e.eventType === "QR_SCAN")?.length;
     totalScans += scanEvts && scanEvts > 0 ? scanEvts : 1;
   }
   const totalConversions = sessions.filter((s) => Boolean(s.converted)).length;
@@ -278,7 +279,8 @@ export function computeExperimentMetrics(
     const varSessionCount = variantSessions.length;
     let varScanCount = 0;
     for (const s of variantSessions) {
-      const scanEvts = (s as any).events?.filter((e: any) => e.eventType === "QR_SCAN")?.length;
+      const sEvents = (s as unknown as { events?: Array<{ eventType?: string }> }).events;
+      const scanEvts = sEvents?.filter((e) => e.eventType === "QR_SCAN")?.length;
       varScanCount += scanEvts && scanEvts > 0 ? scanEvts : 1;
     }
     const varConversions = variantSessions.filter((s) => Boolean(s.converted)).length;

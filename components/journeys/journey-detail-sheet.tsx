@@ -8,18 +8,8 @@ import {
   Send,
   Trophy,
   ExternalLink,
-  Smartphone,
-  Tablet,
-  Monitor,
-  Globe,
-  Clock,
-  CheckCircle2,
-  XCircle,
   Sparkles,
-  ArrowRight,
   GitFork,
-  Copy,
-  Check,
 } from "lucide-react";
 import {
   Sheet,
@@ -29,13 +19,25 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { JourneySession } from "./journeys-table";
+
+export interface SessionEventData {
+  conditionMatched?: string;
+  destinationUrl?: string;
+  page?: string;
+  title?: string;
+  target?: string;
+  buttonId?: string;
+  action?: string;
+  goal?: string;
+  amount?: string | number;
+  [key: string]: string | number | boolean | null | undefined;
+}
 
 export interface SessionTimelineEvent {
   id: string;
   eventType: string;
-  eventData?: Record<string, any>;
+  eventData?: SessionEventData;
   timestamp: string | Date;
 }
 
@@ -257,11 +259,11 @@ export function JourneyDetailSheet({ session, open, onOpenChange }: JourneyDetai
     if (!session || !open) return;
 
     let isMounted = true;
-    setLoading(true);
-
-    fetch(`/api/analytics/sessions/${session.id}`)
-      .then((res) => res.json())
-      .then((data) => {
+    async function loadEvents() {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/analytics/sessions/${session?.id}`);
+        const data = await res.json();
         if (isMounted) {
           if (data.events && data.events.length > 0) {
             setEvents(data.events);
@@ -269,21 +271,22 @@ export function JourneyDetailSheet({ session, open, onOpenChange }: JourneyDetai
             // Fallback synthetic initial scan event if not populated
             setEvents([
               {
-                id: `evt_init_${session.id}`,
+                id: `evt_init_${session?.id}`,
                 eventType: "QR_SCAN",
-                eventData: { destinationUrl: session.qrSlug ? `/r/${session.qrSlug}` : "Destination" },
-                timestamp: session.startedAt,
+                eventData: { destinationUrl: session?.qrSlug ? `/r/${session.qrSlug}` : "Destination" },
+                timestamp: session?.startedAt || new Date().toISOString(),
               },
             ]);
           }
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Failed to load session events:", err);
-      })
-      .finally(() => {
+      } finally {
         if (isMounted) setLoading(false);
-      });
+      }
+    }
+
+    loadEvents();
 
     return () => {
       isMounted = false;

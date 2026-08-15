@@ -33,11 +33,11 @@ export interface ConversionGoalData {
   userId?: string;
   name: string;
   description?: string | null;
-  eventType: string; // 'BUTTON_CLICK' | 'LINK_CLICK' | 'FORM_SUBMIT' | 'PAGE_VIEW' | 'CONVERSION' | string
+  eventType: string;
   targetPattern?: string | null;
   qrCodeId?: string | null;
   campaignId?: string | null;
-  monetaryValue: number; // in cents (e.g. 1500 = $15.00)
+  monetaryValue: number;
   currency?: string;
   isActive: boolean;
   createdAt: string | Date;
@@ -71,9 +71,9 @@ export function ConversionCard({
         return (
           <Badge
             variant="outline"
-            className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 text-[10px] font-semibold gap-1"
+            className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20 text-[10px] font-semibold gap-1"
           >
-            <MousePointerClick className="h-3 w-3 text-indigo-400" />
+            <MousePointerClick className="size-3 text-indigo-500" />
             BUTTON_CLICK
           </Badge>
         );
@@ -81,9 +81,9 @@ export function ConversionCard({
         return (
           <Badge
             variant="outline"
-            className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-semibold gap-1"
+            className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[10px] font-semibold gap-1"
           >
-            <FileText className="h-3 w-3 text-emerald-400" />
+            <FileText className="size-3 text-emerald-500" />
             FORM_SUBMIT
           </Badge>
         );
@@ -91,9 +91,9 @@ export function ConversionCard({
         return (
           <Badge
             variant="outline"
-            className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[10px] font-semibold gap-1"
+            className="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20 text-[10px] font-semibold gap-1"
           >
-            <Globe className="h-3 w-3 text-cyan-400" />
+            <Globe className="size-3 text-cyan-500" />
             PAGE_VIEW
           </Badge>
         );
@@ -101,9 +101,9 @@ export function ConversionCard({
         return (
           <Badge
             variant="outline"
-            className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-[10px] font-semibold gap-1"
+            className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px] font-semibold gap-1"
           >
-            <ExternalLink className="h-3 w-3 text-amber-400" />
+            <ExternalLink className="size-3 text-amber-500" />
             LINK_CLICK
           </Badge>
         );
@@ -112,9 +112,9 @@ export function ConversionCard({
         return (
           <Badge
             variant="outline"
-            className="bg-sky-500/10 text-sky-400 border-sky-500/20 text-[10px] font-semibold gap-1"
+            className="bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20 text-[10px] font-semibold gap-1"
           >
-            <Target className="h-3 w-3 text-sky-400" />
+            <Target className="size-3 text-sky-500" />
             {eventType || "CONVERSION"}
           </Badge>
         );
@@ -126,9 +126,9 @@ export function ConversionCard({
       return (
         <Badge
           variant="outline"
-          className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-semibold gap-1"
+          className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[10px] font-semibold gap-1"
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
           Active
         </Badge>
       );
@@ -136,9 +136,9 @@ export function ConversionCard({
     return (
       <Badge
         variant="outline"
-        className="bg-zinc-800 text-zinc-400 border-zinc-700 text-[10px] font-semibold gap-1"
+        className="bg-muted text-muted-foreground border-border text-[10px] font-semibold gap-1"
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" />
+        <span className="size-1.5 rounded-full bg-muted-foreground/60" />
         Inactive
       </Badge>
     );
@@ -157,13 +157,13 @@ export function ConversionCard({
   const rateBarWidth = Math.min(100, Math.max(0, conversionRate));
 
   return (
-    <div className="group relative flex flex-col justify-between rounded-2xl border border-zinc-800/80 bg-zinc-950/70 p-5 shadow-lg transition-all hover:border-sky-500/40 hover:shadow-xl">
+    <div className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md p-5 shadow-2xs transition-all duration-200 hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5">
       {/* Header with Title, Badges & Actions Menu */}
       <div>
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1.5 min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-bold text-base text-zinc-100 group-hover:text-sky-400 transition-colors truncate">
+              <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">
                 {goal.name}
               </h3>
               {getStatusBadge(goal.isActive)}
@@ -171,7 +171,7 @@ export function ConversionCard({
             </div>
 
             {goal.description && (
-              <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                 {goal.description}
               </p>
             )}
@@ -183,24 +183,24 @@ export function ConversionCard({
               render={
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon-sm"
                   aria-label="Actions"
-                  className="h-8 w-8 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+                  className="size-8 text-muted-foreground hover:text-foreground hover:bg-muted"
                 >
-                  <MoreVertical className="h-4 w-4" />
+                  <MoreVertical className="size-4" />
                 </Button>
               }
             />
             <DropdownMenuContent
               align="end"
-              className="w-48 bg-zinc-950 border-zinc-800 text-zinc-200"
+              className="w-48"
             >
               {onViewSnippet && (
                 <DropdownMenuItem
                   onClick={() => onViewSnippet(goal)}
                   className="text-xs gap-2 cursor-pointer"
                 >
-                  <Code className="h-3.5 w-3.5 text-sky-400" />
+                  <Code className="size-3.5 text-sky-500" />
                   Get Code Snippet
                 </DropdownMenuItem>
               )}
@@ -208,7 +208,7 @@ export function ConversionCard({
                 onClick={() => onEdit(goal)}
                 className="text-xs gap-2 cursor-pointer"
               >
-                <Edit className="h-3.5 w-3.5" />
+                <Edit className="size-3.5" />
                 Edit Goal
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -217,22 +217,22 @@ export function ConversionCard({
               >
                 {goal.isActive ? (
                   <>
-                    <Pause className="h-3.5 w-3.5 text-amber-400" />
+                    <Pause className="size-3.5 text-amber-500" />
                     Deactivate Goal
                   </>
                 ) : (
                   <>
-                    <Play className="h-3.5 w-3.5 text-emerald-400" />
+                    <Play className="size-3.5 text-emerald-500" />
                     Activate Goal
                   </>
                 )}
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-zinc-800" />
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => onDelete(goal.id)}
-                className="text-xs text-red-400 focus:text-red-400 focus:bg-red-500/10 gap-2 cursor-pointer"
+                className="text-xs text-destructive focus:text-destructive focus:bg-destructive/10 gap-2 cursor-pointer"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2 className="size-3.5" />
                 Delete Goal
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -240,31 +240,31 @@ export function ConversionCard({
         </div>
 
         {/* Scope & Target Pattern Details */}
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {goal.targetPattern && (
-            <div className="flex items-center gap-1.5 rounded-md bg-zinc-900/80 px-2 py-1 border border-zinc-800 text-[11px] font-mono text-zinc-300">
-              <Code className="h-3 w-3 text-sky-400" />
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2 py-1 border border-border/60 text-[11px] font-mono text-foreground">
+              <Code className="size-3 text-sky-500" />
               <span className="truncate max-w-[180px]">{goal.targetPattern}</span>
             </div>
           )}
 
           {goal.qrCode?.name ? (
-            <div className="flex items-center gap-1.5 rounded-md bg-zinc-900/80 px-2 py-1 border border-zinc-800 text-[11px] text-zinc-300">
-              <QrCode className="h-3 w-3 text-emerald-400" />
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2 py-1 border border-border/60 text-[11px] text-foreground">
+              <QrCode className="size-3 text-emerald-500" />
               <span className="truncate max-w-[140px]">{goal.qrCode.name}</span>
             </div>
           ) : null}
 
           {goal.campaign?.name ? (
-            <div className="flex items-center gap-1.5 rounded-md bg-zinc-900/80 px-2 py-1 border border-zinc-800 text-[11px] text-zinc-300">
-              <FolderGit2 className="h-3 w-3 text-purple-400" />
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2 py-1 border border-border/60 text-[11px] text-foreground">
+              <FolderGit2 className="size-3 text-purple-500" />
               <span className="truncate max-w-[140px]">{goal.campaign.name}</span>
             </div>
           ) : null}
 
           {!goal.qrCode?.name && !goal.campaign?.name && (
-            <div className="flex items-center gap-1.5 rounded-md bg-zinc-900/80 px-2 py-1 border border-zinc-800 text-[11px] text-zinc-400">
-              <Globe className="h-3 w-3 text-zinc-400" />
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2 py-1 border border-border/60 text-[11px] text-muted-foreground">
+              <Globe className="size-3" />
               <span>All QR Codes (Global Scope)</span>
             </div>
           )}
@@ -273,36 +273,36 @@ export function ConversionCard({
 
       {/* Aggregate Metrics Grid */}
       <div className="my-4 space-y-2.5">
-        <div className="grid grid-cols-3 gap-2 rounded-xl border border-zinc-850 bg-zinc-900/40 p-3">
+        <div className="grid grid-cols-3 gap-2 rounded-xl border border-border/60 bg-muted/30 p-3">
           {/* Conversions Count */}
           <div className="flex flex-col">
-            <span className="text-[11px] text-zinc-500 flex items-center gap-1">
-              <Target className="h-3 w-3 text-sky-400" />
+            <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+              <Target className="size-3 text-sky-500" />
               Conversions
             </span>
-            <span className="text-lg font-bold font-mono text-zinc-100 mt-0.5">
+            <span className="text-sm font-bold font-mono text-foreground mt-0.5">
               {totalConversions.toLocaleString()}
             </span>
           </div>
 
           {/* Conversion Rate */}
-          <div className="flex flex-col">
-            <span className="text-[11px] text-zinc-500 flex items-center gap-1">
-              <Sparkles className="h-3 w-3 text-emerald-400" />
+          <div className="flex flex-col border-l border-border/60 pl-3">
+            <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+              <Sparkles className="size-3 text-emerald-500" />
               Conv. Rate
             </span>
-            <span className="text-lg font-bold font-mono text-emerald-400 mt-0.5">
+            <span className="text-sm font-bold font-mono text-emerald-500 mt-0.5">
               {conversionRate}%
             </span>
           </div>
 
           {/* Attributed Revenue */}
-          <div className="flex flex-col">
-            <span className="text-[11px] text-zinc-500 flex items-center gap-1">
-              <DollarSign className="h-3 w-3 text-amber-400" />
+          <div className="flex flex-col border-l border-border/60 pl-3">
+            <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+              <DollarSign className="size-3 text-amber-500" />
               Revenue
             </span>
-            <span className="text-lg font-bold font-mono text-zinc-100 mt-0.5">
+            <span className="text-sm font-bold font-mono text-foreground mt-0.5">
               {formattedRevenue}
             </span>
           </div>
@@ -310,7 +310,7 @@ export function ConversionCard({
 
         {/* Rate Progress Bar */}
         <div className="space-y-1 px-1">
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800/80">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-gradient-to-r from-sky-500 to-emerald-500 transition-all duration-500"
               style={{ width: `${rateBarWidth}%` }}
@@ -320,7 +320,7 @@ export function ConversionCard({
       </div>
 
       {/* Footer Info & Quick Actions */}
-      <div className="flex items-center justify-between text-xs text-zinc-500 pt-3 border-t border-zinc-850">
+      <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/60">
         <span className="font-mono text-[11px]">
           Created {new Date(goal.createdAt).toLocaleDateString()}
         </span>
@@ -330,20 +330,21 @@ export function ConversionCard({
             <Button
               size="sm"
               variant="ghost"
+              aria-label="Get code snippet"
               onClick={() => onViewSnippet(goal)}
-              className="h-7 text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 gap-1 px-2"
+              className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1 px-2"
             >
-              <Code className="h-3.5 w-3.5 text-sky-400" />
-              <span>Get Code Snippet</span>
+              <Code className="size-3.5 text-sky-500" />
+              <span>Snippet</span>
             </Button>
           )}
           <Button
             size="sm"
             variant="ghost"
             onClick={() => onEdit(goal)}
-            className="h-7 text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 gap-1 px-2"
+            className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1 px-2"
           >
-            <Edit className="h-3.5 w-3.5" />
+            <Edit className="size-3.5" />
             <span>Edit</span>
           </Button>
         </div>

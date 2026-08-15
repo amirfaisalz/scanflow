@@ -146,7 +146,7 @@ export async function PATCH(
     if (winnerVariantId !== undefined) {
       if (winnerVariantId !== null) {
         const matchingVariant = existing.variants?.find(
-          (v: any) => v.id === winnerVariantId
+          (v) => v.id === winnerVariantId
         );
         if (!matchingVariant) {
           return NextResponse.json(
@@ -160,7 +160,7 @@ export async function PATCH(
 
     if (Array.isArray(variants)) {
       const totalWeight = variants.reduce(
-        (sum: number, v: any) => sum + (Number(v.trafficWeight) || 0),
+        (sum: number, v: { trafficWeight?: number }) => sum + (Number(v.trafficWeight) || 0),
         0
       );
       if (Math.round(totalWeight) !== 100) {

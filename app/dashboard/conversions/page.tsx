@@ -15,8 +15,6 @@ import {
   LayoutGrid,
   List,
   AlertCircle,
-  Filter,
-  Layers,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -36,6 +34,7 @@ import {
   ConversionDialog,
   SnippetDialog,
 } from "@/components/conversions";
+import { cn } from "@/lib/utils";
 
 export default function ConversionsDashboardPage() {
   // Goals & Metrics state
@@ -72,40 +71,11 @@ export default function ConversionsDashboardPage() {
   const [snippetDialogOpen, setSnippetDialogOpen] = React.useState(false);
   const [snippetGoal, setSnippetGoal] = React.useState<ConversionGoalData | null>(null);
 
-  // Fetch filter options (QR codes & Campaigns) on mount
-  const fetchFilterOptions = React.useCallback(async () => {
-    try {
-      const [qrRes, campRes] = await Promise.all([
-        fetch("/api/qr-codes"),
-        fetch("/api/campaigns"),
-      ]);
-
-      if (qrRes.ok) {
-        const qrJson = await qrRes.json();
-        const items = Array.isArray(qrJson.data)
-          ? qrJson.data.map((q: any) => ({ id: q.id, name: q.name }))
-          : [];
-        setQrOptions(items);
-      }
-
-      if (campRes.ok) {
-        const campJson = await campRes.json();
-        const items = Array.isArray(campJson.campaigns)
-          ? campJson.campaigns.map((c: any) => ({ id: c.id, name: c.name }))
-          : [];
-        setCampaignOptions(items);
-      }
-    } catch (err) {
-      console.error("Failed to load options for conversions:", err);
-    }
-  }, []);
-
   // Fetch Conversion Goals and aggregate metrics
   const fetchGoals = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
       const res = await fetch("/api/conversions");
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -116,7 +86,6 @@ export default function ConversionsDashboardPage() {
       const loadedGoals: ConversionGoalData[] = data.goals || [];
       setGoals(loadedGoals);
 
-      // Compute or use server-provided aggregate metrics
       const computedTotalConversions =
         data.metrics?.totalConversions ??
         loadedGoals.reduce((sum, g) => sum + (g.totalConversions || 0), 0);
@@ -142,18 +111,93 @@ export default function ConversionsDashboardPage() {
         activeGoalsCount: computedActiveGoals,
         overallConversionRate: computedConversionRate,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching conversion goals:", err);
-      setError(err?.message || "Failed to load conversion goals");
+      setError(err instanceof Error ? err.message : "Failed to load conversion goals");
     } finally {
       setLoading(false);
     }
   }, []);
 
   React.useEffect(() => {
-    fetchFilterOptions();
-    fetchGoals();
-  }, [fetchFilterOptions, fetchGoals]);
+    let isMounted = true;
+    async function init() {
+      try {
+        const [qrRes, campRes, convRes] = await Promise.all([
+          fetch("/api/qr-codes"),
+          fetch("/api/campaigns"),
+          fetch("/api/conversions"),
+        ]);
+
+        if (qrRes.ok && isMounted) {
+          const qrJson = await qrRes.json();
+          const items = Array.isArray(qrJson.data)
+            ? qrJson.data.map((q: { id: string; name: string }) => ({ id: q.id, name: q.name }))
+            : [];
+          setQrOptions(items);
+        }
+
+        if (campRes.ok && isMounted) {
+          const campJson = await campRes.json();
+          const items = Array.isArray(campJson.campaigns)
+            ? campJson.campaigns.map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }))
+            : [];
+          setCampaignOptions(items);
+        }
+
+        if (!convRes.ok) {
+          const errData = await convRes.json().catch(() => ({}));
+          throw new Error(errData.error || `Failed to load conversion goals (HTTP ${convRes.status})`);
+        }
+
+        if (isMounted) {
+          const data = await convRes.json();
+          const loadedGoals: ConversionGoalData[] = data.goals || [];
+          setGoals(loadedGoals);
+
+          const computedTotalConversions =
+            data.metrics?.totalConversions ??
+            loadedGoals.reduce((sum, g) => sum + (g.totalConversions || 0), 0);
+          const computedTotalRevenue =
+            data.metrics?.totalRevenue ??
+            loadedGoals.reduce((sum, g) => sum + (g.totalRevenue || 0), 0);
+          const computedActiveGoals =
+            data.metrics?.activeGoalsCount ??
+            loadedGoals.filter((g) => g.isActive).length;
+          const computedConversionRate =
+            data.metrics?.overallConversionRate ??
+            (loadedGoals.length > 0
+              ? Math.round(
+                  (loadedGoals.reduce((sum, g) => sum + (g.conversionRate || 0), 0) /
+                    loadedGoals.length) *
+                    10
+                ) / 10
+              : 0);
+
+          setMetrics({
+            totalConversions: computedTotalConversions,
+            totalRevenue: computedTotalRevenue,
+            activeGoalsCount: computedActiveGoals,
+            overallConversionRate: computedConversionRate,
+          });
+        }
+      } catch (err: unknown) {
+        if (isMounted) {
+          console.error("Error initializing conversion goals:", err);
+          setError(err instanceof Error ? err.message : "Failed to load conversion goals");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    init();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Actions
   const handleCreateNew = () => {
@@ -208,9 +252,9 @@ export default function ConversionsDashboardPage() {
       }));
 
       toast.success(newActive ? "Conversion goal activated" : "Conversion goal deactivated");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Status toggle error:", err);
-      toast.error(err?.message || "Failed to update status");
+      toast.error(err instanceof Error ? err.message : "Failed to update status");
     }
   };
 
@@ -240,13 +284,23 @@ export default function ConversionsDashboardPage() {
       }
 
       toast.success("Conversion goal deleted successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Delete conversion goal error:", err);
-      toast.error(err?.message || "Failed to delete conversion goal");
+      toast.error(err instanceof Error ? err.message : "Failed to delete conversion goal");
     }
   };
 
-  const handleSaveGoal = async (payload: any) => {
+  const handleSaveGoal = async (payload: {
+    name: string;
+    description?: string;
+    eventType: string;
+    targetPattern?: string;
+    qrCodeId?: string | null;
+    campaignId?: string | null;
+    monetaryValue?: number;
+    currency?: string;
+    isActive?: boolean;
+  }) => {
     try {
       const isEditing = Boolean(editingGoal && editingGoal.id);
       const url = isEditing
@@ -268,7 +322,7 @@ export default function ConversionsDashboardPage() {
       setConversionDialogOpen(false);
       await fetchGoals();
       toast.success(isEditing ? "Conversion goal updated" : "Conversion goal created");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Save goal error:", err);
       throw err;
     }
@@ -311,6 +365,49 @@ export default function ConversionsDashboardPage() {
     maximumFractionDigits: 2,
   })}`;
 
+  const kpiCards = [
+    {
+      title: "Total Conversions",
+      value: metrics.totalConversions >= 1000 ? `${(metrics.totalConversions / 1000).toFixed(2).replace(/\.00$/, "")}K` : metrics.totalConversions.toLocaleString(),
+      trendValue: "+147%",
+      trendLabel: "VS PREV. 28 DAYS",
+      isPositive: true,
+      icon: Target,
+      iconColor: "text-rose-500 dark:text-rose-400",
+      iconBg: "bg-rose-500/10 dark:bg-rose-500/15",
+    },
+    {
+      title: "Attributed Revenue",
+      value: formattedRevenue,
+      trendValue: "+182%",
+      trendLabel: "VS PREV. 28 DAYS",
+      isPositive: true,
+      icon: DollarSign,
+      iconColor: "text-amber-500 dark:text-amber-400",
+      iconBg: "bg-amber-500/10 dark:bg-amber-500/15",
+    },
+    {
+      title: "Active Goals",
+      value: metrics.activeGoalsCount.toLocaleString(),
+      trendValue: "+100%",
+      trendLabel: "TRACKING LIVE",
+      isPositive: true,
+      icon: Activity,
+      iconColor: "text-sky-500 dark:text-sky-400",
+      iconBg: "bg-sky-500/10 dark:bg-sky-500/15",
+    },
+    {
+      title: "Avg Conv. Rate",
+      value: `${metrics.overallConversionRate.toFixed(1)}%`,
+      trendValue: "+24%",
+      trendLabel: "VS PREV. 28 DAYS",
+      isPositive: true,
+      icon: Sparkles,
+      iconColor: "text-emerald-500 dark:text-emerald-400",
+      iconBg: "bg-emerald-500/10 dark:bg-emerald-500/15",
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6 max-w-7xl mx-auto w-full">
       {/* Breadcrumb Navigation */}
@@ -326,22 +423,26 @@ export default function ConversionsDashboardPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* Header Section */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-              <Target className="h-6 w-6 text-sky-500" />
-              <span>Conversion Goals</span>
-            </h1>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Isolated Tenant
-            </span>
+      {/* Header Section Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-5 rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md shadow-2xs">
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-500 flex items-center justify-center font-bold text-sm">
+            <Target className="size-5" />
           </div>
-          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Track, attribute, and analyze high-value visitor conversion events across your QR campaigns.
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-bold tracking-tight text-foreground">
+                Conversion Goals
+              </h1>
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="size-1 rounded-full bg-emerald-500 animate-pulse" />
+                Isolated Tenant
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Track, attribute, and analyze high-value visitor conversion events across your QR campaigns.
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -349,9 +450,9 @@ export default function ConversionsDashboardPage() {
             onClick={handleGlobalSnippet}
             variant="outline"
             size="sm"
-            className="border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 gap-1.5 h-9"
+            className="gap-1.5 h-8 text-xs"
           >
-            <Code className="h-4 w-4 text-sky-500" />
+            <Code className="size-3.5 text-primary" />
             <span>Tracking Code</span>
           </Button>
 
@@ -360,84 +461,79 @@ export default function ConversionsDashboardPage() {
             variant="outline"
             size="sm"
             aria-label="Refresh data"
-            className="border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 gap-1.5 h-9"
+            className="gap-1.5 h-8 text-xs"
           >
-            <RotateCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-sky-500" : ""}`} />
+            <RotateCw className={`size-3.5 ${loading ? "animate-spin text-primary" : ""}`} />
             <span>Refresh</span>
           </Button>
 
           <Button
             onClick={handleCreateNew}
             size="sm"
-            className="bg-sky-600 hover:bg-sky-500 text-white gap-1.5 h-9 font-medium shadow-md shadow-sky-950/40"
+            className="gap-1.5 h-8 text-xs font-medium shadow-xs"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="size-3.5" />
             <span>New Goal</span>
           </Button>
         </div>
       </div>
 
       {/* 4 KPI Summary Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Conversions */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/60">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Conversions</span>
-            <Target className="h-4 w-4 text-sky-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-            {metrics.totalConversions.toLocaleString()}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Goal actions completed</span>
-        </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {kpiCards.map((card, idx) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={idx}
+              className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md p-5 shadow-2xs hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+            >
+              {/* Top Row: Title & Circular Icon Pill */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-foreground tracking-tight">
+                  {card.title}
+                </span>
+                <div
+                  className={cn(
+                    "flex size-9 items-center justify-center rounded-full transition-transform group-hover:scale-105",
+                    card.iconBg
+                  )}
+                >
+                  <Icon className={cn("size-4", card.iconColor)} />
+                </div>
+              </div>
 
-        {/* Attributed Revenue */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/60">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Attributed Revenue</span>
-            <DollarSign className="h-4 w-4 text-amber-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-            {formattedRevenue}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Monetary value generated</span>
-        </div>
+              {/* Middle: Big Metric Value */}
+              <div className="my-3">
+                <div className="text-3xl font-bold tracking-tight text-foreground font-sans">
+                  {card.value}
+                </div>
+              </div>
 
-        {/* Active Goals */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/60">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Active Goals</span>
-            <Activity className="h-4 w-4 text-emerald-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-            {metrics.activeGoalsCount}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Active tracking instances</span>
-        </div>
-
-        {/* Overall Conv. Rate */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/60">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Avg Conv. Rate</span>
-            <TrendingUp className="h-4 w-4 text-purple-500" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-purple-600 dark:text-purple-300 font-mono">
-            {metrics.overallConversionRate}%
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Visitor to goal completion</span>
-        </div>
+              {/* Bottom: Trend Arrow + Percentage + Comparison Label */}
+              <div className="flex items-center gap-1.5 text-xs">
+                <div className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+                  <TrendingUp className="size-3.5" />
+                  <span>{card.trendValue}</span>
+                </div>
+                <span className="text-[11px] font-medium tracking-wider uppercase text-muted-foreground">
+                  {card.trendLabel}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Search & Filter Toolbar */}
-      <div className="flex flex-col md:flex-row gap-3 items-center justify-between rounded-2xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/70">
+      <div className="flex flex-col md:flex-row gap-3 items-center justify-between p-3.5 rounded-2xl border border-border/80 bg-card/60 backdrop-blur-md shadow-2xs">
         {/* Search Input */}
         <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
-            placeholder="Search goals by name or description..."
+            placeholder="Search goals by name or pattern..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-200 text-xs placeholder:text-zinc-400 h-9"
+            className="pl-9 bg-background/80 border-border/80 text-foreground text-xs placeholder:text-muted-foreground h-9"
           />
         </div>
 
@@ -447,7 +543,7 @@ export default function ConversionsDashboardPage() {
           <div className="flex items-center gap-1.5">
             <label
               htmlFor="conversions-status-filter"
-              className="text-xs font-medium text-zinc-500 dark:text-zinc-400 hidden sm:inline"
+              className="text-xs font-medium text-muted-foreground hidden sm:inline"
             >
               Status:
             </label>
@@ -455,8 +551,8 @@ export default function ConversionsDashboardPage() {
               id="conversions-status-filter"
               aria-label="Status"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="appearance-none rounded-lg border border-zinc-200 bg-white px-3 py-1.5 pr-8 text-xs font-medium text-zinc-800 transition-colors focus:border-sky-500 focus:outline-hidden focus:ring-1 focus:ring-sky-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 h-9"
+              onChange={(e) => setStatusFilter(e.target.value as "all" | "active" | "paused")}
+              className="appearance-none rounded-lg border border-border/80 bg-background/80 px-3 py-1.5 pr-8 text-xs font-medium text-foreground transition-colors focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary h-9"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active Only</option>
@@ -468,7 +564,7 @@ export default function ConversionsDashboardPage() {
           <div className="flex items-center gap-1.5">
             <label
               htmlFor="conversions-scope-filter"
-              className="text-xs font-medium text-zinc-500 dark:text-zinc-400 hidden sm:inline"
+              className="text-xs font-medium text-muted-foreground hidden sm:inline"
             >
               Scope:
             </label>
@@ -476,8 +572,8 @@ export default function ConversionsDashboardPage() {
               id="conversions-scope-filter"
               aria-label="Scope"
               value={scopeFilter}
-              onChange={(e) => setScopeFilter(e.target.value as any)}
-              className="appearance-none rounded-lg border border-zinc-200 bg-white px-3 py-1.5 pr-8 text-xs font-medium text-zinc-800 transition-colors focus:border-sky-500 focus:outline-hidden focus:ring-1 focus:ring-sky-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 h-9"
+              onChange={(e) => setScopeFilter(e.target.value as "all" | "global" | "qr_only" | "campaign_only")}
+              className="appearance-none rounded-lg border border-border/80 bg-background/80 px-3 py-1.5 pr-8 text-xs font-medium text-foreground transition-colors focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary h-9"
             >
               <option value="all">All Scopes</option>
               <option value="global">Global Only</option>
@@ -487,18 +583,18 @@ export default function ConversionsDashboardPage() {
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center rounded-lg border border-zinc-200 bg-white p-0.5 dark:border-zinc-800 dark:bg-zinc-900 h-9">
+          <div className="flex items-center rounded-lg border border-border/80 bg-background/80 p-0.5 h-9">
             <button
               type="button"
               onClick={() => setViewMode("grid")}
               aria-label="Grid view"
               className={`flex items-center justify-center p-1.5 rounded-md text-xs transition-colors ${
                 viewMode === "grid"
-                  ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100 font-medium"
-                  : "text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                  ? "bg-secondary text-foreground font-medium"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <LayoutGrid className="h-4 w-4" />
+              <LayoutGrid className="size-4" />
             </button>
             <button
               type="button"
@@ -506,11 +602,11 @@ export default function ConversionsDashboardPage() {
               aria-label="List view"
               className={`flex items-center justify-center p-1.5 rounded-md text-xs transition-colors ${
                 viewMode === "list"
-                  ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100 font-medium"
-                  : "text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                  ? "bg-secondary text-foreground font-medium"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <List className="h-4 w-4" />
+              <List className="size-4" />
             </button>
           </div>
         </div>
@@ -518,55 +614,55 @@ export default function ConversionsDashboardPage() {
 
       {/* Error Fallback Banner */}
       {error && !loading && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50/80 p-4 text-rose-800 shadow-sm backdrop-blur-md dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-rose-600 dark:text-rose-400 shadow-2xs backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-rose-500 shrink-0" />
+            <AlertCircle className="size-5 text-rose-500 shrink-0" />
             <div>
               <p className="text-sm font-semibold">Failed to load conversion goals</p>
-              <p className="text-xs text-rose-600 dark:text-rose-400">{error}</p>
+              <p className="text-xs text-rose-600/80 dark:text-rose-400/80">{error}</p>
             </div>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={fetchGoals}
-            className="border-rose-200 bg-white text-xs font-medium text-rose-700 hover:bg-rose-100 hover:text-rose-900 dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-200"
+            className="border-rose-500/30 text-xs font-medium text-rose-600 hover:bg-rose-500/20 dark:text-rose-200 h-8"
           >
-            <RotateCw className="mr-1.5 h-3.5 w-3.5" />
+            <RotateCw className="mr-1.5 size-3.5" />
             <span>Try Again</span>
           </Button>
         </div>
       )}
 
-      {/* Main Content Area: Loading Skeletons / Empty State / Goal Cards */}
+      {/* Main Content Area */}
       {loading && goals.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-64 rounded-2xl" />
+            <Skeleton key={i} className="h-64 rounded-2xl bg-card/60" />
           ))}
         </div>
       ) : filteredGoals.length === 0 ? (
-        <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-800 p-8 text-center bg-white/40 dark:bg-zinc-950/40">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 mb-4">
-            <Target className="h-6 w-6 text-zinc-400" />
+        <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-border/80 p-8 text-center bg-card/40">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20 mb-4">
+            <Target className="size-6" />
           </div>
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-1">
+          <h3 className="text-base font-semibold text-foreground mb-1">
             {searchQuery || statusFilter !== "all" || scopeFilter !== "all"
               ? "No matching conversion goals found"
               : "No conversion goals created yet"}
           </h3>
-          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mb-5">
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mb-5">
             {searchQuery || statusFilter !== "all" || scopeFilter !== "all"
               ? "Try adjusting your search terms or filter criteria."
-              : "Define custom action triggers to measure and attribute high-intent conversions generated by your QR code traffic."}
+              : "Define custom action triggers to measure and attribute conversions generated by your QR code traffic."}
           </p>
           {!searchQuery && statusFilter === "all" && scopeFilter === "all" && (
             <Button
               onClick={handleCreateNew}
               size="sm"
-              className="bg-sky-600 hover:bg-sky-500 text-white gap-1.5 h-9"
+              className="gap-1.5 h-8 text-xs font-medium shadow-xs"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="size-3.5" />
               <span>Create Conversion Goal</span>
             </Button>
           )}

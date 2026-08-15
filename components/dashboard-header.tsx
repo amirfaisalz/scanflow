@@ -55,8 +55,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
         {/* Brand */}
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="flex items-center gap-2.5 font-bold text-lg tracking-tight">
-            <div className="size-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
-              <QrCode className="size-5" />
+            <div className="size-8 rounded-lg bg-gradient-to-br from-[#FA5D29] to-[#E04818] text-white flex items-center justify-center shadow-sm">
+              <QrCode className="size-4 text-white" />
             </div>
             <span>ScanFlow</span>
           </Link>

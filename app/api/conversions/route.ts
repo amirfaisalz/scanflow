@@ -34,9 +34,9 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    const enrichedGoals = userGoals.map((goal: any) => {
+    const enrichedGoals = userGoals.map((goal) => {
       // Filter sessions relevant to this goal's scope
-      const relevantSessions = userSessions.filter((s: any) => {
+      const relevantSessions = userSessions.filter((s) => {
         if (goal.qrCodeId && s.qrCodeId !== goal.qrCodeId) return false;
         if (goal.campaignId && s.campaignId !== goal.campaignId) return false;
         return true;
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
       const totalSessions = relevantSessions.length;
       const convertedSessions = relevantSessions.filter(
-        (s: any) => s.converted && s.conversionEvent === goal.name
+        (s) => s.converted && s.conversionEvent === goal.name
       );
       const totalConversions = convertedSessions.length;
       const conversionRate =
@@ -79,14 +79,14 @@ export async function GET(request: NextRequest) {
     });
 
     const totalConversions = enrichedGoals.reduce(
-      (sum: number, g: any) => sum + g.totalConversions,
+      (sum, g) => sum + g.totalConversions,
       0
     );
     const totalRevenue = enrichedGoals.reduce(
-      (sum: number, g: any) => sum + g.totalRevenue,
+      (sum, g) => sum + g.totalRevenue,
       0
     );
-    const activeGoalsCount = enrichedGoals.filter((g: any) => g.isActive).length;
+    const activeGoalsCount = enrichedGoals.filter((g) => g.isActive).length;
     const overallConversionRate =
       userSessions.length > 0
         ? Math.round((totalConversions / userSessions.length) * 1000) / 10

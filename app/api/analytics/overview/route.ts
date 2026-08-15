@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-helpers";
-import { getAnalyticsOverview, type AnalyticsFilterOptions } from "@/lib/analytics/overview";
+import { getAnalyticsOverview } from "@/lib/analytics/overview";
 
 const VALID_PERIODS = ["24h", "7d", "30d", "90d", "all"] as const;
 type Period = (typeof VALID_PERIODS)[number];

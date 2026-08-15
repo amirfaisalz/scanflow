@@ -4,7 +4,6 @@ import * as React from "react";
 import {
   Calendar,
   Filter,
-  Download,
   RotateCw,
   QrCode,
   FolderGit2,
@@ -55,12 +54,12 @@ export function AnalyticsFilters({
   isLoading = false,
 }: AnalyticsFiltersProps) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-zinc-200/80 bg-white/70 p-4 shadow-sm backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/70">
+    <div className="flex flex-col gap-4 rounded-2xl border border-border/80 bg-card/60 p-4 shadow-2xs backdrop-blur-md">
       {/* Top row: Time Period selection & Actions (Export, Refresh) */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Period Selector Tabs */}
-        <div className="flex items-center gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900">
-          <Calendar className="ml-2 mr-1 h-3.5 w-3.5 text-zinc-400" />
+        <div className="flex items-center gap-1 rounded-xl bg-muted/60 p-1">
+          <Calendar className="ml-2 mr-1 size-3.5 text-muted-foreground" />
           {PERIOD_OPTIONS.map((opt) => {
             const isActive = period === opt.value;
             return (
@@ -71,8 +70,8 @@ export function AnalyticsFilters({
                 className={cn(
                   "rounded-lg px-3 py-1.5 text-xs font-medium transition-all",
                   isActive
-                    ? "bg-white text-zinc-900 shadow-xs dark:bg-zinc-800 dark:text-zinc-100 font-semibold"
-                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                    ? "bg-background text-foreground shadow-2xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
                 aria-pressed={isActive}
               >
@@ -84,24 +83,24 @@ export function AnalyticsFilters({
 
         {/* Action Controls: Export CSV, Export JSON, Refresh */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center rounded-lg border border-zinc-200 bg-white p-0.5 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex items-center rounded-lg border border-border/80 bg-background/80 p-0.5 shadow-2xs">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onExport("csv")}
-              className="h-7 gap-1.5 px-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+              className="h-7 gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground"
             >
-              <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-500" />
+              <FileSpreadsheet className="size-3.5 text-emerald-500" />
               <span>CSV</span>
             </Button>
-            <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-800" />
+            <div className="h-4 w-px bg-border/80" />
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onExport("json")}
-              className="h-7 gap-1.5 px-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+              className="h-7 gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground"
             >
-              <FileCode className="h-3.5 w-3.5 text-sky-500" />
+              <FileCode className="size-3.5 text-sky-500" />
               <span>JSON</span>
             </Button>
           </div>
@@ -111,10 +110,10 @@ export function AnalyticsFilters({
             size="sm"
             onClick={onRefresh}
             disabled={isLoading}
-            className="h-8 gap-1.5 border-zinc-200 bg-white text-xs font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="h-8 gap-1.5 text-xs font-medium shadow-2xs"
             aria-label="Refresh data"
           >
-            <RotateCw className={cn("h-3.5 w-3.5", isLoading && "animate-spin text-sky-500")} />
+            <RotateCw className={cn("size-3.5", isLoading && "animate-spin text-primary")} />
             <span>Refresh</span>
           </Button>
         </div>
@@ -126,9 +125,9 @@ export function AnalyticsFilters({
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="qr-select-filter"
-            className="flex items-center gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
           >
-            <QrCode className="h-3.5 w-3.5 text-sky-500" />
+            <QrCode className="size-3.5 text-sky-500" />
             <span>QR Code</span>
           </label>
           <div className="relative">
@@ -137,7 +136,7 @@ export function AnalyticsFilters({
               aria-label="QR Code"
               value={qrCodeId || "all"}
               onChange={(e) => onQrCodeChange(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-zinc-200 bg-white px-3 py-2 pr-8 text-xs font-medium text-zinc-800 transition-colors focus:border-sky-500 focus:outline-hidden focus:ring-1 focus:ring-sky-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+              className="w-full appearance-none rounded-xl border border-border/80 bg-background/80 px-3 py-2 pr-8 text-xs font-medium text-foreground transition-colors focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
             >
               <option value="all">All QR Codes</option>
               {qrOptions.map((opt) => (
@@ -146,7 +145,7 @@ export function AnalyticsFilters({
                 </option>
               ))}
             </select>
-            <Filter className="pointer-events-none absolute right-2.5 top-2.5 h-3.5 w-3.5 text-zinc-400" />
+            <Filter className="pointer-events-none absolute right-2.5 top-2.5 size-3.5 text-muted-foreground" />
           </div>
         </div>
 
@@ -154,9 +153,9 @@ export function AnalyticsFilters({
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="campaign-select-filter"
-            className="flex items-center gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
           >
-            <FolderGit2 className="h-3.5 w-3.5 text-purple-500" />
+            <FolderGit2 className="size-3.5 text-purple-500" />
             <span>Campaign</span>
           </label>
           <div className="relative">
@@ -165,7 +164,7 @@ export function AnalyticsFilters({
               aria-label="Campaign"
               value={campaignId || "all"}
               onChange={(e) => onCampaignChange(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-zinc-200 bg-white px-3 py-2 pr-8 text-xs font-medium text-zinc-800 transition-colors focus:border-purple-500 focus:outline-hidden focus:ring-1 focus:ring-purple-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+              className="w-full appearance-none rounded-xl border border-border/80 bg-background/80 px-3 py-2 pr-8 text-xs font-medium text-foreground transition-colors focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
             >
               <option value="all">All Campaigns</option>
               {campaignOptions.map((opt) => (
@@ -174,7 +173,7 @@ export function AnalyticsFilters({
                 </option>
               ))}
             </select>
-            <Filter className="pointer-events-none absolute right-2.5 top-2.5 h-3.5 w-3.5 text-zinc-400" />
+            <Filter className="pointer-events-none absolute right-2.5 top-2.5 size-3.5 text-muted-foreground" />
           </div>
         </div>
 
@@ -182,9 +181,9 @@ export function AnalyticsFilters({
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="device-select-filter"
-            className="flex items-center gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
           >
-            <Smartphone className="h-3.5 w-3.5 text-emerald-500" />
+            <Smartphone className="size-3.5 text-emerald-500" />
             <span>Device</span>
           </label>
           <div className="relative">
@@ -193,14 +192,14 @@ export function AnalyticsFilters({
               aria-label="Device"
               value={device || "all"}
               onChange={(e) => onDeviceChange(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-zinc-200 bg-white px-3 py-2 pr-8 text-xs font-medium text-zinc-800 transition-colors focus:border-emerald-500 focus:outline-hidden focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+              className="w-full appearance-none rounded-xl border border-border/80 bg-background/80 px-3 py-2 pr-8 text-xs font-medium text-foreground transition-colors focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
             >
               <option value="all">All Devices</option>
               <option value="mobile">Mobile</option>
               <option value="desktop">Desktop</option>
               <option value="tablet">Tablet</option>
             </select>
-            <Filter className="pointer-events-none absolute right-2.5 top-2.5 h-3.5 w-3.5 text-zinc-400" />
+            <Filter className="pointer-events-none absolute right-2.5 top-2.5 size-3.5 text-muted-foreground" />
           </div>
         </div>
       </div>

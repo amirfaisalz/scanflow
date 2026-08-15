@@ -4,7 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavMain } from "@/components/nav-main";
-import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -23,8 +22,6 @@ import {
   Target,
   BarChart3,
   GitBranch,
-  Settings2Icon,
-  BookOpenIcon,
   ShieldCheck,
 } from "lucide-react";
 
@@ -90,19 +87,6 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     },
   ];
 
-  const navSecondary = [
-    {
-      title: "Data Isolation & Settings",
-      url: "/dashboard/settings",
-      icon: <Settings2Icon className="size-4" />,
-    },
-    {
-      title: "Product Documentation",
-      url: "/dashboard/docs",
-      icon: <BookOpenIcon className="size-4" />,
-    },
-  ];
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -113,8 +97,8 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
               className="data-[slot=sidebar-menu-button]:p-2 hover:bg-sidebar-accent"
               render={<Link href="/dashboard" />}
             >
-              <div className="size-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
-                <QrCode className="size-5" />
+              <div className="size-8 rounded-lg bg-gradient-to-br from-[#FA5D29] to-[#E04818] text-white flex items-center justify-center shadow-xs">
+                <QrCode className="size-4 text-white" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold text-foreground">ScanFlow</span>
@@ -130,7 +114,6 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
 
       <SidebarContent>
         <NavMain items={navMain} />
-        <NavSecondary items={navSecondary} className="mt-auto" />
       </SidebarContent>
 
       <SidebarFooter>

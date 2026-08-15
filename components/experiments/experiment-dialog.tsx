@@ -12,13 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Split, Sparkles, Plus, Trash2 } from "lucide-react";
+import { Split, Sparkles } from "lucide-react";
 import type { ExperimentData, ExperimentVariantData } from "./experiment-card";
 
 export interface ExperimentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  experiment?: ExperimentData | any | null;
+  experiment?: ExperimentData | null;
   qrCodes?: Array<{ id: string; name: string; destinationUrl?: string }>;
   campaigns?: Array<{ id: string; name: string }>;
   onSave?: (data: {
@@ -47,87 +47,59 @@ function isValidHttpUrl(string: string) {
   }
 }
 
-export function ExperimentDialog({
-  open,
-  onOpenChange,
+function ExperimentFormContent({
   experiment,
   qrCodes = [],
   campaigns = [],
   onSave,
-}: ExperimentDialogProps) {
-  const [name, setName] = React.useState("");
-  const [description, setDescription] = React.useState("");
-  const [qrCodeId, setQrCodeId] = React.useState("");
-  const [campaignId, setCampaignId] = React.useState<string>("none");
-  const [trafficAllocation, setTrafficAllocation] = React.useState(100);
-  const [status, setStatus] = React.useState("draft");
+  onClose,
+}: {
+  experiment?: ExperimentData | null;
+  qrCodes?: Array<{ id: string; name: string; destinationUrl?: string }>;
+  campaigns?: Array<{ id: string; name: string }>;
+  onSave?: (data: {
+    name: string;
+    description?: string;
+    qrCodeId: string;
+    campaignId?: string | null;
+    trafficAllocation?: number;
+    status?: string;
+    variants: Array<{
+      id?: string;
+      name: string;
+      destinationUrl: string;
+      trafficWeight: number;
+      isControl: boolean;
+    }>;
+  }) => Promise<void> | void;
+  onClose: () => void;
+}) {
+  const expVariants = experiment?.variants || [];
+  const control = expVariants.find((v: ExperimentVariantData) => v.isControl) || expVariants[0];
+  const nonControl = expVariants.find((v: ExperimentVariantData) => !v.isControl) || expVariants[1];
+
+  const [name, setName] = React.useState(experiment?.name || "");
+  const [description, setDescription] = React.useState(experiment?.description || "");
+  const [qrCodeId, setQrCodeId] = React.useState(
+    experiment?.qrCodeId || (qrCodes.length === 1 ? qrCodes[0].id : "")
+  );
+  const [campaignId, setCampaignId] = React.useState<string>(experiment?.campaignId || "none");
+  const trafficAllocation = experiment?.trafficAllocation ?? 100;
+  const status = experiment?.status || "draft";
 
   // Variants state
-  const [variantAName, setVariantAName] = React.useState("Variant A (Control)");
-  const [variantAUrl, setVariantAUrl] = React.useState("");
-  const [variantAWeight, setVariantAWeight] = React.useState(50);
+  const [variantAName, setVariantAName] = React.useState(control?.name || "Variant A (Control)");
+  const [variantAUrl, setVariantAUrl] = React.useState(control?.destinationUrl || "");
+  const [variantAWeight, setVariantAWeight] = React.useState(control?.trafficWeight ?? 50);
 
-  const [variantBName, setVariantBName] = React.useState("Variant B");
-  const [variantBUrl, setVariantBUrl] = React.useState("");
-  const [variantBWeight, setVariantBWeight] = React.useState(50);
+  const [variantBName, setVariantBName] = React.useState(nonControl?.name || "Variant B");
+  const [variantBUrl, setVariantBUrl] = React.useState(nonControl?.destinationUrl || "");
+  const [variantBWeight, setVariantBWeight] = React.useState(nonControl?.trafficWeight ?? 50);
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
 
   const isEditing = Boolean(experiment && experiment.id);
-
-  React.useEffect(() => {
-    if (open) {
-      if (experiment) {
-        setName(experiment.name || "");
-        setDescription(experiment.description || "");
-        setQrCodeId(experiment.qrCodeId || "");
-        setCampaignId(experiment.campaignId || "none");
-        setTrafficAllocation(experiment.trafficAllocation ?? 100);
-        setStatus(experiment.status || "draft");
-
-        const expVariants = experiment.variants || [];
-        const control = expVariants.find((v: ExperimentVariantData) => v.isControl) || expVariants[0];
-        const nonControl = expVariants.find((v: ExperimentVariantData) => !v.isControl) || expVariants[1];
-
-        if (control) {
-          setVariantAName(control.name || "Variant A (Control)");
-          setVariantAUrl(control.destinationUrl || "");
-          setVariantAWeight(control.trafficWeight ?? 50);
-        } else {
-          setVariantAName("Variant A (Control)");
-          setVariantAUrl("");
-          setVariantAWeight(50);
-        }
-
-        if (nonControl) {
-          setVariantBName(nonControl.name || "Variant B");
-          setVariantBUrl(nonControl.destinationUrl || "");
-          setVariantBWeight(nonControl.trafficWeight ?? 50);
-        } else {
-          setVariantBName("Variant B");
-          setVariantBUrl("");
-          setVariantBWeight(50);
-        }
-      } else {
-        setName("");
-        setDescription("");
-        setQrCodeId(qrCodes.length === 1 ? qrCodes[0].id : "");
-        setCampaignId("none");
-        setTrafficAllocation(100);
-        setStatus("draft");
-
-        setVariantAName("Variant A (Control)");
-        setVariantAUrl("");
-        setVariantAWeight(50);
-
-        setVariantBName("Variant B");
-        setVariantBUrl("");
-        setVariantBWeight(50);
-      }
-      setError("");
-    }
-  }, [open, experiment, qrCodes]);
 
   const applyPreset = (weightA: number, weightB: number) => {
     setVariantAWeight(weightA);
@@ -180,11 +152,11 @@ export function ExperimentDialog({
 
       const existingControlId =
         isEditing && experiment?.variants
-          ? (experiment.variants.find((v: any) => v.isControl) || experiment.variants[0])?.id
+          ? (experiment.variants.find((v: ExperimentVariantData) => v.isControl) || experiment.variants[0])?.id
           : undefined;
       const existingNonControlId =
         isEditing && experiment?.variants
-          ? (experiment.variants.find((v: any) => !v.isControl) || experiment.variants[1])?.id
+          ? (experiment.variants.find((v: ExperimentVariantData) => !v.isControl) || experiment.variants[1])?.id
           : undefined;
 
       const variantsPayload = [
@@ -232,26 +204,25 @@ export function ExperimentDialog({
         }
       }
 
-      onOpenChange(false);
-    } catch (err: any) {
-      setError(err.message || "Failed to save experiment");
+      onClose();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to save experiment");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl bg-zinc-950 border-zinc-800 text-zinc-100 max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
-            <Split className="h-5 w-5 text-sky-400" />
-            <span>{isEditing ? "Edit Experiment" : "Create Experiment"}</span>
-          </DialogTitle>
-          <DialogDescription className="text-zinc-400 text-xs">
-            Split visitor traffic between different landing pages to measure conversion rate lift and statistical significance.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <DialogHeader>
+        <DialogTitle className="text-xl font-bold flex items-center gap-2">
+          <Split className="h-5 w-5 text-sky-400" />
+          <span>{isEditing ? "Edit Experiment" : "Create Experiment"}</span>
+        </DialogTitle>
+        <DialogDescription className="text-zinc-400 text-xs">
+          Split visitor traffic between different landing pages to measure conversion rate lift and statistical significance.
+        </DialogDescription>
+      </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           {error && (
@@ -510,7 +481,7 @@ export function ExperimentDialog({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => onOpenChange(false)}
+              onClick={onClose}
               className="border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
             >
               Cancel
@@ -532,6 +503,31 @@ export function ExperimentDialog({
             </Button>
           </DialogFooter>
         </form>
+    </>
+  );
+}
+
+export function ExperimentDialog({
+  open,
+  onOpenChange,
+  experiment,
+  qrCodes = [],
+  campaigns = [],
+  onSave,
+}: ExperimentDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-xl bg-zinc-950 border-zinc-800 text-zinc-100 max-h-[90vh] overflow-y-auto">
+        {open && (
+          <ExperimentFormContent
+            key={experiment?.id || "new"}
+            experiment={experiment}
+            qrCodes={qrCodes}
+            campaigns={campaigns}
+            onSave={onSave}
+            onClose={() => onOpenChange(false)}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

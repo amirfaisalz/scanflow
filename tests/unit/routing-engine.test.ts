@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseVisitorContext, evaluateRoutingRules, anonymizeIp } from "@/lib/routing/engine";
+import { parseVisitorContext, evaluateRoutingRules, anonymizeIp, type VisitorContext } from "@/lib/routing/engine";
 import type { RoutingRule } from "@/lib/db/schema";
 
 describe("Routing Engine", () => {
@@ -66,9 +66,9 @@ describe("Routing Engine", () => {
   });
 
   describe("Deterministic Rule Evaluator", () => {
-    const baseContext = {
-      deviceType: "mobile" as const,
-      os: "iOS" as const,
+    const baseContext: VisitorContext = {
+      deviceType: "mobile",
+      os: "iOS",
       browser: "Safari",
       country: "ID",
       city: "Jakarta",

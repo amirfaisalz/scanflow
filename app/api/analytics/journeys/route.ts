@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth-helpers";
 import { db } from "@/lib/db";
 import { sessions } from "@/lib/db/schema";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const journeys = sessionRecords.map((s: any) => ({
+    const journeys = sessionRecords.map((s) => ({
       id: s.id,
       qrCodeId: s.qrCodeId,
       qrName: s.qrCode?.name || "Unknown QR",

@@ -234,52 +234,54 @@ export async function getAnalyticsOverview(
 
   // 3. Compute KPI metrics
   let totalScans = 0;
-  for (const s of sessionList as any[]) {
-    const scanEvts = s.events?.filter((e: any) => e.eventType === "QR_SCAN").length;
+  for (const s of sessionList) {
+    const sEvents = (s as unknown as { events?: Array<{ eventType?: string }> }).events;
+    const scanEvts = sEvents?.filter((e) => e.eventType === "QR_SCAN").length;
     totalScans += scanEvts && scanEvts > 0 ? scanEvts : 1;
   }
 
   const uniqueVisitors = new Set(
-    sessionList.map((s: any) => s.ipHash).filter((h: any) => Boolean(h))
+    sessionList.map((s) => s.ipHash).filter((h): h is string => Boolean(h))
   ).size;
 
-  const conversions = sessionList.filter((s: any) => Boolean(s.converted)).length;
+  const conversions = sessionList.filter((s) => Boolean(s.converted)).length;
   const conversionRate =
     totalSessions > 0 ? Math.round((conversions / totalSessions) * 1000) / 10 : 0;
 
   const totalDuration = sessionList.reduce(
-    (sum: number, s: any) => sum + (s.durationSeconds || 0),
+    (sum: number, s) => sum + (s.durationSeconds || 0),
     0
   );
   const avgDurationSeconds =
     totalSessions > 0 ? Math.round(totalDuration / totalSessions) : 0;
 
   const bouncedSessions = sessionList.filter(
-    (s: any) => (s.eventsCount || 1) <= 1
+    (s) => (s.eventsCount || 1) <= 1
   ).length;
   const bounceRate =
     totalSessions > 0 ? Math.round((bouncedSessions / totalSessions) * 1000) / 10 : 0;
 
   // 4. Generate Time Series
   const earliestDate = sessionList.length > 0
-    ? new Date(Math.min(...sessionList.map((s: any) => new Date(s.startedAt).getTime())))
+    ? new Date(Math.min(...sessionList.map((s) => new Date(s.startedAt).getTime())))
     : undefined;
 
   const buckets = generateTimeBuckets(period, earliestDate);
 
   const timeSeries = buckets.map((bucket) => {
-    const matchingSessions = sessionList.filter((s: any) =>
+    const matchingSessions = sessionList.filter((s) =>
       bucket.matches(new Date(s.startedAt))
     );
 
     let scans = 0;
-    for (const s of matchingSessions as any[]) {
-      const scanEvts = s.events?.filter((e: any) => e.eventType === "QR_SCAN").length;
+    for (const s of matchingSessions) {
+      const sEvents = (s as unknown as { events?: Array<{ eventType?: string }> }).events;
+      const scanEvts = sEvents?.filter((e) => e.eventType === "QR_SCAN").length;
       scans += scanEvts && scanEvts > 0 ? scanEvts : 1;
     }
 
     const sessCount = matchingSessions.length;
-    const convCount = matchingSessions.filter((s: any) => Boolean(s.converted)).length;
+    const convCount = matchingSessions.filter((s) => Boolean(s.converted)).length;
 
     return {
       timestamp: bucket.timestamp,
@@ -293,7 +295,7 @@ export async function getAnalyticsOverview(
   // 5. Dimensional Breakdowns
   // Device Breakdown
   const deviceCounts: Record<string, number> = {};
-  for (const s of sessionList as any[]) {
+  for (const s of sessionList) {
     const name = formatDeviceName(s.deviceType);
     deviceCounts[name] = (deviceCounts[name] || 0) + 1;
   }
@@ -307,7 +309,7 @@ export async function getAnalyticsOverview(
 
   // OS Breakdown
   const osCounts: Record<string, number> = {};
-  for (const s of sessionList as any[]) {
+  for (const s of sessionList) {
     const name = s.os || "Other";
     osCounts[name] = (osCounts[name] || 0) + 1;
   }
@@ -321,7 +323,7 @@ export async function getAnalyticsOverview(
 
   // Browser Breakdown
   const browserCounts: Record<string, number> = {};
-  for (const s of sessionList as any[]) {
+  for (const s of sessionList) {
     const name = s.browser || "Other";
     browserCounts[name] = (browserCounts[name] || 0) + 1;
   }
@@ -335,7 +337,7 @@ export async function getAnalyticsOverview(
 
   // Country Breakdown
   const countryCounts: Record<string, number> = {};
-  for (const s of sessionList as any[]) {
+  for (const s of sessionList) {
     const code = s.country || "Unknown";
     countryCounts[code] = (countryCounts[code] || 0) + 1;
   }
@@ -350,7 +352,7 @@ export async function getAnalyticsOverview(
 
   // City Breakdown
   const cityCounts: Record<string, { country: string; scans: number }> = {};
-  for (const s of sessionList as any[]) {
+  for (const s of sessionList) {
     if (s.city) {
       const key = `${s.city}|${s.country || "Unknown"}`;
       if (!cityCounts[key]) {
@@ -373,7 +375,7 @@ export async function getAnalyticsOverview(
 
   // Hourly Distribution Breakdown (0 - 23)
   const hourCounts: number[] = new Array(24).fill(0);
-  for (const s of sessionList as any[]) {
+  for (const s of sessionList) {
     const h = new Date(s.startedAt).getHours();
     if (h >= 0 && h < 24) {
       hourCounts[h] += 1;
@@ -396,7 +398,7 @@ export async function getAnalyticsOverview(
   }>();
 
   // Populate from known user QR codes
-  for (const qr of userQrCodes as any[]) {
+  for (const qr of userQrCodes) {
     qrPerformanceMap.set(qr.id, {
       id: qr.id,
       name: qr.name,
@@ -408,7 +410,7 @@ export async function getAnalyticsOverview(
   }
 
   // Aggregate stats from matching sessions
-  for (const s of sessionList as any[]) {
+  for (const s of sessionList) {
     let entry = qrPerformanceMap.get(s.qrCodeId);
     if (!entry) {
       entry = {
@@ -421,7 +423,8 @@ export async function getAnalyticsOverview(
       };
       qrPerformanceMap.set(s.qrCodeId, entry);
     }
-    const scanEvts = s.events?.filter((e: any) => e.eventType === "QR_SCAN").length;
+    const sEvents = (s as unknown as { events?: Array<{ eventType?: string }> }).events;
+    const scanEvts = sEvents?.filter((e) => e.eventType === "QR_SCAN").length;
     entry.scans += scanEvts && scanEvts > 0 ? scanEvts : 1;
     entry.sessions += 1;
     if (s.converted) {
@@ -430,7 +433,7 @@ export async function getAnalyticsOverview(
   }
 
   const topQrCodes = Array.from(qrPerformanceMap.values())
-    .filter((q) => (userQrCodes.length === 0 ? true : q.sessions > 0 || userQrCodes.some((u: any) => u.id === q.id)))
+    .filter((q) => (userQrCodes.length === 0 ? true : q.sessions > 0 || userQrCodes.some((u) => u.id === q.id)))
     .map((q) => ({
       ...q,
       conversionRate: q.sessions > 0 ? Math.round((q.conversions / q.sessions) * 1000) / 10 : 0,
@@ -446,7 +449,7 @@ export async function getAnalyticsOverview(
     conversions: number;
   }>();
 
-  for (const camp of userCampaigns as any[]) {
+  for (const camp of userCampaigns) {
     campaignPerformanceMap.set(camp.id, {
       id: camp.id,
       name: camp.name,
@@ -456,7 +459,7 @@ export async function getAnalyticsOverview(
     });
   }
 
-  for (const s of sessionList as any[]) {
+  for (const s of sessionList) {
     if (!s.campaignId) continue;
     let entry = campaignPerformanceMap.get(s.campaignId);
     if (!entry) {
@@ -469,7 +472,8 @@ export async function getAnalyticsOverview(
       };
       campaignPerformanceMap.set(s.campaignId, entry);
     }
-    const scanEvts = s.events?.filter((e: any) => e.eventType === "QR_SCAN").length;
+    const sEvents = (s as unknown as { events?: Array<{ eventType?: string }> }).events;
+    const scanEvts = sEvents?.filter((e) => e.eventType === "QR_SCAN").length;
     entry.scans += scanEvts && scanEvts > 0 ? scanEvts : 1;
     entry.sessions += 1;
     if (s.converted) {
@@ -478,7 +482,7 @@ export async function getAnalyticsOverview(
   }
 
   const topCampaigns = Array.from(campaignPerformanceMap.values())
-    .filter((c) => (userCampaigns.length === 0 ? true : c.sessions > 0 || userCampaigns.some((u: any) => u.id === c.id)))
+    .filter((c) => (userCampaigns.length === 0 ? true : c.sessions > 0 || userCampaigns.some((u) => u.id === c.id)))
     .map((c) => ({
       ...c,
       conversionRate: c.sessions > 0 ? Math.round((c.conversions / c.sessions) * 1000) / 10 : 0,

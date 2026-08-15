@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { QrCode, Lock, Mail, User, AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Lock, Mail, User, AlertCircle, ArrowRight, CheckCircle2, QrCode } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -70,9 +70,9 @@ export default function RegisterPage() {
       <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center space-y-2">
-          <Link href="/" className="flex items-center gap-2 font-bold text-2xl tracking-tight">
-            <div className="size-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-md">
-              <QrCode className="size-6" />
+          <Link href="/" className="flex items-center gap-2.5 font-bold text-2xl tracking-tight">
+            <div className="size-10 rounded-xl bg-gradient-to-br from-[#FA5D29] to-[#E04818] text-white flex items-center justify-center shadow-md">
+              <QrCode className="size-6 text-white" />
             </div>
             <span>ScanFlow</span>
           </Link>

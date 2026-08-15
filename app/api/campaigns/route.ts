@@ -21,13 +21,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const enrichedCampaigns = userCampaigns.map((camp: any) => {
+    const enrichedCampaigns = userCampaigns.map((camp) => {
       const qrList = camp.qrCodes || [];
       const sessionList = camp.sessions || [];
 
-      const totalScans = qrList.reduce((sum: number, q: any) => sum + (q.scanCount || 0), 0);
+      const totalScans = qrList.reduce((sum, q) => sum + (q.scanCount || 0), 0);
       const totalSessions = sessionList.length;
-      const conversions = sessionList.filter((s: any) => s.converted).length;
+      const conversions = sessionList.filter((s) => s.converted).length;
       const conversionRate =
         totalSessions > 0 ? Math.round((conversions / totalSessions) * 1000) / 10 : 0;
 
