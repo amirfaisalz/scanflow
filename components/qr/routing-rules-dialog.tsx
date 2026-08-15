@@ -28,6 +28,7 @@ import {
   Languages,
   Clock,
 } from "lucide-react";
+import { normalizeUrl, isValidUrl } from "@/lib/qr";
 import type { QRCode, RoutingRule } from "@/lib/db/schema";
 
 interface RoutingRulesDialogProps {
@@ -87,10 +88,9 @@ export function RoutingRulesDialog({
       return;
     }
 
-    try {
-      new URL(destinationUrl);
-    } catch {
-      setFormError("Please enter a valid absolute destination URL (e.g. https://...)");
+    const normUrl = normalizeUrl(destinationUrl);
+    if (!normUrl || !isValidUrl(normUrl)) {
+      setFormError("Please enter a valid destination URL (e.g. google.com or https://...)");
       return;
     }
 
@@ -102,7 +102,7 @@ export function RoutingRulesDialog({
         body: JSON.stringify({
           conditionType,
           conditionValue: conditionValue.trim(),
-          destinationUrl: destinationUrl.trim(),
+          destinationUrl: normUrl,
           priority: Number(priority) || 1,
         }),
       });
@@ -157,40 +157,46 @@ export function RoutingRulesDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl bg-zinc-950 border-zinc-800 text-zinc-100 max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
-            <GitFork className="h-5 w-5 text-sky-400" />
-            <span>Dynamic Routing Rules</span>
-          </DialogTitle>
-          <DialogDescription className="text-zinc-400 text-xs">
-            Configure condition-based routing rules for <span className="font-semibold text-zinc-200">{qrCode.name}</span>. Rules are evaluated in priority order.
-          </DialogDescription>
+      <DialogContent className="sm:max-w-2xl p-6 rounded-2xl border-border/80 bg-background/95 backdrop-blur-xl shadow-2xl text-foreground max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-3 border-b border-border/60">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-500 flex items-center justify-center shadow-2xs">
+              <GitFork className="size-5" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg font-bold tracking-tight text-foreground">
+                Dynamic Routing Rules
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                Configure condition-based routing rules for <span className="font-semibold text-foreground">{qrCode.name}</span>. Rules are evaluated in priority order.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         {/* Fallback Destination Banner */}
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 text-xs flex items-center justify-between">
+        <div className="rounded-xl border border-border/80 bg-muted/40 p-3 text-xs flex items-center justify-between mt-3">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="border-zinc-700 bg-zinc-800 text-zinc-300 font-mono">
+            <Badge variant="outline" className="border-border/80 bg-background text-foreground font-mono">
               Fallback / Default
             </Badge>
-            <span className="text-zinc-400 truncate max-w-sm font-mono">{qrCode.destinationUrl}</span>
+            <span className="text-muted-foreground truncate max-w-sm font-mono">{qrCode.destinationUrl}</span>
           </div>
-          <span className="text-[11px] text-zinc-500">When no rules match</span>
+          <span className="text-[11px] text-muted-foreground">When no rules match</span>
         </div>
 
         {/* Existing Rules List */}
-        <div className="space-y-2">
+        <div className="space-y-2 mt-4">
           <div className="flex items-center justify-between">
-            <Label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+            <Label className="text-xs font-semibold text-foreground uppercase tracking-wider">
               Configured Rules ({rules.length})
             </Label>
           </div>
 
           {loading ? (
-            <div className="py-6 text-center text-xs text-zinc-500">Loading rules...</div>
+            <div className="py-6 text-center text-xs text-muted-foreground">Loading rules...</div>
           ) : rules.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-zinc-800 p-6 text-center text-xs text-zinc-500">
+            <div className="rounded-xl border border-dashed border-border/80 p-6 text-center text-xs text-muted-foreground">
               No conditional rules configured. All scans will be routed to the default destination URL.
             </div>
           ) : (
@@ -198,22 +204,22 @@ export function RoutingRulesDialog({
               {rules.map((rule, idx) => (
                 <div
                   key={rule.id}
-                  className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-3 flex items-center justify-between gap-3 text-xs transition-colors hover:border-zinc-700"
+                  className="rounded-xl border border-border/80 bg-card/60 p-3 flex items-center justify-between gap-3 text-xs transition-colors hover:border-primary/40"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Badge variant="secondary" className="font-mono text-[10px] bg-zinc-800 text-zinc-300 px-1.5 py-0.5">
+                    <Badge variant="secondary" className="font-mono text-[10px] px-1.5 py-0.5">
                       #{rule.priority ?? idx + 1}
                     </Badge>
 
-                    <div className="flex items-center gap-1.5 bg-zinc-800/80 px-2 py-1 rounded text-zinc-200 font-medium">
+                    <div className="flex items-center gap-1.5 bg-muted/60 px-2 py-1 rounded-lg text-foreground font-medium">
                       {getConditionIcon(rule.conditionType)}
                       <span className="uppercase text-[11px]">{rule.conditionType}:</span>
-                      <span className="font-mono text-sky-300">{rule.conditionValue}</span>
+                      <span className="font-mono text-primary">{rule.conditionValue}</span>
                     </div>
 
-                    <div className="flex items-center gap-1 min-w-0 text-zinc-400">
+                    <div className="flex items-center gap-1 min-w-0 text-muted-foreground">
                       <span>→</span>
-                      <span className="truncate font-mono text-zinc-200 underline">{rule.destinationUrl}</span>
+                      <span className="truncate font-mono text-foreground underline">{rule.destinationUrl}</span>
                     </div>
                   </div>
 
@@ -222,10 +228,10 @@ export function RoutingRulesDialog({
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDeleteRule(rule.id)}
-                    className="h-7 w-7 p-0 text-zinc-500 hover:text-red-400 hover:bg-zinc-800 shrink-0"
+                    className="size-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 rounded-lg"
                     title="Delete rule"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="size-3.5" />
                   </Button>
                 </div>
               ))}
@@ -234,13 +240,13 @@ export function RoutingRulesDialog({
         </div>
 
         {/* Add New Rule Form */}
-        <form onSubmit={handleAddRule} className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 space-y-4">
-          <Label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider block">
+        <form onSubmit={handleAddRule} className="rounded-xl border border-border/80 bg-muted/30 p-4 space-y-4 mt-4">
+          <Label className="text-xs font-semibold text-foreground uppercase tracking-wider block">
             Add Dynamic Rule
           </Label>
 
           {formError && (
-            <div className="rounded-md bg-red-500/10 border border-red-500/30 p-2 text-xs text-red-400">
+            <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 text-xs text-destructive">
               {formError}
             </div>
           )}
@@ -248,7 +254,7 @@ export function RoutingRulesDialog({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Condition Type */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-zinc-400">Condition Type</Label>
+              <Label className="text-xs text-muted-foreground">Condition Type</Label>
               <Select
                 value={conditionType}
                 onValueChange={(val) => {
@@ -260,10 +266,10 @@ export function RoutingRulesDialog({
                   else if (val === "language") setConditionValue("id");
                 }}
               >
-                <SelectTrigger className="bg-zinc-950 border-zinc-800 text-zinc-200 text-xs h-9">
+                <SelectTrigger className="bg-background/80 border-border/80 text-foreground text-xs h-9 rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-950 border-zinc-800 text-zinc-200">
+                <SelectContent className="bg-popover border-border/80 text-popover-foreground rounded-xl shadow-xl">
                   <SelectItem value="os">Operating System (OS)</SelectItem>
                   <SelectItem value="device">Device Type</SelectItem>
                   <SelectItem value="country">Country Code</SelectItem>
@@ -274,37 +280,37 @@ export function RoutingRulesDialog({
 
             {/* Condition Value */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-zinc-400">Match Value</Label>
+              <Label className="text-xs text-muted-foreground">Match Value</Label>
               <Input
                 placeholder="e.g. ios, android, US"
                 value={conditionValue}
                 onChange={(e) => setConditionValue(e.target.value)}
-                className="bg-zinc-950 border-zinc-800 text-zinc-200 text-xs h-9"
+                className="bg-background/80 border-border/80 text-foreground text-xs h-9 rounded-xl"
               />
             </div>
 
             {/* Priority */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-zinc-400">Priority (1 = Highest)</Label>
+              <Label className="text-xs text-muted-foreground">Priority (1 = Highest)</Label>
               <Input
                 type="number"
                 min="1"
                 max="99"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="bg-zinc-950 border-zinc-800 text-zinc-200 text-xs h-9"
+                className="bg-background/80 border-border/80 text-foreground text-xs h-9 rounded-xl"
               />
             </div>
           </div>
 
           {/* Destination URL */}
           <div className="space-y-1.5">
-            <Label className="text-xs text-zinc-400">Custom Target Destination URL</Label>
+            <Label className="text-xs text-muted-foreground">Custom Target Destination URL</Label>
             <Input
               placeholder="https://apps.apple.com/app/your-app"
               value={destinationUrl}
               onChange={(e) => setDestinationUrl(e.target.value)}
-              className="bg-zinc-950 border-zinc-800 text-zinc-200 text-xs h-9"
+              className="bg-background/80 border-border/80 text-foreground text-xs h-9 rounded-xl"
             />
           </div>
 
@@ -313,9 +319,9 @@ export function RoutingRulesDialog({
               type="submit"
               size="sm"
               disabled={addingRule}
-              className="bg-sky-600 hover:bg-sky-500 text-white text-xs gap-1.5 h-8"
+              className="h-8 px-4 text-xs font-semibold rounded-xl shadow-xs bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="size-3.5" />
               <span>{addingRule ? "Adding..." : "Add Rule"}</span>
             </Button>
           </div>

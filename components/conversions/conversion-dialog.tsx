@@ -135,26 +135,32 @@ function ConversionFormContent({
 
   return (
     <>
-      <DialogHeader>
-        <DialogTitle className="text-xl font-bold flex items-center gap-2">
-          <Target className="h-5 w-5 text-sky-400" />
-          <span>{isEditing ? "Edit Conversion Goal" : "Create Conversion Goal"}</span>
-        </DialogTitle>
-        <DialogDescription className="text-zinc-400 text-xs">
-          Track key visitor actions such as button clicks, page visits, form submissions, and revenue events.
-        </DialogDescription>
+      <DialogHeader className="pb-3 border-b border-border/60">
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-500 flex items-center justify-center shadow-2xs">
+            <Target className="size-5" />
+          </div>
+          <div>
+            <DialogTitle className="text-lg font-bold tracking-tight text-foreground">
+              {isEditing ? "Edit Conversion Goal" : "Create Conversion Goal"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+              Track key visitor actions such as button clicks, page visits, form submissions, and revenue events.
+            </DialogDescription>
+          </div>
+        </div>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit} className="space-y-4 py-2">
+      <form onSubmit={handleSubmit} className="space-y-4 pt-3">
         {error && (
-          <div className="rounded-md bg-red-500/10 border border-red-500/30 p-2.5 text-xs text-red-400">
+          <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 text-xs text-destructive">
             {error}
           </div>
         )}
 
         {/* Goal Name */}
         <div className="space-y-1.5">
-          <Label htmlFor="goal-name" className="text-xs font-semibold text-zinc-300">
+          <Label htmlFor="goal-name" className="text-xs font-semibold text-foreground">
             Goal Name *
           </Label>
           <Input
@@ -162,35 +168,35 @@ function ConversionFormContent({
             placeholder="e.g. Newsletter Sign-up or Checkout Completed"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-sm"
+            className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 shadow-2xs"
           />
         </div>
 
         {/* Description */}
         <div className="space-y-1.5">
-          <Label htmlFor="goal-description" className="text-xs font-semibold text-zinc-300">
-            Description (Optional)
+          <Label htmlFor="goal-description" className="text-xs font-semibold text-foreground">
+            Description
           </Label>
           <Input
             id="goal-description"
             placeholder="e.g. Measures sign-ups triggered from table tent QR codes"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-sm"
+            className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 shadow-2xs"
           />
         </div>
 
         {/* Event Type & Monetary Value Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="goal-event-type" className="text-xs font-semibold text-zinc-300">
+            <Label htmlFor="goal-event-type" className="text-xs font-semibold text-foreground">
               Trigger Event Type *
             </Label>
             <Select value={eventType} onValueChange={(val) => { if (val) setEventType(val); }}>
-              <SelectTrigger id="goal-event-type" className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-xs">
+              <SelectTrigger id="goal-event-type" className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-950 border-zinc-800 text-zinc-200">
+              <SelectContent className="bg-popover border-border/80 text-popover-foreground rounded-xl shadow-xl">
                 <SelectItem value="PAGE_VIEW">Page Visit / URL</SelectItem>
                 <SelectItem value="BUTTON_CLICK">Button Click</SelectItem>
                 <SelectItem value="LINK_CLICK">Link Click</SelectItem>
@@ -201,8 +207,8 @@ function ConversionFormContent({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="goal-value" className="text-xs font-semibold text-zinc-300">
-              Monetary Value ($ USD)
+            <Label htmlFor="goal-value" className="text-xs font-semibold text-foreground">
+              Monetary Value
             </Label>
             <Input
               id="goal-value"
@@ -212,25 +218,16 @@ function ConversionFormContent({
               placeholder="e.g. 29.99"
               value={monetaryValue}
               onChange={(e) => setMonetaryValue(e.target.value)}
-              className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-sm"
+              className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 shadow-2xs"
             />
           </div>
         </div>
 
         {/* Target Pattern */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="goal-pattern" className="text-xs font-semibold text-zinc-300">
-              Target Pattern / Match String
-            </Label>
-            <span className="text-[11px] text-zinc-400 font-mono">
-              {eventType === "PAGE_VIEW"
-                ? "e.g. /thank-you or /success"
-                : eventType === "FORM_SUBMIT"
-                ? "e.g. #contact-form"
-                : "e.g. .btn-checkout"}
-            </span>
-          </div>
+          <Label htmlFor="goal-pattern" className="text-xs font-semibold text-foreground">
+            Target Pattern
+          </Label>
           <Input
             id="goal-pattern"
             placeholder={
@@ -240,21 +237,21 @@ function ConversionFormContent({
             }
             value={targetPattern}
             onChange={(e) => setTargetPattern(e.target.value)}
-            className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-sm font-mono"
+            className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 shadow-2xs font-mono"
           />
         </div>
 
         {/* Scope Assignment (QR Code & Campaign) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           <div className="space-y-1.5">
-            <Label htmlFor="goal-scope-qr" className="text-xs font-semibold text-zinc-300">
+            <Label htmlFor="goal-scope-qr" className="text-xs font-semibold text-foreground">
               Scope: QR Code
             </Label>
             <Select value={qrCodeId} onValueChange={(val) => { if (val) setQrCodeId(val); }}>
-              <SelectTrigger id="goal-scope-qr" className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-xs">
+              <SelectTrigger id="goal-scope-qr" className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80">
                 <SelectValue placeholder="All QR Codes (Global)" />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-950 border-zinc-800 text-zinc-200">
+              <SelectContent className="bg-popover border-border/80 text-popover-foreground rounded-xl shadow-xl">
                 <SelectItem value="all">All QR Codes (Global Scope)</SelectItem>
                 {qrCodes.map((qr) => (
                   <SelectItem key={qr.id} value={qr.id}>
@@ -266,14 +263,14 @@ function ConversionFormContent({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="goal-scope-campaign" className="text-xs font-semibold text-zinc-300">
+            <Label htmlFor="goal-scope-campaign" className="text-xs font-semibold text-foreground">
               Scope: Campaign
             </Label>
             <Select value={campaignId} onValueChange={(val) => { if (val) setCampaignId(val); }}>
-              <SelectTrigger id="goal-scope-campaign" className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-xs">
+              <SelectTrigger id="goal-scope-campaign" className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80">
                 <SelectValue placeholder="All Campaigns (Global)" />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-950 border-zinc-800 text-zinc-200">
+              <SelectContent className="bg-popover border-border/80 text-popover-foreground rounded-xl shadow-xl">
                 <SelectItem value="all">All Campaigns (Global Scope)</SelectItem>
                 {campaigns.map((camp) => (
                   <SelectItem key={camp.id} value={camp.id}>
@@ -286,12 +283,12 @@ function ConversionFormContent({
         </div>
 
         {/* Active Toggle Switch */}
-        <div className="flex items-center justify-between p-3 rounded-lg border border-zinc-800 bg-zinc-900/40">
+        <div className="flex items-center justify-between p-3 rounded-xl border border-border/80 bg-muted/40">
           <div className="space-y-0.5">
-            <Label htmlFor="goal-active" className="text-xs font-medium text-zinc-200 cursor-pointer">
+            <Label htmlFor="goal-active" className="text-xs font-medium text-foreground cursor-pointer">
               Active Tracking
             </Label>
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-[11px] text-muted-foreground">
               When disabled, new visitor actions will not increment conversions for this goal.
             </p>
           </div>
@@ -300,17 +297,17 @@ function ConversionFormContent({
             id="goal-active"
             checked={isActive}
             onChange={(e) => setIsActive(e.target.checked)}
-            className="h-4 w-4 rounded border-zinc-700 bg-zinc-900 text-sky-500 focus:ring-sky-400 focus:ring-offset-zinc-950"
+            className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
           />
         </div>
 
-        <DialogFooter className="pt-3">
+        <DialogFooter className="pt-3 border-t border-border/60 flex items-center justify-end gap-2">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={onClose}
-            className="border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
+            className="h-9 px-4 text-xs font-medium rounded-xl hover:bg-muted"
           >
             Cancel
           </Button>
@@ -318,9 +315,9 @@ function ConversionFormContent({
             type="submit"
             size="sm"
             disabled={loading}
-            className="bg-sky-600 hover:bg-sky-500 text-white text-xs gap-1.5"
+            className="h-9 px-5 text-xs font-semibold rounded-xl shadow-xs bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
           >
-            <Sparkles className="h-3.5 w-3.5" />
+            <Sparkles className="size-3.5" />
             <span>
               {loading
                 ? "Saving..."
@@ -345,7 +342,7 @@ export function ConversionDialog({
 }: ConversionDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg bg-zinc-950 border-zinc-800 text-zinc-100 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg p-6 rounded-2xl border-border/80 bg-background/95 backdrop-blur-xl shadow-2xl text-foreground max-h-[90vh] overflow-y-auto">
         {open && (
           <ConversionFormContent
             key={goal?.id || "new"}

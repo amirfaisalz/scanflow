@@ -4,12 +4,16 @@ import { db } from "@/lib/db";
 import { qrCodes } from "@/lib/db/schema";
 import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { z } from "zod";
-import { isValidSlug, isValidUrl, sanitizeSlug } from "@/lib/qr";
+import { isValidSlug, isValidUrl, sanitizeSlug, normalizeUrl } from "@/lib/qr";
 import { ensureUserDemoData } from "@/lib/db/seed-user";
 
 const createQrCodeSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
-  destinationUrl: z.string().url("Invalid destination URL").refine(isValidUrl, "URL must be http or https"),
+  destinationUrl: z
+    .string()
+    .min(1, "Destination URL is required")
+    .transform((val) => normalizeUrl(val))
+    .refine(isValidUrl, "URL must be a valid http or https link"),
   slug: z
     .string()
     .min(2, "Slug must be at least 2 characters")
@@ -75,7 +79,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { data: userQrCodes },
-      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=60" } }
+      { headers: { "Cache-Control": "no-store, no-cache, must-revalidate" } }
     );
   } catch (error) {
     console.error("Error fetching QR codes:", error);

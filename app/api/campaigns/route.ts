@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { campaigns: enrichedCampaigns },
-      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=60" } }
+      { headers: { "Cache-Control": "no-store, no-cache, must-revalidate" } }
     );
   } catch (error) {
     console.error("GET /api/campaigns error:", error);

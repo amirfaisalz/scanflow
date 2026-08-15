@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QRPreview } from "@/components/qr/qr-preview";
-import { sanitizeSlug, isValidSlug, isValidUrl, buildRedirectUrl } from "@/lib/qr";
+import { sanitizeSlug, isValidSlug, isValidUrl, normalizeUrl, buildRedirectUrl } from "@/lib/qr";
 import { toast } from "sonner";
 import {
   Loader2,
@@ -106,8 +106,10 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
       return;
     }
 
-    if (!isValidUrl(destinationUrl)) {
-      toast.error("Please enter a valid destination URL (http:// or https://)");
+    const normalizedUrl = normalizeUrl(destinationUrl);
+
+    if (!isValidUrl(normalizedUrl)) {
+      toast.error("Please enter a valid destination URL (e.g. google.com or https://...)");
       return;
     }
 
@@ -121,7 +123,7 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
     try {
       const payload = {
         name: name.trim(),
-        destinationUrl: destinationUrl.trim(),
+        destinationUrl: normalizedUrl,
         slug: slug.trim(),
         campaignId: campaignId || null,
         status,
@@ -204,13 +206,13 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
                 </Label>
                 {destinationUrl && (
                   <span className="text-[11px] flex items-center gap-1 font-medium">
-                    {isUrlValid ? (
+                    {isValidUrl(normalizeUrl(destinationUrl)) ? (
                       <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                         <CheckCircle2 className="size-3" /> Valid URL
                       </span>
                     ) : (
                       <span className="text-destructive flex items-center gap-1">
-                        <AlertCircle className="size-3" /> Needs https://
+                        <AlertCircle className="size-3" /> Enter valid URL or domain
                       </span>
                     )}
                   </span>

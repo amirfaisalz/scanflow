@@ -4,14 +4,15 @@ import { db } from "@/lib/db";
 import { qrCodes } from "@/lib/db/schema";
 import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
-import { isValidSlug, isValidUrl, sanitizeSlug } from "@/lib/qr";
+import { isValidSlug, isValidUrl, sanitizeSlug, normalizeUrl } from "@/lib/qr";
 
 const updateQrCodeSchema = z.object({
   name: z.string().min(1, "Name is required").max(100).optional(),
   destinationUrl: z
     .string()
-    .url("Invalid destination URL")
-    .refine(isValidUrl, "URL must be http or https")
+    .min(1, "Destination URL is required")
+    .transform((val) => normalizeUrl(val))
+    .refine(isValidUrl, "URL must be a valid http or https link")
     .optional(),
   slug: z
     .string()

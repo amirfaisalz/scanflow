@@ -96,26 +96,32 @@ function CampaignFormContent({
 
   return (
     <>
-      <DialogHeader>
-        <DialogTitle className="text-xl font-bold flex items-center gap-2">
-          <FolderGit2 className="h-5 w-5 text-sky-400" />
-          <span>{isEditing ? "Edit Campaign" : "Create Campaign"}</span>
-        </DialogTitle>
-        <DialogDescription className="text-zinc-400 text-xs">
-          Group dynamic QR codes into cohesive promotional campaigns to compare aggregate metrics.
-        </DialogDescription>
+      <DialogHeader className="pb-3 border-b border-border/60">
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-500 flex items-center justify-center shadow-2xs">
+            <FolderGit2 className="size-5" />
+          </div>
+          <div>
+            <DialogTitle className="text-lg font-bold tracking-tight text-foreground">
+              {isEditing ? "Edit Campaign" : "Create Campaign"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+              Group dynamic QR codes into cohesive promotional campaigns to compare aggregate metrics.
+            </DialogDescription>
+          </div>
+        </div>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit} className="space-y-4 py-2">
+      <form onSubmit={handleSubmit} className="space-y-4 pt-3">
         {error && (
-          <div className="rounded-md bg-red-500/10 border border-red-500/30 p-2.5 text-xs text-red-400">
+          <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 text-xs text-destructive">
             {error}
           </div>
         )}
 
         {/* Campaign Name */}
         <div className="space-y-1.5">
-          <Label htmlFor="campaign-name" className="text-xs font-semibold text-zinc-300">
+          <Label htmlFor="campaign-name" className="text-xs font-semibold text-foreground">
             Campaign Name
           </Label>
           <Input
@@ -123,13 +129,13 @@ function CampaignFormContent({
             placeholder="e.g. Summer Restaurant Promo 2026"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-sm"
+            className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 shadow-2xs"
           />
         </div>
 
         {/* Description */}
         <div className="space-y-1.5">
-          <Label htmlFor="campaign-description" className="text-xs font-semibold text-zinc-300">
+          <Label htmlFor="campaign-description" className="text-xs font-semibold text-foreground">
             Description (Optional)
           </Label>
           <Input
@@ -137,20 +143,20 @@ function CampaignFormContent({
             placeholder="e.g. Table tents, window stickers, and flyer QR codes"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-sm"
+            className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 shadow-2xs"
           />
         </div>
 
         {/* Status */}
         <div className="space-y-1.5">
-          <Label htmlFor="campaign-status" className="text-xs font-semibold text-zinc-300">
+          <Label htmlFor="campaign-status" className="text-xs font-semibold text-foreground">
             Campaign Status
           </Label>
           <Select value={status} onValueChange={(val) => { if (val) setStatus(val); }}>
-            <SelectTrigger id="campaign-status" className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-xs">
+            <SelectTrigger id="campaign-status" className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-950 border-zinc-800 text-zinc-200">
+            <SelectContent className="bg-popover border-border/80 text-popover-foreground rounded-xl shadow-xl">
               <SelectItem value="active">Active (Tracking Scans & Events)</SelectItem>
               <SelectItem value="paused">Paused (Temporarily Paused)</SelectItem>
               <SelectItem value="archived">Archived (Campaign Concluded)</SelectItem>
@@ -158,13 +164,13 @@ function CampaignFormContent({
           </Select>
         </div>
 
-        <DialogFooter className="pt-2">
+        <DialogFooter className="pt-3 border-t border-border/60 flex items-center justify-end gap-2">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={onClose}
-            className="border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
+            className="h-9 px-4 text-xs font-medium rounded-xl hover:bg-muted"
           >
             Cancel
           </Button>
@@ -172,9 +178,9 @@ function CampaignFormContent({
             type="submit"
             size="sm"
             disabled={loading}
-            className="bg-sky-600 hover:bg-sky-500 text-white text-xs gap-1.5"
+            className="h-9 px-5 text-xs font-semibold rounded-xl shadow-xs bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
           >
-            <Sparkles className="h-3.5 w-3.5" />
+            <Sparkles className="size-3.5" />
             <span>{loading ? "Saving..." : isEditing ? "Save Changes" : "Create Campaign"}</span>
           </Button>
         </DialogFooter>
@@ -191,7 +197,7 @@ export function CampaignDialog({
 }: CampaignDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-zinc-100">
+      <DialogContent className="sm:max-w-md p-6 rounded-2xl border-border/80 bg-background/95 backdrop-blur-xl shadow-2xl text-foreground">
         {open && (
           <CampaignFormContent
             key={campaign?.id || "new"}

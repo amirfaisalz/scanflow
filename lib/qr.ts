@@ -84,12 +84,28 @@ export function isValidSlug(slug: string): boolean {
 }
 
 /**
+ * Normalize a user-entered URL (auto-prefix https:// if scheme is missing).
+ */
+export function normalizeUrl(input: string): string {
+  const trimmed = (input || "").trim();
+  if (!trimmed) return "";
+  if (!/^https?:\/\//i.test(trimmed)) {
+    return `https://${trimmed}`;
+  }
+  return trimmed;
+}
+
+/**
  * Validate a destination URL.
  */
 export function isValidUrl(url: string): boolean {
+  if (!url) return false;
   try {
     const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
+    return (
+      (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+      Boolean(parsed.hostname)
+    );
   } catch {
     return false;
   }

@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
           overallConversionRate,
         },
       },
-      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=60" } }
+      { headers: { "Cache-Control": "no-store, no-cache, must-revalidate" } }
     );
   } catch (error) {
     console.error("GET /api/conversions error:", error);

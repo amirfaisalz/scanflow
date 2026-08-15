@@ -13,30 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Split, Sparkles } from "lucide-react";
+import { normalizeUrl, isValidUrl } from "@/lib/qr";
 import type { ExperimentData, ExperimentVariantData } from "./experiment-card";
-
-export interface ExperimentDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  experiment?: ExperimentData | null;
-  qrCodes?: Array<{ id: string; name: string; destinationUrl?: string }>;
-  campaigns?: Array<{ id: string; name: string }>;
-  onSave?: (data: {
-    name: string;
-    description?: string;
-    qrCodeId: string;
-    campaignId?: string | null;
-    trafficAllocation?: number;
-    status?: string;
-    variants: Array<{
-      id?: string;
-      name: string;
-      destinationUrl: string;
-      trafficWeight: number;
-      isControl: boolean;
-    }>;
-  }) => Promise<void> | void;
-}
 
 function isValidHttpUrl(string: string) {
   try {
@@ -74,55 +52,79 @@ function ExperimentFormContent({
   }) => Promise<void> | void;
   onClose: () => void;
 }) {
-  const expVariants = experiment?.variants || [];
-  const control = expVariants.find((v: ExperimentVariantData) => v.isControl) || expVariants[0];
-  const nonControl = expVariants.find((v: ExperimentVariantData) => !v.isControl) || expVariants[1];
+  const isEditing = Boolean(experiment?.id);
 
+  // Form states
   const [name, setName] = React.useState(experiment?.name || "");
-  const [description, setDescription] = React.useState(experiment?.description || "");
-  const [qrCodeId, setQrCodeId] = React.useState(
-    experiment?.qrCodeId || (qrCodes.length === 1 ? qrCodes[0].id : "")
+  const [description, setDescription] = React.useState(
+    experiment?.description || ""
   );
-  const [campaignId, setCampaignId] = React.useState<string>(experiment?.campaignId || "none");
-  const trafficAllocation = experiment?.trafficAllocation ?? 100;
-  const status = experiment?.status || "draft";
+  const [qrCodeId, setQrCodeId] = React.useState(
+    experiment?.qrCodeId || ""
+  );
+  const [campaignId, setCampaignId] = React.useState(
+    experiment?.campaignId || "none"
+  );
+  const [status, setStatus] = React.useState(
+    experiment?.status || "draft"
+  );
+  const [trafficAllocation, setTrafficAllocation] = React.useState(
+    experiment?.trafficAllocation || 100
+  );
 
-  // Variants state
-  const [variantAName, setVariantAName] = React.useState(control?.name || "Variant A (Control)");
-  const [variantAUrl, setVariantAUrl] = React.useState(control?.destinationUrl || "");
-  const [variantAWeight, setVariantAWeight] = React.useState(control?.trafficWeight ?? 50);
+  // Variants state (typically A & B)
+  const defaultControl = experiment?.variants?.find((v) => v.isControl) || experiment?.variants?.[0];
+  const defaultChallenger = experiment?.variants?.find((v) => !v.isControl) || experiment?.variants?.[1];
 
-  const [variantBName, setVariantBName] = React.useState(nonControl?.name || "Variant B");
-  const [variantBUrl, setVariantBUrl] = React.useState(nonControl?.destinationUrl || "");
-  const [variantBWeight, setVariantBWeight] = React.useState(nonControl?.trafficWeight ?? 50);
+  const [variantAName, setVariantAName] = React.useState(
+    defaultControl?.name || "Variant A (Control)"
+  );
+  const [variantAUrl, setVariantAUrl] = React.useState(
+    defaultControl?.destinationUrl || ""
+  );
+  const [variantAWeight, setVariantAWeight] = React.useState(
+    defaultControl?.trafficWeight ?? 50
+  );
+
+  const [variantBName, setVariantBName] = React.useState(
+    defaultChallenger?.name || "Variant B"
+  );
+  const [variantBUrl, setVariantBUrl] = React.useState(
+    defaultChallenger?.destinationUrl || ""
+  );
+  const [variantBWeight, setVariantBWeight] = React.useState(
+    defaultChallenger?.trafficWeight ?? 50
+  );
 
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
 
-  const isEditing = Boolean(experiment && experiment.id);
+  // When QR code changes and URL is empty, prefill variant A with selected QR destinationUrl
+  React.useEffect(() => {
+    if (!variantAUrl && qrCodeId) {
+      const selected = qrCodes.find((q) => q.id === qrCodeId);
+      if (selected?.destinationUrl) {
+        setVariantAUrl(selected.destinationUrl);
+      }
+    }
+  }, [qrCodeId, qrCodes, variantAUrl]);
 
-  const applyPreset = (weightA: number, weightB: number) => {
-    setVariantAWeight(weightA);
-    setVariantBWeight(weightB);
+  const totalWeight = Number(variantAWeight) + Number(variantBWeight);
+
+  const applyPreset = (a: number, b: number) => {
+    setVariantAWeight(a);
+    setVariantBWeight(b);
   };
-
-  const totalWeight = Number(variantAWeight || 0) + Number(variantBWeight || 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!name.trim()) {
       setError("Experiment name is required");
       return;
     }
 
-    if (!qrCodeId || !qrCodeId.trim() || qrCodeId === "none") {
+    if (!qrCodeId.trim()) {
       setError("Please select a QR code");
-      return;
-    }
-
-    if (!variantAName.trim()) {
-      setError("Variant A requires a name");
       return;
     }
 
@@ -214,295 +216,301 @@ function ExperimentFormContent({
 
   return (
     <>
-      <DialogHeader>
-        <DialogTitle className="text-xl font-bold flex items-center gap-2">
-          <Split className="h-5 w-5 text-sky-400" />
-          <span>{isEditing ? "Edit Experiment" : "Create Experiment"}</span>
-        </DialogTitle>
-        <DialogDescription className="text-zinc-400 text-xs">
-          Split visitor traffic between different landing pages to measure conversion rate lift and statistical significance.
-        </DialogDescription>
+      <DialogHeader className="pb-3 border-b border-border/60">
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-500 flex items-center justify-center shadow-2xs">
+            <Split className="size-5" />
+          </div>
+          <div>
+            <DialogTitle className="text-lg font-bold tracking-tight text-foreground">
+              {isEditing ? "Edit Experiment" : "Create Experiment"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+              Split visitor traffic between different landing pages to measure conversion rate lift and statistical significance.
+            </DialogDescription>
+          </div>
+        </div>
       </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          {error && (
-            <div className="rounded-md bg-red-500/10 border border-red-500/30 p-2.5 text-xs text-red-400">
-              {error}
-            </div>
-          )}
+      <form onSubmit={handleSubmit} className="space-y-4 pt-3">
+        {error && (
+          <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 text-xs text-destructive">
+            {error}
+          </div>
+        )}
 
-          {/* Experiment Name */}
+        {/* Experiment Name */}
+        <div className="space-y-1.5">
+          <Label htmlFor="experiment-name" className="text-xs font-semibold text-foreground">
+            Experiment Name *
+          </Label>
+          <Input
+            id="experiment-name"
+            placeholder="e.g. Hero CTA Redesign Test"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 shadow-2xs"
+          />
+        </div>
+
+        {/* Description */}
+        <div className="space-y-1.5">
+          <Label htmlFor="experiment-description" className="text-xs font-semibold text-foreground">
+            Description (Optional)
+          </Label>
+          <Input
+            id="experiment-description"
+            placeholder="e.g. Testing conversion lift of green vs blue CTA buttons"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="h-9.5 text-xs rounded-xl border-border/80 bg-background/80 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 shadow-2xs"
+          />
+        </div>
+
+        {/* Scope Assignment (QR Code & Campaign) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="experiment-name" className="text-xs font-semibold text-zinc-300">
-              Experiment Name *
+            <Label htmlFor="experiment-qr-code" className="text-xs font-semibold text-foreground">
+              QR Code *
             </Label>
-            <Input
-              id="experiment-name"
-              placeholder="e.g. Hero CTA Redesign Test"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-sm"
-            />
+            <select
+              id="experiment-qr-code"
+              value={qrCodeId}
+              onChange={(e) => setQrCodeId(e.target.value)}
+              className="flex h-9.5 w-full rounded-xl border border-border/80 bg-background/80 px-3 py-1 text-xs text-foreground shadow-2xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">Select a QR code...</option>
+              {qrCodes.map((qr) => (
+                <option key={qr.id} value={qr.id}>
+                  {qr.name}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* Description */}
           <div className="space-y-1.5">
-            <Label htmlFor="experiment-description" className="text-xs font-semibold text-zinc-300">
-              Description (Optional)
+            <Label htmlFor="experiment-campaign" className="text-xs font-semibold text-foreground">
+              Campaign (Optional)
             </Label>
-            <Input
-              id="experiment-description"
-              placeholder="e.g. Testing conversion lift of green vs blue CTA buttons"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="bg-zinc-900/60 border-zinc-800 text-zinc-200 text-sm"
-            />
+            <select
+              id="experiment-campaign"
+              value={campaignId}
+              onChange={(e) => setCampaignId(e.target.value)}
+              className="flex h-9.5 w-full rounded-xl border border-border/80 bg-background/80 px-3 py-1 text-xs text-foreground shadow-2xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="none">None (Independent)</option>
+              {campaigns.map((camp) => (
+                <option key={camp.id} value={camp.id}>
+                  {camp.name}
+                </option>
+              ))}
+            </select>
           </div>
+        </div>
 
-          {/* Scope Assignment (QR Code & Campaign) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="experiment-qr-code" className="text-xs font-semibold text-zinc-300">
-                QR Code *
-              </Label>
-              <select
-                id="experiment-qr-code"
-                value={qrCodeId}
-                onChange={(e) => setQrCodeId(e.target.value)}
-                className="flex h-9 w-full rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-1 text-xs text-zinc-200 shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">Select a QR code...</option>
-                {qrCodes.map((qr) => (
-                  <option key={qr.id} value={qr.id}>
-                    {qr.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="experiment-campaign" className="text-xs font-semibold text-zinc-300">
-                Campaign (Optional)
-              </Label>
-              <select
-                id="experiment-campaign"
-                value={campaignId}
-                onChange={(e) => setCampaignId(e.target.value)}
-                className="flex h-9 w-full rounded-md border border-zinc-800 bg-zinc-900/60 px-3 py-1 text-xs text-zinc-200 shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="none">None (Independent)</option>
-                {campaigns.map((camp) => (
-                  <option key={camp.id} value={camp.id}>
-                    {camp.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Split Presets & Traffic Weights Header */}
-          <div className="pt-2 border-t border-zinc-850">
-            <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
-              <span className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
-                <Split className="h-3.5 w-3.5 text-sky-400" />
-                Traffic Split & Variants
-              </span>
-              <div className="flex items-center gap-1">
-                <span className="text-[11px] text-zinc-400 mr-1">Presets:</span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => applyPreset(50, 50)}
-                  className={`h-6 text-[11px] px-2 border-zinc-800 ${
-                    variantAWeight === 50 && variantBWeight === 50
-                      ? "bg-sky-500/20 text-sky-400 border-sky-500/30"
-                      : "bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
-                  }`}
-                >
-                  50 / 50
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => applyPreset(70, 30)}
-                  className={`h-6 text-[11px] px-2 border-zinc-800 ${
-                    variantAWeight === 70 && variantBWeight === 30
-                      ? "bg-sky-500/20 text-sky-400 border-sky-500/30"
-                      : "bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
-                  }`}
-                >
-                  70 / 30
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => applyPreset(80, 20)}
-                  className={`h-6 text-[11px] px-2 border-zinc-800 ${
-                    variantAWeight === 80 && variantBWeight === 20
-                      ? "bg-sky-500/20 text-sky-400 border-sky-500/30"
-                      : "bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
-                  }`}
-                >
-                  80 / 20
-                </Button>
-              </div>
-            </div>
-
-            {/* Total weight indicator */}
-            <div className="mb-3 flex items-center justify-between text-xs px-0.5">
-              <span className="text-zinc-400">Total Traffic Split:</span>
-              <span
-                className={`font-mono font-semibold ${
-                  Math.round(totalWeight) === 100
-                    ? "text-emerald-400"
-                    : "text-red-400"
+        {/* Split Presets & Traffic Weights Header */}
+        <div className="pt-2 border-t border-border/60">
+          <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              <Split className="size-3.5 text-primary" />
+              Traffic Split &amp; Variants
+            </span>
+            <div className="flex items-center gap-1">
+              <span className="text-[11px] text-muted-foreground mr-1">Presets:</span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyPreset(50, 50)}
+                className={`h-6 text-[11px] px-2 rounded-lg border-border/80 ${
+                  variantAWeight === 50 && variantBWeight === 50
+                    ? "bg-primary/10 text-primary border-primary/30"
+                    : "bg-muted/40 text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {totalWeight}% {Math.round(totalWeight) !== 100 ? "(Must sum to 100%)" : "✓"}
-              </span>
-            </div>
-
-            {/* Variant A (Control) */}
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3.5 space-y-3 mb-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-200 flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-zinc-400" />
-                  Variant A (Control Baseline)
-                </span>
-                <span className="text-xs font-mono text-zinc-400">
-                  {variantAWeight}% traffic
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <div className="space-y-1 sm:col-span-1">
-                  <Label htmlFor="variant-a-name" className="text-[11px] text-zinc-400">
-                    Variant A Name
-                  </Label>
-                  <Input
-                    id="variant-a-name"
-                    value={variantAName}
-                    onChange={(e) => setVariantAName(e.target.value)}
-                    className="bg-zinc-950/60 border-zinc-800 text-zinc-200 text-xs h-8"
-                  />
-                </div>
-
-                <div className="space-y-1 sm:col-span-2">
-                  <Label htmlFor="variant-a-url" className="text-[11px] text-zinc-400">
-                    Variant A Destination URL *
-                  </Label>
-                  <Input
-                    id="variant-a-url"
-                    placeholder="https://example.com/control"
-                    value={variantAUrl}
-                    onChange={(e) => setVariantAUrl(e.target.value)}
-                    className="bg-zinc-950/60 border-zinc-800 text-zinc-200 text-xs h-8 font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <Label htmlFor="variant-a-weight" className="text-[11px] text-zinc-400">
-                  Variant A Weight (%)
-                </Label>
-                <Input
-                  id="variant-a-weight"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={variantAWeight}
-                  onChange={(e) => setVariantAWeight(Number(e.target.value) || 0)}
-                  className="bg-zinc-950/60 border-zinc-800 text-zinc-200 text-xs h-8 font-mono max-w-[120px]"
-                />
-              </div>
-            </div>
-
-            {/* Variant B */}
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3.5 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-200 flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-sky-400" />
-                  Variant B (Challenger)
-                </span>
-                <span className="text-xs font-mono text-zinc-400">
-                  {variantBWeight}% traffic
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <div className="space-y-1 sm:col-span-1">
-                  <Label htmlFor="variant-b-name" className="text-[11px] text-zinc-400">
-                    Variant B Name
-                  </Label>
-                  <Input
-                    id="variant-b-name"
-                    value={variantBName}
-                    onChange={(e) => setVariantBName(e.target.value)}
-                    className="bg-zinc-950/60 border-zinc-800 text-zinc-200 text-xs h-8"
-                  />
-                </div>
-
-                <div className="space-y-1 sm:col-span-2">
-                  <Label htmlFor="variant-b-url" className="text-[11px] text-zinc-400">
-                    Variant B Destination URL *
-                  </Label>
-                  <Input
-                    id="variant-b-url"
-                    placeholder="https://example.com/challenger"
-                    value={variantBUrl}
-                    onChange={(e) => setVariantBUrl(e.target.value)}
-                    className="bg-zinc-950/60 border-zinc-800 text-zinc-200 text-xs h-8 font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <Label htmlFor="variant-b-weight" className="text-[11px] text-zinc-400">
-                  Variant B Weight (%)
-                </Label>
-                <Input
-                  id="variant-b-weight"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={variantBWeight}
-                  onChange={(e) => setVariantBWeight(Number(e.target.value) || 0)}
-                  className="bg-zinc-950/60 border-zinc-800 text-zinc-200 text-xs h-8 font-mono max-w-[120px]"
-                />
-              </div>
+                50 / 50
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyPreset(70, 30)}
+                className={`h-6 text-[11px] px-2 rounded-lg border-border/80 ${
+                  variantAWeight === 70 && variantBWeight === 30
+                    ? "bg-primary/10 text-primary border-primary/30"
+                    : "bg-muted/40 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                70 / 30
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyPreset(80, 20)}
+                className={`h-6 text-[11px] px-2 rounded-lg border-border/80 ${
+                  variantAWeight === 80 && variantBWeight === 20
+                    ? "bg-primary/10 text-primary border-primary/30"
+                    : "bg-muted/40 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                80 / 20
+              </Button>
             </div>
           </div>
 
-          <DialogFooter className="pt-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onClose}
-              className="border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
+          {/* Total weight indicator */}
+          <div className="mb-3 flex items-center justify-between text-xs px-0.5">
+            <span className="text-muted-foreground">Total Traffic Split:</span>
+            <span
+              className={`font-mono font-semibold ${
+                Math.round(totalWeight) === 100
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-destructive"
+              }`}
             >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              disabled={loading}
-              className="bg-sky-600 hover:bg-sky-500 text-white text-xs gap-1.5"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>
-                {loading
-                  ? "Saving..."
-                  : isEditing
-                  ? "Save Changes"
-                  : "Create Experiment"}
+              {totalWeight}% {Math.round(totalWeight) !== 100 ? "(Must sum to 100%)" : "✓"}
+            </span>
+          </div>
+
+          {/* Variant A (Control) */}
+          <div className="rounded-xl border border-border/80 bg-muted/40 p-3.5 space-y-3 mb-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-muted-foreground" />
+                Variant A (Control Baseline)
               </span>
-            </Button>
-          </DialogFooter>
-        </form>
+              <span className="text-xs font-mono text-muted-foreground">
+                {variantAWeight}% traffic
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="space-y-1 sm:col-span-1">
+                <Label htmlFor="variant-a-name" className="text-[11px] text-muted-foreground">
+                  Variant A Name
+                </Label>
+                <Input
+                  id="variant-a-name"
+                  value={variantAName}
+                  onChange={(e) => setVariantAName(e.target.value)}
+                  className="bg-background/80 border-border/80 text-foreground text-xs h-8 rounded-lg"
+                />
+              </div>
+
+              <div className="space-y-1 sm:col-span-2">
+                <Label htmlFor="variant-a-url" className="text-[11px] text-muted-foreground">
+                  Variant A Destination URL *
+                </Label>
+                <Input
+                  id="variant-a-url"
+                  placeholder="https://example.com/control"
+                  value={variantAUrl}
+                  onChange={(e) => setVariantAUrl(e.target.value)}
+                  className="bg-background/80 border-border/80 text-foreground text-xs h-8 font-mono rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="variant-a-weight" className="text-[11px] text-muted-foreground">
+                Variant A Weight (%)
+              </Label>
+              <Input
+                id="variant-a-weight"
+                type="number"
+                min="0"
+                max="100"
+                value={variantAWeight}
+                onChange={(e) => setVariantAWeight(Number(e.target.value) || 0)}
+                className="bg-background/80 border-border/80 text-foreground text-xs h-8 font-mono max-w-[120px] rounded-lg"
+              />
+            </div>
+          </div>
+
+          {/* Variant B */}
+          <div className="rounded-xl border border-border/80 bg-muted/40 p-3.5 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-sky-500" />
+                Variant B (Challenger)
+              </span>
+              <span className="text-xs font-mono text-muted-foreground">
+                {variantBWeight}% traffic
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="space-y-1 sm:col-span-1">
+                <Label htmlFor="variant-b-name" className="text-[11px] text-muted-foreground">
+                  Variant B Name
+                </Label>
+                <Input
+                  id="variant-b-name"
+                  value={variantBName}
+                  onChange={(e) => setVariantBName(e.target.value)}
+                  className="bg-background/80 border-border/80 text-foreground text-xs h-8 rounded-lg"
+                />
+              </div>
+
+              <div className="space-y-1 sm:col-span-2">
+                <Label htmlFor="variant-b-url" className="text-[11px] text-muted-foreground">
+                  Variant B Destination URL *
+                </Label>
+                <Input
+                  id="variant-b-url"
+                  placeholder="https://example.com/challenger"
+                  value={variantBUrl}
+                  onChange={(e) => setVariantBUrl(e.target.value)}
+                  className="bg-background/80 border-border/80 text-foreground text-xs h-8 font-mono rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="variant-b-weight" className="text-[11px] text-muted-foreground">
+                Variant B Weight (%)
+              </Label>
+              <Input
+                id="variant-b-weight"
+                type="number"
+                min="0"
+                max="100"
+                value={variantBWeight}
+                onChange={(e) => setVariantBWeight(Number(e.target.value) || 0)}
+                className="bg-background/80 border-border/80 text-foreground text-xs h-8 font-mono max-w-[120px] rounded-lg"
+              />
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className="pt-3 border-t border-border/60 flex items-center justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            className="h-9 px-4 text-xs font-medium rounded-xl hover:bg-muted"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            size="sm"
+            disabled={loading}
+            className="h-9 px-5 text-xs font-semibold rounded-xl shadow-xs bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
+          >
+            <Sparkles className="size-3.5" />
+            <span>
+              {loading
+                ? "Saving..."
+                : isEditing
+                ? "Save Changes"
+                : "Create Experiment"}
+            </span>
+          </Button>
+        </DialogFooter>
+      </form>
     </>
   );
 }
@@ -517,7 +525,7 @@ export function ExperimentDialog({
 }: ExperimentDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl bg-zinc-950 border-zinc-800 text-zinc-100 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-xl p-6 rounded-2xl border-border/80 bg-background/95 backdrop-blur-xl shadow-2xl text-foreground max-h-[90vh] overflow-y-auto">
         {open && (
           <ExperimentFormContent
             key={experiment?.id || "new"}

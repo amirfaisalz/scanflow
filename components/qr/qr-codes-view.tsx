@@ -78,8 +78,9 @@ export function QRCodesView({ initialQrCodes }: QRCodesViewProps) {
       const params = new URLSearchParams();
       if (searchQuery.trim()) params.set("search", searchQuery.trim());
       if (statusFilter !== "all") params.set("status", statusFilter);
+      params.set("_t", Date.now().toString());
 
-      const res = await fetch(`/api/qr-codes?${params.toString()}`);
+      const res = await fetch(`/api/qr-codes?${params.toString()}`, { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to fetch QR codes");
       const json = await res.json();
       setQrCodes(json.data || []);
@@ -527,7 +528,20 @@ export function QRCodesView({ initialQrCodes }: QRCodesViewProps) {
             if (!open) setEditingQr(null);
           }}
           initialData={editingQr}
-          onSuccess={() => fetchQrCodes()}
+          onSuccess={(savedQr) => {
+            if (savedQr) {
+              setQrCodes((prev) => {
+                const index = prev.findIndex((q) => q.id === savedQr.id);
+                if (index >= 0) {
+                  const updated = [...prev];
+                  updated[index] = savedQr;
+                  return updated;
+                }
+                return [savedQr, ...prev];
+              });
+            }
+            fetchQrCodes();
+          }}
         />
       )}
 
