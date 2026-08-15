@@ -51,8 +51,9 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
       expect(screen.getByText("Isolated Workspace")).toBeInTheDocument();
       expect(screen.getByText("Dashboard")).toBeInTheDocument();
       expect(screen.getByText("QR Codes")).toBeInTheDocument();
+      expect(screen.getByText("Scan Journeys")).toBeInTheDocument();
       expect(screen.getByText("Campaigns")).toBeInTheDocument();
-      expect(screen.getByText("Analytics & Journeys")).toBeInTheDocument();
+      expect(screen.getByText("Analytics")).toBeInTheDocument();
       expect(screen.getByText("A/B Experiments")).toBeInTheDocument();
       expect(screen.getByText("Data Isolation & Settings")).toBeInTheDocument();
       expect(screen.getByText("Product Documentation")).toBeInTheDocument();
@@ -64,10 +65,13 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
       const qrCodesLink = screen.getByRole("link", { name: /qr codes/i });
       expect(qrCodesLink).toHaveAttribute("href", "/dashboard/qr-codes");
 
+      const journeysLink = screen.getByRole("link", { name: /scan journeys/i });
+      expect(journeysLink).toHaveAttribute("href", "/dashboard/journeys");
+
       const campaignsLink = screen.getByRole("link", { name: /campaigns/i });
       expect(campaignsLink).toHaveAttribute("href", "/dashboard/campaigns");
 
-      const analyticsLink = screen.getByRole("link", { name: /analytics & journeys/i });
+      const analyticsLink = screen.getByRole("link", { name: /analytics/i });
       expect(analyticsLink).toHaveAttribute("href", "/dashboard/analytics");
 
       const experimentsLink = screen.getByRole("link", { name: /a\/b experiments/i });
@@ -78,9 +82,6 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
 
       const docsLink = screen.getByRole("link", { name: /product documentation/i });
       expect(docsLink).toHaveAttribute("href", "/dashboard/docs");
-
-      const quickCreateLink = screen.getByRole("link", { name: /create dynamic qr/i });
-      expect(quickCreateLink).toHaveAttribute("href", "/dashboard/qr-codes");
     });
 
 
@@ -229,6 +230,7 @@ describe("AppSidebar & SiteHeader (dashboard-01 components)", () => {
     it("should render appropriate titles for subroutes", () => {
       const routes = [
         { path: "/dashboard/qr-codes", expected: "QR Code Management" },
+        { path: "/dashboard/journeys", expected: "Scan Journeys Explorer" },
         { path: "/dashboard/campaigns", expected: "Campaigns" },
         { path: "/dashboard/analytics", expected: "Scan Analytics & Journeys" },
         { path: "/dashboard/experiments", expected: "A/B Experiments" },

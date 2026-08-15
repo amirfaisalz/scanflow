@@ -19,6 +19,7 @@ export function SiteHeader() {
 
   const getPageTitle = () => {
     if (pathname.includes("qr-codes")) return "QR Code Management";
+    if (pathname.includes("journeys")) return "Scan Journeys Explorer";
     if (pathname.includes("campaigns")) return "Campaigns";
     if (pathname.includes("analytics")) return "Scan Analytics & Journeys";
     if (pathname.includes("experiments")) return "A/B Experiments";

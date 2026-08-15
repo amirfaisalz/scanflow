@@ -18,6 +18,7 @@ import {
 import {
   LayoutDashboardIcon,
   QrCode,
+  Compass,
   FolderGit2,
   BarChart3,
   GitBranch,
@@ -57,13 +58,19 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       isActive: pathname.startsWith("/dashboard/qr-codes"),
     },
     {
+      title: "Scan Journeys",
+      url: "/dashboard/journeys",
+      icon: <Compass className="size-4" />,
+      isActive: pathname.startsWith("/dashboard/journeys"),
+    },
+    {
       title: "Campaigns",
       url: "/dashboard/campaigns",
       icon: <FolderGit2 className="size-4" />,
       isActive: pathname.startsWith("/dashboard/campaigns"),
     },
     {
-      title: "Analytics & Journeys",
+      title: "Analytics",
       url: "/dashboard/analytics",
       icon: <BarChart3 className="size-4" />,
       isActive: pathname.startsWith("/dashboard/analytics"),
