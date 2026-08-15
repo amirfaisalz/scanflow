@@ -20,9 +20,12 @@
   <a href="#quickstart--local-setup">Quickstart</a> •
   <a href="#tech-stack">Tech Stack</a> •
   <a href="#database-schema">Database Schema</a> •
-  <a href="#testing">Testing</a> •
-  <a href="#roadmap">Roadmap</a>
+  <a href="#testing">Testing</a>
 </p>
+
+<br />
+
+<img src="public/screenshot-home.png" alt="ScanFlow Landing Page & Dynamic Routing Console" width="100%" />
 
 </div>
 
@@ -273,24 +276,6 @@ npm run test:coverage
 ├── proxy.ts                # Next.js 16 route protection & session guards
 └── drizzle.config.ts       # Drizzle Kit configuration
 ```
-
----
-
-## Roadmap
-
-- [x] **Phase 1: MVP Core Features**
-  - [x] Multi-tenant Better Auth integration with 1-Click Demo Login
-  - [x] Dynamic QR Generator with SVG & 4K PNG exports
-  - [x] Deterministic condition routing engine (Device, OS, Country, Time)
-  - [x] Non-blocking `/r/:code` redirect telemetry
-  - [x] Interactive Visitor Scan Journey visualizer
-  - [x] Marketing Campaigns management & QR attribution
-- [ ] **Phase 2: Advanced Optimizations**
-  - [ ] A/B Testing split engine with automated statistical winner selection
-  - [ ] Custom conversion event triggers (SDK & webhooks)
-  - [ ] Public Developer REST API with scoped API keys
-  - [ ] Geo-fencing & radius-based proximity routing
-  - [ ] Automated scheduled reports & Slack/Discord alerts
 
 ---
 
