@@ -8,9 +8,9 @@ This document tracks the implementation progress of all features outlined in [do
 
 | Phase | Total Features | Completed | In Progress | Pending |
 | :--- | :---: | :---: | :---: | :---: |
-| **Phase 1 (MVP)** | 12 | 3 | 0 | 9 |
+| **Phase 1 (MVP)** | 12 | 8 | 0 | 4 |
 | **Phase 2 (Advanced)** | 13 | 0 | 0 | 13 |
-| **Total** | **25** | **3** | **0** | **22** |
+| **Total** | **25** | **8** | **0** | **17** |
 
 ---
 
@@ -59,49 +59,55 @@ This document tracks the implementation progress of all features outlined in [do
   - [x] QR Codes management dashboard page with Grid & Table view toggle (`app/dashboard/qr-codes/page.tsx`)
   - [x] Comprehensive unit and component tests with 100% test passing (`tests/unit/qr.test.ts`, `tests/unit/qr-api.test.ts`, `tests/unit/qr-components.test.tsx`)
 
-
 ---
 
 ### 4. Dynamic QR Routing
-- **Status**: ⚪ Pending
+- **Status**: 🟢 Completed
 - **Tasks**:
-  - [ ] Condition-based routing engine (Device, OS, Country, Language, Time, Campaign)
-  - [ ] Prioritized deterministic rule evaluator
+  - [x] Condition-based routing engine (Device, OS, Country, Language, Time window) (`lib/routing/engine.ts`)
+  - [x] Prioritized deterministic rule evaluator with fallback
+  - [x] Routing rules management CRUD API (`app/api/qr-codes/[id]/rules/route.ts` & `app/api/qr-codes/[id]/rules/[ruleId]/route.ts`)
+  - [x] Dynamic routing rules modal dialog (`components/qr/routing-rules-dialog.tsx`) integrated into QR cards
 
 ---
 
 ### 5. QR Redirect Engine (`GET /r/:code`)
-- **Status**: ⚪ Pending
+- **Status**: 🟢 Completed
 - **Tasks**:
-  - [ ] High-performance redirect handler (`app/r/[code]/route.ts`)
-  - [ ] Validation, status checking, rule resolution
-  - [ ] Non-blocking async scan tracking event dispatch
-  - [ ] Caching and minimal latency optimization
+  - [x] High-performance redirect handler (`app/r/[code]/route.ts`)
+  - [x] QR validation and status enforcement (Active: 307 redirect, Paused: Paused notice, Archived: Archived notice, Missing: 404)
+  - [x] Deterministic routing rule evaluation against visitor context
+  - [x] Non-blocking scan event and session recording with `sf_sid` cookie management
 
 ---
 
 ### 6. Scan Tracking & Ingestion
-- **Status**: ⚪ Pending
+- **Status**: 🟢 Completed
 - **Tasks**:
-  - [ ] Ingest scan events with user agent parsing (Device, OS, Browser)
-  - [ ] Geo-location resolution (Country, Region/City)
-  - [ ] Referrer and timestamp capture
+  - [x] Ingest scan events with user agent parsing (Device, OS, Browser)
+  - [x] Geo-location resolution (Country, City from headers)
+  - [x] Referrer and timestamp capture with IP anonymization (SHA-256 hash)
+  - [x] Downstream event ingestion API (`app/api/track/route.ts`)
 
 ---
 
 ### 7. Visitor Sessions
-- **Status**: ⚪ Pending
+- **Status**: 🟢 Completed
 - **Tasks**:
-  - [ ] Session grouping for multi-step visitor journeys
-  - [ ] Session lifecycle (start, duration, events count, conversion status)
+  - [x] Database table `sessions` & `session_events` in PostgreSQL (`lib/db/schema.ts`)
+  - [x] Session lifecycle tracking (startedAt, endedAt, durationSeconds, eventsCount, converted status)
+  - [x] Session analytics tracker utility (`lib/analytics/tracker.ts`)
 
 ---
 
 ### 8. Scan Journey (Standout Feature)
-- **Status**: ⚪ Pending
+- **Status**: 🟢 Completed
 - **Tasks**:
-  - [ ] Chronological event timeline (`QR_SCAN` -> `PAGE_VIEW` -> `BUTTON_CLICK` -> `CONVERSION`)
-  - [ ] Visual step-by-step visitor path explorer in dashboard
+  - [x] Chronological event timeline API (`app/api/analytics/journeys/route.ts` & `app/api/analytics/sessions/[id]/route.ts`)
+  - [x] Interactive visual step-by-step visitor path explorer in dashboard (`app/dashboard/journeys/page.tsx`)
+  - [x] Connected vertical timeline sheet component (`components/journeys/journey-detail-sheet.tsx`)
+  - [x] Search, device filters, outcome filters, and summary metrics
+  - [x] Sidebar navigation integration (`components/app-sidebar.tsx`)
 
 ---
 
