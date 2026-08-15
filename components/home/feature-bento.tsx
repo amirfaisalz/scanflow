@@ -7,50 +7,51 @@ import {
   Zap,
   Split,
   Layers,
+  Sparkles,
 } from "lucide-react";
 
 const features = [
   {
-    title: "Dynamic Rule Orchestrator",
+    title: "Zero-Friction OS Routing",
     icon: Sliders,
     badge: "Edge Native",
     description:
-      "Build deterministic routing logic based on visitor OS (iOS/Android/macOS/Windows), country code, language, and hour of the day.",
+      "Direct iOS users to the App Store, Android to Google Play, and desktop to your web app with zero manual intervention.",
   },
   {
-    title: "End-to-End Scan Journeys",
+    title: "Full-Funnel Scan Attribution",
     icon: Layers,
-    badge: "Visitor Stitching",
+    badge: "Lifecycle Tracking",
     description:
-      "Track every touchpoint from initial physical QR scan through session binding, page engagement, and final conversion event.",
+      "Track the complete customer journey from initial physical QR scan through session identity binding and completed checkout.",
   },
   {
-    title: "A/B Traffic Split Engine",
+    title: "Automated A/B Split Testing",
     icon: Split,
-    badge: "Conversion Optimization",
+    badge: "Conversion Boost",
     description:
-      "Run multi-variant experiments with deterministic hash-based traffic weights to continuously find highest-converting landing pages.",
+      "Distribute incoming scan traffic across multiple landing page variants with deterministic hash splits to find winning offers.",
   },
   {
-    title: "Dynamic QR Studio & Vector Export",
+    title: "Custom Vector QR Studio",
     icon: Palette,
-    badge: "Custom Branding",
+    badge: "Brand Ready",
     description:
-      "Customize QR module colors, error correction levels, and styling with instant preview. Export print-ready high-res SVG or PNG.",
+      "Customize brand colors, error correction levels, and styling with real-time preview. Export print-ready crisp SVG or PNG files.",
   },
   {
-    title: "Sub-12ms Edge FastPath",
+    title: "Sub-12ms Instant Edge Redirects",
     icon: Zap,
-    badge: "Zero Latency",
+    badge: "Zero Lag",
     description:
-      "Deterministic HTTP 307 redirects resolved directly in memory at global edge nodes with asynchronous telemetry streaming.",
+      "Deterministic HTTP 307 redirects resolved directly in memory at global edge nodes with non-blocking background telemetry.",
   },
   {
-    title: "Enterprise Multi-Tenancy & RBAC",
+    title: "Enterprise Multi-Tenancy & Security",
     icon: ShieldCheck,
     badge: "PostgreSQL & Auth",
     description:
-      "Strict organization and account isolation using Better Auth and Drizzle ORM on PostgreSQL with encrypted telemetry logs.",
+      "Strict organization workspaces and role-based access control with Better Auth and Drizzle ORM on PostgreSQL.",
   },
 ];
 
@@ -61,13 +62,14 @@ export function FeatureBento() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
+            <Sparkles className="size-3.5 text-fire" />
             <span>Core Capabilities</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white text-balance">
-            Everything you need to scale dynamic QR infrastructure
+            Everything You Need to Maximize Every Single QR Scan
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 mt-3 text-base sm:text-lg leading-relaxed">
-            A developer-first platform designed for low latency, reliable context-aware routing, and rich analytics.
+            A high-performance dynamic QR engine built for zero latency, bulletproof routing, and verified revenue attribution.
           </p>
         </div>
 

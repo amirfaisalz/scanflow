@@ -5,7 +5,6 @@ import {
   QrCode,
   Smartphone,
   Laptop,
-  Sliders,
   Globe,
   Zap,
   CheckCircle2,
@@ -53,14 +52,14 @@ export function RoutingVisualizer() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
-            <Sliders className="size-3.5" />
-            <span>Smart Routing Engine</span>
+            <Zap className="size-3.5 text-fire" />
+            <span>Instant Device Routing</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white text-balance">
-            Deterministic Edge Routing in &lt; 12ms
+            Never Send an iPhone User to Google Play Again
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 mt-3 text-base sm:text-lg leading-relaxed">
-            Eliminate friction by sending visitors to the exact app store, language variant, or promotion tailored for their device.
+            Eliminate download friction by automatically delivering visitors to their native app store, localized language, or active campaign in under 12ms.
           </p>
         </div>
 
@@ -96,14 +95,14 @@ export function RoutingVisualizer() {
                 <span className="text-xs font-mono text-fire font-bold">STEP 01</span>
                 <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
-              <div className="font-semibold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
+              <div className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-white flex items-center gap-2">
                 <QrCode className="size-4 text-fire" />
                 <span>Physical QR Scan</span>
               </div>
-              <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono bg-zinc-100 dark:bg-zinc-900 p-2 rounded-md">
+              <div className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-mono bg-zinc-100 dark:bg-zinc-900 p-2.5 rounded-md">
                 GET /r/launch-2026
               </div>
-              <div className="text-[11px] text-zinc-500">
+              <div className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400">
                 Visitor scanned via {activeDevice.toUpperCase()} camera
               </div>
             </div>
@@ -116,15 +115,15 @@ export function RoutingVisualizer() {
                   ⚡ {result.edgeTime}
                 </span>
               </div>
-              <div className="font-semibold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
+              <div className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-white flex items-center gap-2">
                 <Zap className="size-4 text-fire" />
                 <span>Rule Evaluator</span>
               </div>
-              <div className="text-xs text-zinc-700 dark:text-zinc-300 font-mono bg-white dark:bg-zinc-950 p-2 rounded-md border border-fire/20 break-all">
+              <div className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 font-mono bg-white dark:bg-zinc-950 p-2.5 rounded-md border border-fire/20 break-all">
                 {result.rule}
               </div>
-              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                <CheckCircle2 className="size-3" />
+              <div className="text-xs sm:text-sm font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                <CheckCircle2 className="size-3.5 shrink-0" />
                 <span>Rule matched with high priority</span>
               </div>
             </div>
@@ -135,14 +134,14 @@ export function RoutingVisualizer() {
                 <span className="text-xs font-mono text-emerald-500 font-bold">STEP 03 (307)</span>
                 <span className="text-[11px] font-mono text-emerald-500 font-semibold">SUCCESS</span>
               </div>
-              <div className="font-semibold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
+              <div className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-white flex items-center gap-2">
                 <Globe className="size-4 text-emerald-500" />
                 <span>{result.destinationLabel}</span>
               </div>
-              <div className="text-xs text-emerald-600 dark:text-emerald-400 font-mono bg-emerald-50 dark:bg-emerald-950/40 p-2 rounded-md border border-emerald-500/20 truncate">
+              <div className="text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-mono bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-md border border-emerald-500/20 truncate">
                 {result.destination}
               </div>
-              <div className="text-[11px] text-zinc-500">
+              <div className="text-xs sm:text-sm font-medium text-zinc-500 dark:text-zinc-400">
                 Visitor seamlessly redirected without landing page delay
               </div>
             </div>
