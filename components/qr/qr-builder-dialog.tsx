@@ -79,7 +79,7 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
           setAvailableCampaigns(data.campaigns);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -281,9 +281,15 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
                 onValueChange={(val) => setCampaignId(val === "none" ? null : val)}
               >
                 <SelectTrigger id="qr-campaign" className="w-full h-9.5 text-xs rounded-xl border-border/80 bg-background/80 shadow-2xs">
-                  <SelectValue placeholder="Standalone (No Campaign)" />
+                  <SelectValue placeholder="Standalone (No Campaign)">
+                    {(val: string) => {
+                      if (!val || val === "none") return "Standalone (No Campaign)";
+                      const camp = availableCampaigns.find((c) => c.id === val);
+                      return camp ? `📁 ${camp.name}` : "Standalone (No Campaign)";
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="rounded-xl w-[var(--radix-select-trigger-width)]">
+                <SelectContent className="rounded-xl">
                   <SelectItem value="none" className="text-xs rounded-lg">
                     Standalone (No Campaign)
                   </SelectItem>
@@ -309,9 +315,37 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
                 }}
               >
                 <SelectTrigger id="qr-status" className="w-full h-9.5 text-xs rounded-xl border-border/80 bg-background/80 shadow-2xs">
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder="Select status">
+                    {(val: string) => {
+                      if (val === "active") {
+                        return (
+                          <span className="flex items-center gap-1.5">
+                            <span className="size-2 rounded-full bg-emerald-500" />
+                            Active (Routing Live)
+                          </span>
+                        );
+                      }
+                      if (val === "paused") {
+                        return (
+                          <span className="flex items-center gap-1.5">
+                            <span className="size-2 rounded-full bg-amber-500" />
+                            Paused (Holding Page)
+                          </span>
+                        );
+                      }
+                      if (val === "archived") {
+                        return (
+                          <span className="flex items-center gap-1.5">
+                            <span className="size-2 rounded-full bg-zinc-400" />
+                            Archived (Disabled)
+                          </span>
+                        );
+                      }
+                      return val;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="rounded-xl w-[var(--radix-select-trigger-width)]">
+                <SelectContent className="rounded-xl">
                   <SelectItem value="active" className="text-xs rounded-lg">
                     <span className="flex items-center gap-1.5">
                       <span className="size-2 rounded-full bg-emerald-500" />
@@ -467,8 +501,8 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
               status === "active"
                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                 : status === "paused"
-                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                : "bg-muted text-muted-foreground border-border"
+                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                  : "bg-muted text-muted-foreground border-border"
             )}
           >
             <span
