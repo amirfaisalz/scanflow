@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import * as React from "react";
-import AnalyticsPage from "@/app/dashboard/analytics/page";
+import { AnalyticsView } from "@/components/analytics/analytics-view";
 import { toast } from "sonner";
 
 vi.mock("sonner", () => ({
@@ -141,11 +140,11 @@ describe("Analytics Dashboard Page (app/dashboard/analytics/page.tsx)", () => {
   });
 
   it("renders header with title, subtitle, breadcrumb, and tenant badge", async () => {
-    render(<AnalyticsPage />);
+    render(<AnalyticsView initialData={mockOverviewData} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     expect(screen.getByText(/Analytics Deep-Dive/i)).toBeInTheDocument();
     expect(screen.getByText(/Isolated Tenant/i)).toBeInTheDocument();
-    expect(screen.getByText(/Multi-dimensional scan intelligence/i)).toBeInTheDocument();
+    expect(screen.getByText(/Explore scans, visitor hardware telemetry/i)).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText("15,420")).toBeInTheDocument();
@@ -153,7 +152,7 @@ describe("Analytics Dashboard Page (app/dashboard/analytics/page.tsx)", () => {
   });
 
   it("loads analytics data and populates all child component sections", async () => {
-    render(<AnalyticsPage />);
+    render(<AnalyticsView initialData={mockOverviewData} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       // KPI Cards
@@ -174,15 +173,10 @@ describe("Analytics Dashboard Page (app/dashboard/analytics/page.tsx)", () => {
       expect(screen.getByText(/Top Performing QR Codes/i)).toBeInTheDocument();
       expect(screen.getByText(/Top Performing Campaigns/i)).toBeInTheDocument();
     });
-
-    // Verify initial API calls
-    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("/api/analytics/overview?period=24h"));
-    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("/api/qr-codes"));
-    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("/api/campaigns"));
   });
 
   it("re-fetches overview when period filter changes", async () => {
-    render(<AnalyticsPage />);
+    render(<AnalyticsView initialData={mockOverviewData} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("15,420")).toBeInTheDocument();
@@ -199,7 +193,7 @@ describe("Analytics Dashboard Page (app/dashboard/analytics/page.tsx)", () => {
   });
 
   it("re-fetches overview when QR code, Campaign, or Device filter changes", async () => {
-    render(<AnalyticsPage />);
+    render(<AnalyticsView initialData={mockOverviewData} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("15,420")).toBeInTheDocument();
@@ -237,7 +231,7 @@ describe("Analytics Dashboard Page (app/dashboard/analytics/page.tsx)", () => {
   });
 
   it("triggers manual reload when refresh button is clicked", async () => {
-    render(<AnalyticsPage />);
+    render(<AnalyticsView initialData={mockOverviewData} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("15,420")).toBeInTheDocument();
@@ -257,7 +251,7 @@ describe("Analytics Dashboard Page (app/dashboard/analytics/page.tsx)", () => {
     const appendChildSpy = vi.spyOn(document.body, "appendChild");
     const removeChildSpy = vi.spyOn(document.body, "removeChild");
 
-    render(<AnalyticsPage />);
+    render(<AnalyticsView initialData={mockOverviewData} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("15,420")).toBeInTheDocument();
@@ -277,7 +271,7 @@ describe("Analytics Dashboard Page (app/dashboard/analytics/page.tsx)", () => {
     const appendChildSpy = vi.spyOn(document.body, "appendChild");
     const removeChildSpy = vi.spyOn(document.body, "removeChild");
 
-    render(<AnalyticsPage />);
+    render(<AnalyticsView initialData={mockOverviewData} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("15,420")).toBeInTheDocument();
@@ -310,7 +304,10 @@ describe("Analytics Dashboard Page (app/dashboard/analytics/page.tsx)", () => {
       } as Response;
     });
 
-    render(<AnalyticsPage />);
+    render(<AnalyticsView initialData={mockOverviewData} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
+
+    const refreshBtn = screen.getByRole("button", { name: /Refresh/i });
+    fireEvent.click(refreshBtn);
 
     await waitFor(() => {
       expect(screen.getAllByText(/Failed to load analytics overview/i).length).toBeGreaterThanOrEqual(1);
@@ -373,7 +370,7 @@ describe("Analytics Dashboard Page (app/dashboard/analytics/page.tsx)", () => {
       } as Response;
     });
 
-    render(<AnalyticsPage />);
+    render(<AnalyticsView initialData={emptyOverview} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText(/No scan data available/i)).toBeInTheDocument();

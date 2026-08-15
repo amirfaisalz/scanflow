@@ -1,10 +1,12 @@
-"use client";
-
-import * as React from "react";
 import Link from "next/link";
 import { ChartAreaInteractive, type ScanChartDataPoint } from "@/components/chart-area-interactive";
 import { DashboardOverviewTable } from "@/components/dashboard-overview-table";
 import { SectionCards } from "@/components/section-cards";
+import { getCurrentUser } from "@/lib/auth-helpers";
+import { getAnalyticsOverview } from "@/lib/analytics/overview";
+import { db } from "@/lib/db";
+import { qrCodes, sessions } from "@/lib/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { QrCode, ArrowRight, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,65 +15,50 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { useCachedState } from "@/lib/client-cache";
-import DashboardLoading from "./loading";
-import type { QRCode as QRCodeModel } from "@/lib/db/schema";
 
-interface DashboardData {
-  user: {
-    id: string;
-    name?: string | null;
-    email?: string | null;
+export default async function DashboardPage() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  // 1. Fetch real analytics overview data (90-day window) for this tenant on the server
+  const overviewData = await getAnalyticsOverview(user.id, { period: "90d" });
+
+  // 2. Fetch user's real dynamic QR codes on the server
+  const userQrCodes = await db.query.qrCodes.findMany({
+    where: eq(qrCodes.userId, user.id),
+    orderBy: [desc(qrCodes.createdAt)],
+  });
+
+  // 3. Fetch count of recent sessions on the server
+  const recentSessions = await db.query.sessions.findMany({
+    where: eq(sessions.userId, user.id),
+    orderBy: [desc(sessions.startedAt)],
+    limit: 10,
+  });
+
+  // 4. Map time series to chart data points with device ratios
+  const deviceRatio = overviewData.breakdowns.devices.find((d) => d.name === "Mobile");
+  const mobilePercent = deviceRatio ? deviceRatio.percentage / 100 : 0.6;
+
+  const chartPoints: ScanChartDataPoint[] = (overviewData.timeSeries || []).map((t) => {
+    const totalScans = t.scans || 0;
+    const mobileScans = Math.round(totalScans * mobilePercent);
+    const desktopScans = totalScans - mobileScans;
+    return {
+      date: t.timestamp.split("T")[0],
+      desktop: desktopScans,
+      mobile: mobileScans,
+    };
+  });
+
+  // 5. Compute real tenant KPI metrics
+  const activeQrCount = userQrCodes.filter((q) => q.status === "active").length;
+  const kpis = {
+    totalScans: overviewData.kpis.totalScans,
+    uniqueSessions: overviewData.kpis.totalSessions,
+    activeQRCodes: activeQrCount,
+    conversionRate: overviewData.kpis.conversionRate,
   };
-  kpis: {
-    totalScans: number;
-    uniqueSessions: number;
-    activeQRCodes: number;
-    conversionRate: number;
-  };
-  chartPoints: ScanChartDataPoint[];
-  qrCodes: QRCodeModel[];
-  recentSessionsCount: number;
-}
-
-export default function DashboardPage() {
-  const [data, setData, loading, setLoading] = useCachedState<DashboardData | null>(
-    "/api/dashboard/overview",
-    null
-  );
-
-  const fetchDashboardData = React.useCallback(async () => {
-    try {
-      const res = await fetch("/api/dashboard/overview");
-      if (res.ok) {
-        const json = await res.json();
-        setData(json);
-      }
-    } catch (err) {
-      console.error("Failed to load dashboard overview:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [setData, setLoading]);
-
-  React.useEffect(() => {
-    fetchDashboardData();
-  }, [fetchDashboardData]);
-
-  if (loading && !data) {
-    return <DashboardLoading />;
-  }
-
-  const user = data?.user;
-  const kpis = data?.kpis || {
-    totalScans: 0,
-    uniqueSessions: 0,
-    activeQRCodes: 0,
-    conversionRate: 0,
-  };
-  const chartPoints = data?.chartPoints || [];
-  const qrCodes = data?.qrCodes || [];
-  const recentSessionsCount = data?.recentSessionsCount || 0;
 
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6 max-w-7xl mx-auto w-full">
@@ -123,7 +110,7 @@ export default function DashboardPage() {
       <ChartAreaInteractive data={chartPoints} />
 
       {/* Dynamic QR Codes & Activity Table */}
-      <DashboardOverviewTable qrCodes={qrCodes} recentSessionsCount={recentSessionsCount} />
+      <DashboardOverviewTable qrCodes={userQrCodes} recentSessionsCount={recentSessions.length} />
     </div>
   );
 }

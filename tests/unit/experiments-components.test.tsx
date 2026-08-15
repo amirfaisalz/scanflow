@@ -239,9 +239,9 @@ describe("Experiments UI Components", () => {
       expect(screen.getByText("10%")).toBeInTheDocument();
       expect(screen.getByText("20%")).toBeInTheDocument();
 
-      // Check lift and significance
+      // Check lift and winner badge
       expect(screen.getByText("+100%")).toBeInTheDocument();
-      expect(screen.getByText(/96.2% Confident|Significant/i)).toBeInTheDocument();
+      expect(screen.getByText("Winner")).toBeInTheDocument();
     });
 
     it("should render winner crown/badge on declared or statistically significant winning variant", () => {
@@ -423,7 +423,7 @@ describe("Experiments UI Components", () => {
         />
       );
 
-      const manageBtn = screen.getByRole("button", { name: /manage experiment/i });
+      const manageBtn = screen.getByRole("button", { name: /manage/i });
       fireEvent.click(manageBtn);
 
       expect(onViewDetails).toHaveBeenCalledTimes(1);

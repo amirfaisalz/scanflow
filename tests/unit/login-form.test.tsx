@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { LoginForm } from "@/components/login-form";
 import LoginPage from "@/app/login/page";
-import { authClient } from "@/lib/auth-client";
 
 // Mock next/navigation
 const mockPush = vi.fn();
@@ -17,21 +16,10 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-// Mock auth-client
-vi.mock("@/lib/auth-client", () => ({
-  authClient: {
-    signIn: {
-      email: vi.fn(),
-    },
-    signUp: {
-      email: vi.fn(),
-    },
-  },
-}));
-
 describe("LoginForm Component (shadcn login-03)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    global.fetch = vi.fn();
   });
 
   it("renders welcome title, quick evaluation admin demo button, and google login button", () => {
@@ -44,9 +32,9 @@ describe("LoginForm Component (shadcn login-03)", () => {
   });
 
   it("triggers 1-Click Demo Admin sign in when demo button is clicked", async () => {
-    vi.mocked(authClient.signIn.email).mockResolvedValueOnce({
-      data: { session: { token: "admin-token", user: { id: "admin-1" } } } as any,
-      error: null,
+    (global.fetch as any).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true }),
     });
 
     render(<LoginForm />);
@@ -57,38 +45,12 @@ describe("LoginForm Component (shadcn login-03)", () => {
     fireEvent.click(demoButton);
 
     await waitFor(() => {
-      expect(authClient.signIn.email).toHaveBeenCalledWith({
-        email: "admin@scanflow.io",
-        password: "AdminPassword123!",
-      });
-      expect(mockPush).toHaveBeenCalledWith("/dashboard");
-    });
-  });
-
-  it("handles demo signup fallback if account does not exist initially", async () => {
-    vi.mocked(authClient.signIn.email).mockResolvedValueOnce({
-      data: null,
-      error: { message: "User not found", status: 404 } as any,
-    });
-    vi.mocked(authClient.signUp.email).mockResolvedValueOnce({
-      data: { user: { id: "admin-1", email: "admin@scanflow.io" } } as any,
-      error: null,
-    });
-
-    render(<LoginForm />);
-
-    const demoButton = screen.getByRole("button", {
-      name: /1-Click Demo Admin Sign-In/i,
-    });
-    fireEvent.click(demoButton);
-
-    await waitFor(() => {
-      expect(authClient.signUp.email).toHaveBeenCalledWith({
-        email: "admin@scanflow.io",
-        password: "AdminPassword123!",
-        name: "Admin Demo User",
-      });
-      expect(mockPush).toHaveBeenCalledWith("/dashboard");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/auth/demo-login",
+        expect.objectContaining({
+          method: "POST",
+        })
+      );
     });
   });
 

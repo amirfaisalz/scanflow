@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import * as React from "react";
-import ExperimentsDashboardPage from "@/app/dashboard/experiments/page";
+import { ExperimentsView } from "@/components/experiments/experiments-view";
 import { toast } from "sonner";
 
 vi.mock("sonner", () => ({
@@ -71,6 +70,9 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
         winnerVariant: {
           id: "var-2",
           name: "Variant B (Green CTA)",
+          destinationUrl: "https://example.com/green",
+          trafficWeight: 50,
+          isControl: false,
         },
       },
     },
@@ -286,7 +288,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("renders breadcrumb, header title, tenant badge, and action buttons", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /A\/B Testing Experiments/i })).toBeInTheDocument();
@@ -304,7 +306,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("loads and displays all 4 summary KPI metric cards", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Active Experiments")).toBeInTheDocument();
@@ -319,7 +321,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("renders all experiment cards with names, variants, and badges", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Homepage CTA Split Test")).toBeInTheDocument();
@@ -339,7 +341,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("filters experiments by search query in name or description", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Homepage CTA Split Test")).toBeInTheDocument();
@@ -359,13 +361,13 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("filters experiments by status (all, active, paused, ended, draft)", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Homepage CTA Split Test")).toBeInTheDocument();
     });
 
-    const statusFilter = screen.getByLabelText("Status filter");
+    const statusFilter = screen.getByLabelText("Status");
 
     // Active only
     fireEvent.change(statusFilter, { target: { value: "active" } });
@@ -390,13 +392,13 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("filters experiments by QR Code", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Homepage CTA Split Test")).toBeInTheDocument();
     });
 
-    const qrFilter = screen.getByLabelText("QR Code filter");
+    const qrFilter = screen.getByLabelText("QR Code");
 
     // Filter by QR-2 (Product Box QR)
     fireEvent.change(qrFilter, { target: { value: "qr-2" } });
@@ -412,7 +414,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("opens create experiment dialog, submits data, and shows success toast", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Homepage CTA Split Test")).toBeInTheDocument();
@@ -451,7 +453,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("opens edit experiment dialog, updates experiment, and shows success toast", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Homepage CTA Split Test")).toBeInTheDocument();
@@ -486,7 +488,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("toggles experiment status (start/pause/activate/end) and shows success toast", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Homepage CTA Split Test")).toBeInTheDocument();
@@ -512,7 +514,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   });
 
   it("declares winner variant, updates experiment status to ended, and shows toast", async () => {
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Homepage CTA Split Test")).toBeInTheDocument();
@@ -529,7 +531,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
         "/api/experiments/exp-1",
         expect.objectContaining({
           method: "PATCH",
-          body: JSON.stringify({ winnerVariantId: "var-2", status: "ended" }),
+          body: JSON.stringify({ winnerVariantId: "var-2", status: "completed" }),
         })
       );
       expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/winner declared/i));
@@ -539,7 +541,7 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
   it("deletes an experiment after confirmation and shows success toast", async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Homepage CTA Split Test")).toBeInTheDocument();
@@ -582,7 +584,10 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
       } as Response;
     });
 
-    render(<ExperimentsDashboardPage />);
+    render(<ExperimentsView initialExperiments={mockExperiments} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
+
+    const refreshBtn = screen.getByRole("button", { name: /refresh/i });
+    fireEvent.click(refreshBtn);
 
     await waitFor(() => {
       expect(screen.getAllByText(/Failed to load experiments/i).length).toBeGreaterThanOrEqual(1);
@@ -640,10 +645,25 @@ describe("Experiments Dashboard Page (app/dashboard/experiments/page.tsx)", () =
       } as Response;
     });
 
-    render(<ExperimentsDashboardPage />);
+    render(
+      <ExperimentsView
+        initialExperiments={[]}
+        initialMetrics={{
+          totalExperiments: 0,
+          activeExperiments: 0,
+          totalVariants: 0,
+          totalConversions: 0,
+          totalSessions: 0,
+          overallConversionRate: 0,
+          significantWinnersCount: 0,
+        }}
+        qrOptions={mockQrCodes}
+        campaignOptions={mockCampaigns}
+      />
+    );
 
     await waitFor(() => {
-      expect(screen.getByText(/No A\/B experiments yet|No experiments created yet/i)).toBeInTheDocument();
+      expect(screen.getByText("No A/B experiments created yet")).toBeInTheDocument();
     });
   });
 });

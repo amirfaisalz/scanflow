@@ -138,9 +138,9 @@ describe("Dashboard Components & Unified Subpages", () => {
 
     expect(screen.getByText("Total Scans")).toBeInTheDocument();
     expect(screen.getByText("8,500")).toBeInTheDocument();
-    expect(screen.getByText("Unique Sessions")).toBeInTheDocument();
+    expect(screen.getByText("Total Sessions")).toBeInTheDocument();
     expect(screen.getByText("6,100")).toBeInTheDocument();
-    expect(screen.getByText("Goal Conversions")).toBeInTheDocument();
+    expect(screen.getByText("Conversions")).toBeInTheDocument();
     expect(screen.getByText("320")).toBeInTheDocument();
     expect(screen.getByText("Avg. Duration")).toBeInTheDocument();
     expect(screen.getByText("45s")).toBeInTheDocument();

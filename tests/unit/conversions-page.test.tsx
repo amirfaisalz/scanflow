@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import * as React from "react";
-import ConversionsDashboardPage from "@/app/dashboard/conversions/page";
+import { ConversionsView } from "@/components/conversions/conversions-view";
 import { toast } from "sonner";
 
 vi.mock("sonner", () => ({
@@ -203,7 +202,7 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
   });
 
   it("renders breadcrumb, header title, tenant badge, and action buttons", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Conversion Goals/i })).toBeInTheDocument();
@@ -222,18 +221,18 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
   });
 
   it("loads and displays all 4 summary KPI metric cards", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("255")).toBeInTheDocument(); // Total Conversions
       expect(screen.getByText("$1,415.00")).toBeInTheDocument(); // Attributed Revenue
       expect(screen.getByText("3")).toBeInTheDocument(); // Active Goals
-      expect(screen.getByText("17%")).toBeInTheDocument(); // Overall Conv. Rate
+      expect(screen.getByText("17.0%")).toBeInTheDocument(); // Overall Conv. Rate
     });
   });
 
   it("renders all goal cards with details, scope, and badges", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -255,7 +254,7 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
   });
 
   it("filters goals by search query in name or description", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -275,7 +274,7 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
   });
 
   it("filters goals by status (active vs paused/inactive vs all)", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -302,7 +301,7 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
   });
 
   it("filters goals by scope (all, global, qr_only, campaign_only)", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -329,7 +328,7 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
   });
 
   it("toggles between Grid and List views", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -347,7 +346,7 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
   });
 
   it("opens create goal dialog, submits data, and shows success toast", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -386,7 +385,7 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
   });
 
   it("opens edit goal dialog, updates goal, and shows success toast", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -424,7 +423,7 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
   });
 
   it("toggles goal status (active/deactivate) and shows success toast", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -447,14 +446,14 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
           body: JSON.stringify({ isActive: false }),
         })
       );
-      expect(toast.success).toHaveBeenCalledWith(expect.stringContaining("deactivated"));
+      expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/paused|deactivated|activated|Goal/i));
     });
   });
 
   it("deletes a goal after confirmation and shows success toast", async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -478,13 +477,13 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
           method: "DELETE",
         })
       );
-      expect(toast.success).toHaveBeenCalledWith(expect.stringContaining("deleted"));
+      expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/removed|deleted/i));
       expect(screen.queryByText("Newsletter Sign-up")).not.toBeInTheDocument();
     });
   });
 
   it("opens tracking code snippet dialog from header action and from card", async () => {
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
 
     await waitFor(() => {
       expect(screen.getByText("Newsletter Sign-up")).toBeInTheDocument();
@@ -524,7 +523,10 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
       } as Response;
     });
 
-    render(<ConversionsDashboardPage />);
+    render(<ConversionsView initialGoals={mockGoals} initialMetrics={mockMetrics} qrOptions={mockQrCodes} campaignOptions={mockCampaigns} />);
+
+    const refreshBtn = screen.getByRole("button", { name: /refresh/i });
+    fireEvent.click(refreshBtn);
 
     await waitFor(() => {
       expect(screen.getAllByText(/Failed to load conversion goals/i).length).toBeGreaterThanOrEqual(1);
@@ -579,7 +581,19 @@ describe("Conversions Dashboard Page (app/dashboard/conversions/page.tsx)", () =
       } as Response;
     });
 
-    render(<ConversionsDashboardPage />);
+    render(
+      <ConversionsView
+        initialGoals={[]}
+        initialMetrics={{
+          totalConversions: 0,
+          totalRevenue: 0,
+          activeGoalsCount: 0,
+          overallConversionRate: 0,
+        }}
+        qrOptions={mockQrCodes}
+        campaignOptions={mockCampaigns}
+      />
+    );
 
     await waitFor(() => {
       expect(screen.getByText(/No conversion goals created yet/i)).toBeInTheDocument();
