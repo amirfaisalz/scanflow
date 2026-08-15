@@ -12,6 +12,7 @@ import {
   Play,
   Pause,
   BarChart2,
+  GitFork,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { QRPreview } from "@/components/qr/qr-preview";
 import { QRExportDialog } from "@/components/qr/qr-export-dialog";
+import { RoutingRulesDialog } from "@/components/qr/routing-rules-dialog";
 import { buildRedirectUrl } from "@/lib/qr";
 import { toast } from "sonner";
 import type { QRCode as QRCodeModel } from "@/lib/db/schema";
@@ -45,6 +47,7 @@ export function QRCard({
   onStatusToggle,
 }: QRCardProps) {
   const [exportOpen, setExportOpen] = React.useState(false);
+  const [rulesOpen, setRulesOpen] = React.useState(false);
   const [hasCopied, setHasCopied] = React.useState(false);
 
   const redirectUrl = buildRedirectUrl(qrCode.slug);
@@ -116,6 +119,10 @@ export function QRCard({
               <DropdownMenuItem onClick={() => setExportOpen(true)} className="text-xs gap-2">
                 <Download className="size-3.5" />
                 Export PNG / SVG
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setRulesOpen(true)} className="text-xs gap-2">
+                <GitFork className="size-3.5 text-sky-400" />
+                Dynamic Routing Rules
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEdit(qrCode)} className="text-xs gap-2">
                 <Edit className="size-3.5" />
@@ -225,6 +232,13 @@ export function QRCard({
         destinationUrl={qrCode.destinationUrl}
         foregroundColor={qrCode.foregroundColor}
         backgroundColor={qrCode.backgroundColor}
+      />
+
+      {/* Dynamic Routing Rules Dialog */}
+      <RoutingRulesDialog
+        open={rulesOpen}
+        onOpenChange={setRulesOpen}
+        qrCode={qrCode}
       />
     </>
   );
