@@ -89,6 +89,68 @@ export const qrCodes = pgTable("qr_codes", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const routingRules = pgTable("routing_rules", {
+  id: text("id").primaryKey(),
+  qrCodeId: text("qr_code_id")
+    .notNull()
+    .references(() => qrCodes.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  priority: integer("priority").default(1).notNull(), // Lower number = higher priority
+  conditionType: text("condition_type").notNull(), // 'device', 'os', 'country', 'language', 'time_window'
+  conditionValue: text("condition_value").notNull(), // e.g. 'ios', 'android', 'US', 'id', '{"start":"09:00","end":"17:00"}'
+  destinationUrl: text("destination_url").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  qrCodeId: text("qr_code_id")
+    .notNull()
+    .references(() => qrCodes.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  campaignId: text("campaign_id").references(() => campaigns.id, { onDelete: "set null" }),
+  ipHash: text("ip_hash").notNull(), // SHA-256 anonymized hash
+  userAgent: text("user_agent"),
+  deviceType: text("device_type").notNull(), // 'mobile', 'tablet', 'desktop', 'bot', 'other'
+  os: text("os").notNull(), // 'iOS', 'Android', 'macOS', 'Windows', 'Linux', 'Other'
+  browser: text("browser").notNull(), // 'Chrome', 'Safari', 'Firefox', 'Edge', 'Other'
+  country: text("country").default("Unknown").notNull(), // ISO Alpha-2 e.g. 'US', 'ID'
+  city: text("city"),
+  referrer: text("referrer"),
+  matchedRuleId: text("matched_rule_id").references(() => routingRules.id, { onDelete: "set null" }),
+  initialDestination: text("initial_destination").notNull(),
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  endedAt: timestamp("ended_at").defaultNow().notNull(),
+  durationSeconds: integer("duration_seconds").default(0).notNull(),
+  eventsCount: integer("events_count").default(1).notNull(),
+  converted: boolean("converted").default(false).notNull(),
+  conversionEvent: text("conversion_event"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const sessionEvents = pgTable("session_events", {
+  id: text("id").primaryKey(),
+  sessionId: text("session_id")
+    .notNull()
+    .references(() => sessions.id, { onDelete: "cascade" }),
+  qrCodeId: text("qr_code_id")
+    .notNull()
+    .references(() => qrCodes.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  eventType: text("event_type").notNull(), // 'QR_SCAN', 'PAGE_VIEW', 'BUTTON_CLICK', 'LINK_CLICK', 'FORM_SUBMIT', 'CONVERSION', 'EXTERNAL_REDIRECT'
+  eventData: jsonb("event_data").$type<Record<string, unknown>>(),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
 // ---------------------------------------------------------------------------
 // Relations
 // ---------------------------------------------------------------------------
@@ -98,6 +160,9 @@ export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
   campaigns: many(campaigns),
   qrCodes: many(qrCodes),
+  routingRules: many(routingRules),
+  visitorSessions: many(sessions),
+  sessionEvents: many(sessionEvents),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -120,9 +185,10 @@ export const campaignsRelations = relations(campaigns, ({ one, many }) => ({
     references: [user.id],
   }),
   qrCodes: many(qrCodes),
+  sessions: many(sessions),
 }));
 
-export const qrCodesRelations = relations(qrCodes, ({ one }) => ({
+export const qrCodesRelations = relations(qrCodes, ({ one, many }) => ({
   user: one(user, {
     fields: [qrCodes.userId],
     references: [user.id],
@@ -131,6 +197,55 @@ export const qrCodesRelations = relations(qrCodes, ({ one }) => ({
     fields: [qrCodes.campaignId],
     references: [campaigns.id],
   }),
+  routingRules: many(routingRules),
+  sessions: many(sessions),
+  sessionEvents: many(sessionEvents),
+}));
+
+export const routingRulesRelations = relations(routingRules, ({ one }) => ({
+  qrCode: one(qrCodes, {
+    fields: [routingRules.qrCodeId],
+    references: [qrCodes.id],
+  }),
+  user: one(user, {
+    fields: [routingRules.userId],
+    references: [user.id],
+  }),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one, many }) => ({
+  qrCode: one(qrCodes, {
+    fields: [sessions.qrCodeId],
+    references: [qrCodes.id],
+  }),
+  user: one(user, {
+    fields: [sessions.userId],
+    references: [user.id],
+  }),
+  campaign: one(campaigns, {
+    fields: [sessions.campaignId],
+    references: [campaigns.id],
+  }),
+  matchedRule: one(routingRules, {
+    fields: [sessions.matchedRuleId],
+    references: [routingRules.id],
+  }),
+  events: many(sessionEvents),
+}));
+
+export const sessionEventsRelations = relations(sessionEvents, ({ one }) => ({
+  session: one(sessions, {
+    fields: [sessionEvents.sessionId],
+    references: [sessions.id],
+  }),
+  qrCode: one(qrCodes, {
+    fields: [sessionEvents.qrCodeId],
+    references: [qrCodes.id],
+  }),
+  user: one(user, {
+    fields: [sessionEvents.userId],
+    references: [user.id],
+  }),
 }));
 
 export type User = typeof user.$inferSelect;
@@ -138,4 +253,13 @@ export type NewUser = typeof user.$inferInsert;
 export type Session = typeof session.$inferSelect;
 export type Account = typeof account.$inferSelect;
 export type QRCode = typeof qrCodes.$inferSelect;
+export type NewQRCode = typeof qrCodes.$inferInsert;
 export type Campaign = typeof campaigns.$inferSelect;
+export type NewCampaign = typeof campaigns.$inferInsert;
+export type RoutingRule = typeof routingRules.$inferSelect;
+export type NewRoutingRule = typeof routingRules.$inferInsert;
+export type VisitorSession = typeof sessions.$inferSelect;
+export type NewVisitorSession = typeof sessions.$inferInsert;
+export type SessionEvent = typeof sessionEvents.$inferSelect;
+export type NewSessionEvent = typeof sessionEvents.$inferInsert;
+
