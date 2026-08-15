@@ -31,34 +31,23 @@ export function LoginForm({
     setError(null);
     setIsDemoLoading(true);
 
-    const demoEmail = "admin@scanflow.io";
-    const demoPassword = "AdminPassword123!";
-
     try {
-      const signInResult = await authClient.signIn.email({
-        email: demoEmail,
-        password: demoPassword,
+      const res = await fetch("/api/auth/demo-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
 
-      if (signInResult.error) {
-        const signUpResult = await authClient.signUp.email({
-          email: demoEmail,
-          password: demoPassword,
-          name: "Admin Demo User",
-        });
+      const data = await res.json();
 
-        if (signUpResult.error) {
-          setError("Could not sign in with admin demo account. Please try again.");
-          setIsDemoLoading(false);
-          return;
-        }
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Failed to initialize demo session");
       }
 
-      router.push(callbackUrl);
-      router.refresh();
+      // Smooth transition to dashboard
+      window.location.href = callbackUrl;
     } catch (err) {
       console.error("Admin demo sign-in error:", err);
-      setError("Failed to initialize admin demo session. Please try again.");
+      setError(err instanceof Error ? err.message : "Failed to sign in to demo admin account.");
       setIsDemoLoading(false);
     }
   };
