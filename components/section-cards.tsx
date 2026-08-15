@@ -82,7 +82,7 @@ export function SectionCards({ kpis }: SectionCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:grid-cols-4 lg:px-6">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card, idx) => {
         const Icon = card.icon;
         return (

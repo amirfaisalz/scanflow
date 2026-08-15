@@ -49,8 +49,7 @@ export function DashboardOverviewTable({
   };
 
   return (
-    <div className="px-4 lg:px-6">
-      <Card className="rounded-2xl border border-border/80 bg-card/60 shadow-2xs">
+    <Card className="rounded-2xl border border-border/80 bg-card/60 shadow-2xs">
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -202,6 +201,5 @@ export function DashboardOverviewTable({
           )}
         </CardContent>
       </Card>
-    </div>
   );
 }
