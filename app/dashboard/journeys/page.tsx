@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   Compass,
   Filter,
@@ -10,10 +11,29 @@ import {
   Users,
   Clock,
   CheckCircle2,
-  Smartphone,
+  TrendingUpIcon,
+  Layers,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import {
   Select,
   SelectContent,
@@ -84,105 +104,179 @@ export default function JourneysPage() {
   }, [journeys, searchQuery]);
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 max-w-7xl mx-auto w-full">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink render={<Link href="/dashboard" />}>Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Scan Journeys</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Header Section */}
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-100 flex items-center gap-2">
-              <Compass className="h-6 w-6 text-sky-400" />
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+              <Compass className="h-6 w-6 text-sky-500" />
               <span>Scan Journeys</span>
             </h1>
-            <span className="rounded-full bg-sky-500/10 px-2.5 py-0.5 text-xs font-semibold text-sky-400 border border-sky-500/20">
-              Standout Feature
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Isolated Tenant
             </span>
           </div>
-          <p className="text-sm text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Trace individual visitor paths chronologically from QR scan to final goal conversion.
           </p>
         </div>
 
-        <Button
-          onClick={fetchJourneys}
-          variant="outline"
-          size="sm"
-          className="border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 gap-2 h-9"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-          <span>Refresh Journeys</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={fetchJourneys}
+            variant="outline"
+            size="sm"
+            className="gap-2 h-9"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            <span>Refresh Journeys</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Metric Cards Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Metric Cards Row - Styled identically to /dashboard */}
+      <div className="grid grid-cols-1 gap-4 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs dark:*:data-[slot=card]:bg-card">
         {/* Total Sessions */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">Total Journeys</span>
-            <Users className="h-4 w-4 text-sky-400" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-zinc-100 font-mono">
-            {metrics.totalSessions.toLocaleString()}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Recorded visitor sessions</span>
-        </div>
+        <Card className="@container/card">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <CardDescription className="flex items-center gap-1.5 font-medium">
+                <Users className="size-3.5 text-primary" />
+                Total Journeys
+              </CardDescription>
+              <CardAction>
+                <Badge variant="outline" className="text-xs">
+                  Visitor Flow
+                </Badge>
+              </CardAction>
+            </div>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl mt-1 font-mono">
+              {metrics.totalSessions.toLocaleString()}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 font-medium text-foreground">
+              <span>Multi-step journey grouping</span>
+            </div>
+            <div>Recorded visitor sessions</div>
+          </CardFooter>
+        </Card>
 
         {/* Conversions */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">Conversions</span>
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-emerald-400 font-mono">
-            {metrics.convertedCount.toLocaleString()}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Completed end goals</span>
-        </div>
+        <Card className="@container/card">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <CardDescription className="flex items-center gap-1.5 font-medium">
+                <CheckCircle2 className="size-3.5 text-emerald-500" />
+                Conversions
+              </CardDescription>
+              <CardAction>
+                <Badge variant="outline" className="text-xs text-emerald-600 dark:text-emerald-400 border-emerald-500/20 bg-emerald-500/10">
+                  <TrendingUpIcon className="size-3 mr-1 text-emerald-500" />
+                  Live Ingestion
+                </Badge>
+              </CardAction>
+            </div>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl mt-1 text-emerald-600 dark:text-emerald-400 font-mono">
+              {metrics.convertedCount.toLocaleString()}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 font-medium text-foreground">
+              <span>Goal completions reached</span>
+            </div>
+            <div>Attributed end outcomes</div>
+          </CardFooter>
+        </Card>
 
         {/* Conversion Rate */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">Conversion Rate</span>
-            <Sparkles className="h-4 w-4 text-purple-400" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-purple-300 font-mono">
-            {metrics.conversionRate}%
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Visitor to goal ratio</span>
-        </div>
+        <Card className="@container/card">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <CardDescription className="flex items-center gap-1.5 font-medium">
+                <Sparkles className="size-3.5 text-primary" />
+                Conversion Rate
+              </CardDescription>
+              <CardAction>
+                <Badge variant="outline" className="text-xs text-primary border-primary/20 bg-primary/5">
+                  <Sparkles className="size-3 mr-1" />
+                  Outcome Ratio
+                </Badge>
+              </CardAction>
+            </div>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl mt-1 font-mono">
+              {metrics.conversionRate}%
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 font-medium text-foreground">
+              <span>Conversions / Journeys</span>
+            </div>
+            <div>Visitor to goal completion ratio</div>
+          </CardFooter>
+        </Card>
 
         {/* Avg Duration */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">Avg Duration</span>
-            <Clock className="h-4 w-4 text-amber-400" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-amber-300 font-mono">
-            {metrics.avgDuration > 0 ? `${metrics.avgDuration}s` : "< 5s"}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Time spent on site</span>
-        </div>
+        <Card className="@container/card">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <CardDescription className="flex items-center gap-1.5 font-medium">
+                <Clock className="size-3.5 text-amber-500" />
+                Avg Duration
+              </CardDescription>
+              <CardAction>
+                <Badge variant="outline" className="text-xs text-amber-600 dark:text-amber-400 border-amber-500/20 bg-amber-500/10">
+                  Engagement
+                </Badge>
+              </CardAction>
+            </div>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl mt-1 font-mono">
+              {metrics.avgDuration > 0 ? `${metrics.avgDuration}s` : "< 5s"}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 font-medium text-foreground">
+              <span>Active session lifetime</span>
+            </div>
+            <div>Time spent navigating destination</div>
+          </CardFooter>
+        </Card>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between p-3.5 rounded-xl border border-border/80 bg-card/60 shadow-2xs">
         <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by QR, session, country..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-zinc-950/60 border-zinc-800 text-zinc-200 text-sm placeholder:text-zinc-500"
+            className="pl-9 bg-background border-input text-foreground text-sm placeholder:text-muted-foreground"
           />
         </div>
 
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
           {/* Device Filter */}
           <Select value={deviceFilter} onValueChange={setDeviceFilter}>
-            <SelectTrigger className="w-[140px] bg-zinc-950/60 border-zinc-800 text-zinc-300 text-xs h-9">
+            <SelectTrigger className="w-[140px] bg-background border-input text-foreground text-xs h-9">
               <SelectValue placeholder="Device" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-950 border-zinc-800 text-zinc-200">
+            <SelectContent>
               <SelectItem value="all">All Devices</SelectItem>
               <SelectItem value="mobile">Mobile Only</SelectItem>
               <SelectItem value="desktop">Desktop Only</SelectItem>
@@ -192,10 +286,10 @@ export default function JourneysPage() {
 
           {/* Conversion Filter */}
           <Select value={convertedFilter} onValueChange={setConvertedFilter}>
-            <SelectTrigger className="w-[140px] bg-zinc-950/60 border-zinc-800 text-zinc-300 text-xs h-9">
+            <SelectTrigger className="w-[140px] bg-background border-input text-foreground text-xs h-9">
               <SelectValue placeholder="Outcome" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-950 border-zinc-800 text-zinc-200">
+            <SelectContent>
               <SelectItem value="all">All Outcomes</SelectItem>
               <SelectItem value="true">Converted Only</SelectItem>
               <SelectItem value="false">Drop-offs Only</SelectItem>
@@ -206,9 +300,9 @@ export default function JourneysPage() {
 
       {/* Journeys Table */}
       {loading && journeys.length === 0 ? (
-        <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/40 p-8">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-sky-400 border-t-transparent mb-3" />
-          <span className="text-xs text-zinc-500 font-mono">Loading visitor journeys...</span>
+        <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-border bg-card/40 p-8">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mb-3" />
+          <span className="text-xs text-muted-foreground font-mono">Loading visitor journeys...</span>
         </div>
       ) : (
         <JourneysTable journeys={filteredJourneys} onSelectJourney={handleSelectJourney} />

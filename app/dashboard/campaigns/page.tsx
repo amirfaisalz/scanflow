@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   FolderGit2,
   Plus,
@@ -10,10 +11,27 @@ import {
   BarChart3,
   Sparkles,
   Layers,
-  Filter,
+  TrendingUpIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import {
   Select,
   SelectContent,
@@ -129,15 +147,34 @@ export default function CampaignsPage() {
       : 0;
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 max-w-7xl mx-auto w-full">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink render={<Link href="/dashboard" />}>Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Campaigns</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Header */}
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-100 flex items-center gap-2">
-            <FolderGit2 className="h-6 w-6 text-sky-400" />
-            <span>Campaigns Management</span>
-          </h1>
-          <p className="text-sm text-zinc-400 mt-1">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+              <FolderGit2 className="h-6 w-6 text-sky-500" />
+              <span>Campaigns Management</span>
+            </h1>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Isolated Tenant
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Organize dynamic QR codes into cohesive promotional campaigns and track group performance.
           </p>
         </div>
@@ -147,7 +184,7 @@ export default function CampaignsPage() {
             onClick={fetchCampaigns}
             variant="outline"
             size="sm"
-            className="border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 gap-1.5 h-9"
+            className="gap-1.5 h-9"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
             <span>Refresh</span>
@@ -156,7 +193,7 @@ export default function CampaignsPage() {
           <Button
             onClick={handleCreateNew}
             size="sm"
-            className="bg-sky-600 hover:bg-sky-500 text-white gap-1.5 h-9 font-medium shadow-md shadow-sky-950/40"
+            className="gap-1.5 h-9 font-medium shadow-xs"
           >
             <Plus className="h-4 w-4" />
             <span>New Campaign</span>
@@ -164,71 +201,133 @@ export default function CampaignsPage() {
         </div>
       </div>
 
-      {/* Overview Cards Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">Total Campaigns</span>
-            <FolderGit2 className="h-4 w-4 text-sky-400" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-zinc-100 font-mono">
-            {totalCampaigns}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Grouped marketing initiatives</span>
-        </div>
+      {/* Overview Cards Row - Styled identically to /dashboard */}
+      <div className="grid grid-cols-1 gap-4 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs dark:*:data-[slot=card]:bg-card">
+        {/* Total Campaigns */}
+        <Card className="@container/card">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <CardDescription className="flex items-center gap-1.5 font-medium">
+                <FolderGit2 className="size-3.5 text-primary" />
+                Total Campaigns
+              </CardDescription>
+              <CardAction>
+                <Badge variant="outline" className="text-xs">
+                  Organization
+                </Badge>
+              </CardAction>
+            </div>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl mt-1 font-mono">
+              {totalCampaigns}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 font-medium text-foreground">
+              <span>Grouped promotional initiatives</span>
+            </div>
+            <div>Multi-QR campaign structures</div>
+          </CardFooter>
+        </Card>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">Active Campaigns</span>
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-emerald-400 font-mono">
-            {activeCampaigns}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Currently collecting traffic</span>
-        </div>
+        {/* Active Campaigns */}
+        <Card className="@container/card">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <CardDescription className="flex items-center gap-1.5 font-medium">
+                <Layers className="size-3.5 text-emerald-500" />
+                Active Campaigns
+              </CardDescription>
+              <CardAction>
+                <Badge variant="outline" className="text-xs text-emerald-600 dark:text-emerald-400 border-emerald-500/20 bg-emerald-500/10">
+                  <TrendingUpIcon className="size-3 mr-1 text-emerald-500" />
+                  Active Groups
+                </Badge>
+              </CardAction>
+            </div>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl mt-1 text-emerald-600 dark:text-emerald-400 font-mono">
+              {activeCampaigns}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 font-medium text-foreground">
+              <span>Currently collecting scans</span>
+            </div>
+            <div>Accepting live visitor traffic</div>
+          </CardFooter>
+        </Card>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">Total Campaign Scans</span>
-            <BarChart3 className="h-4 w-4 text-purple-400" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-purple-300 font-mono">
-            {totalScans.toLocaleString()}
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Across all assigned QR codes</span>
-        </div>
+        {/* Total Campaign Scans */}
+        <Card className="@container/card">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <CardDescription className="flex items-center gap-1.5 font-medium">
+                <BarChart3 className="size-3.5 text-sky-500" />
+                Total Campaign Scans
+              </CardDescription>
+              <CardAction>
+                <Badge variant="outline" className="text-xs">
+                  Traffic Sum
+                </Badge>
+              </CardAction>
+            </div>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl mt-1 font-mono">
+              {totalScans.toLocaleString()}
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 font-medium text-foreground">
+              <span>Across all assigned QR codes</span>
+            </div>
+            <div>Dynamic redirect volume</div>
+          </CardFooter>
+        </Card>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-400">Avg Conv. Rate</span>
-            <Sparkles className="h-4 w-4 text-amber-400" />
-          </div>
-          <div className="mt-2 text-2xl font-bold text-amber-300 font-mono">
-            {avgConversionRate}%
-          </div>
-          <span className="text-[11px] text-zinc-500 mt-0.5 block">Goal completion average</span>
-        </div>
+        {/* Avg Conv. Rate */}
+        <Card className="@container/card">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <CardDescription className="flex items-center gap-1.5 font-medium">
+                <Sparkles className="size-3.5 text-primary" />
+                Avg Conv. Rate
+              </CardDescription>
+              <CardAction>
+                <Badge variant="outline" className="text-xs text-primary border-primary/20 bg-primary/5">
+                  <Sparkles className="size-3 mr-1" />
+                  Performance
+                </Badge>
+              </CardAction>
+            </div>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl mt-1 font-mono">
+              {avgConversionRate}%
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 font-medium text-foreground">
+              <span>Goal completion average</span>
+            </div>
+            <div>Conversion event efficiency</div>
+          </CardFooter>
+        </Card>
       </div>
 
       {/* Search & Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between p-3.5 rounded-xl border border-border/80 bg-card/60 shadow-2xs">
         <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search campaigns by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-zinc-950/60 border-zinc-800 text-zinc-200 text-sm placeholder:text-zinc-500"
+            className="pl-9 bg-background border-input text-foreground text-sm placeholder:text-muted-foreground"
           />
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[140px] bg-zinc-950/60 border-zinc-800 text-zinc-300 text-xs h-9">
+            <SelectTrigger className="w-[140px] bg-background border-input text-foreground text-xs h-9">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-950 border-zinc-800 text-zinc-200">
+            <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="active">Active Only</SelectItem>
               <SelectItem value="paused">Paused Only</SelectItem>
@@ -240,19 +339,19 @@ export default function CampaignsPage() {
 
       {/* Campaigns Grid */}
       {loading && campaigns.length === 0 ? (
-        <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950/40 p-8">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-sky-400 border-t-transparent mb-3" />
-          <span className="text-xs text-zinc-500 font-mono">Loading campaigns...</span>
+        <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-border bg-card/40 p-8">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mb-3" />
+          <span className="text-xs text-muted-foreground font-mono">Loading campaigns...</span>
         </div>
       ) : filteredCampaigns.length === 0 ? (
-        <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 p-8 text-center bg-zinc-950/40">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 mb-4">
-            <FolderGit2 className="h-6 w-6 text-zinc-500" />
+        <div className="flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-border p-8 text-center bg-card/40">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted border border-border mb-4">
+            <FolderGit2 className="h-6 w-6 text-muted-foreground" />
           </div>
-          <h3 className="text-base font-semibold text-zinc-100 mb-1">
+          <h3 className="text-base font-semibold text-foreground mb-1">
             {searchQuery ? "No matching campaigns found" : "No campaigns created yet"}
           </h3>
-          <p className="text-sm text-zinc-400 max-w-sm mb-5">
+          <p className="text-sm text-muted-foreground max-w-sm mb-5">
             {searchQuery
               ? "Try adjusting your search query or filter criteria."
               : "Create your first promotional campaign to organize QR codes and monitor collective performance."}
@@ -261,7 +360,7 @@ export default function CampaignsPage() {
             <Button
               onClick={handleCreateNew}
               size="sm"
-              className="bg-sky-600 hover:bg-sky-500 text-white gap-1.5 h-9"
+              className="gap-1.5 h-9 font-medium shadow-xs"
             >
               <Plus className="h-4 w-4" />
               <span>Create Campaign</span>

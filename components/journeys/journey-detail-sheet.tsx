@@ -50,46 +50,46 @@ export function JourneyTimeline({ session, events }: JourneyTimelineProps) {
       case "QR_SCAN":
         return {
           title: "QR Scan Detected",
-          icon: <QrCode className="h-4 w-4 text-sky-400" />,
-          color: "bg-sky-500/10 border-sky-500/30 text-sky-400",
+          icon: <QrCode className="h-4 w-4 text-sky-500" />,
+          color: "bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-400",
           railColor: "border-sky-500/40",
         };
       case "PAGE_VIEW":
         return {
           title: "Page View",
-          icon: <Eye className="h-4 w-4 text-blue-400" />,
-          color: "bg-blue-500/10 border-blue-500/30 text-blue-400",
+          icon: <Eye className="h-4 w-4 text-blue-500" />,
+          color: "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
           railColor: "border-blue-500/40",
         };
       case "BUTTON_CLICK":
       case "LINK_CLICK":
         return {
           title: "User Interaction",
-          icon: <MousePointerClick className="h-4 w-4 text-purple-400" />,
-          color: "bg-purple-500/10 border-purple-500/30 text-purple-400",
+          icon: <MousePointerClick className="h-4 w-4 text-purple-500" />,
+          color: "bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400",
           railColor: "border-purple-500/40",
         };
       case "FORM_SUBMIT":
         return {
           title: "Form Submission",
-          icon: <Send className="h-4 w-4 text-amber-400" />,
-          color: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+          icon: <Send className="h-4 w-4 text-amber-500" />,
+          color: "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
           railColor: "border-amber-500/40",
         };
       case "CONVERSION":
         return {
           title: "Goal Conversion Achieved",
-          icon: <Trophy className="h-4 w-4 text-emerald-400" />,
-          color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+          icon: <Trophy className="h-4 w-4 text-emerald-500" />,
+          color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
           railColor: "border-emerald-500/40",
         };
       case "EXTERNAL_REDIRECT":
       default:
         return {
           title: "External Redirection",
-          icon: <ExternalLink className="h-4 w-4 text-zinc-400" />,
-          color: "bg-zinc-800 border-zinc-700 text-zinc-300",
-          railColor: "border-zinc-700",
+          icon: <ExternalLink className="h-4 w-4 text-muted-foreground" />,
+          color: "bg-muted border-border text-foreground",
+          railColor: "border-border",
         };
     }
   };
@@ -108,131 +108,130 @@ export function JourneyTimeline({ session, events }: JourneyTimelineProps) {
   return (
     <div className="space-y-6 pt-4">
       {/* Session Overview Stats Banner */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-3">
+      <div className="rounded-xl border border-border/80 bg-muted/40 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="font-mono text-xs border-zinc-700 text-zinc-300">
+            <Badge variant="outline" className="font-mono text-xs border-border text-foreground">
               {session.deviceType.toUpperCase()} • {session.os}
             </Badge>
-            <Badge variant="outline" className="font-mono text-xs border-zinc-700 text-zinc-300">
+            <Badge variant="outline" className="font-mono text-xs border-border text-foreground">
               {session.country} {session.city ? `(${session.city})` : ""}
             </Badge>
           </div>
           {session.converted ? (
-            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs font-semibold gap-1">
+            <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-xs font-semibold gap-1">
               <Sparkles className="h-3 w-3" />
               Converted
             </Badge>
           ) : (
-            <Badge variant="outline" className="text-zinc-500 border-zinc-800 text-xs">
+            <Badge variant="outline" className="text-muted-foreground border-border text-xs">
               Drop-off
             </Badge>
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-zinc-800/80 text-xs">
+        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border/80 text-xs">
           <div>
-            <span className="text-zinc-500 block">QR Source</span>
-            <span className="font-medium text-zinc-200 truncate block">{session.qrName}</span>
+            <span className="text-muted-foreground block">QR Source</span>
+            <span className="font-medium text-foreground truncate block">{session.qrName}</span>
           </div>
           <div>
-            <span className="text-zinc-500 block">Total Duration</span>
-            <span className="font-mono font-medium text-zinc-200">
+            <span className="text-muted-foreground block">Total Duration</span>
+            <span className="font-mono font-medium text-foreground">
               {session.durationSeconds > 0 ? `${session.durationSeconds}s` : "< 5s"}
             </span>
           </div>
           <div>
-            <span className="text-zinc-500 block">Total Steps</span>
-            <span className="font-mono font-medium text-zinc-200">{events.length}</span>
+            <span className="text-muted-foreground block">Total Steps</span>
+            <span className="font-mono font-medium text-foreground">{events.length}</span>
           </div>
         </div>
       </div>
 
       {/* Step-by-Step Chronological Timeline */}
-      <div className="relative pl-6 space-y-6 before:absolute before:bottom-3 before:top-3 before:left-[11px] before:w-[2px] before:bg-gradient-to-b before:from-sky-500 before:via-purple-500 before:to-emerald-500/30">
+      <div className="relative pl-6 space-y-6 before:absolute before:bottom-3 before:top-3 before:left-[11px] before:w-[2px] before:bg-linear-to-b before:from-sky-500 before:via-purple-500 before:to-emerald-500/30">
         {events.map((event, index) => {
           const meta = getEventMeta(event.eventType);
           const data = event.eventData || {};
-          const isLast = index === events.length - 1;
 
           return (
             <div key={event.id || index} className="relative group">
               {/* Event Dot Icon */}
               <div
-                className={`absolute -left-[23px] top-1 flex h-6 w-6 items-center justify-center rounded-full border bg-zinc-950 shadow-md ${meta.color}`}
+                className={`absolute -left-[23px] top-1 flex h-6 w-6 items-center justify-center rounded-full border bg-card shadow-sm ${meta.color}`}
               >
                 {meta.icon}
               </div>
 
               {/* Event Card */}
-              <div className="rounded-xl border border-zinc-800 bg-zinc-950/80 p-4 transition-all hover:border-zinc-700">
+              <div className="rounded-xl border border-border/80 bg-card p-4 transition-all hover:border-border shadow-2xs">
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-zinc-100">{meta.title}</span>
-                    <Badge variant="secondary" className="font-mono text-[10px] bg-zinc-900 text-zinc-400">
+                    <span className="font-semibold text-sm text-foreground">{meta.title}</span>
+                    <Badge variant="secondary" className="font-mono text-[10px] bg-muted text-muted-foreground">
                       {event.eventType}
                     </Badge>
                   </div>
-                  <span className="font-mono text-xs text-zinc-400 bg-zinc-900/80 px-2 py-0.5 rounded">
+                  <span className="font-mono text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
                     {calculateDelta(event.timestamp)}
                   </span>
                 </div>
 
                 {/* Event Details according to Event Type */}
                 {event.eventType === "QR_SCAN" && (
-                  <div className="mt-2 text-xs space-y-1.5 bg-zinc-900/40 p-2.5 rounded-lg border border-zinc-850">
+                  <div className="mt-2 text-xs space-y-1.5 bg-muted/40 p-2.5 rounded-lg border border-border/60">
                     {data.conditionMatched && (
-                      <div className="flex items-center gap-1.5 text-sky-400 font-medium">
+                      <div className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400 font-medium">
                         <GitFork className="h-3.5 w-3.5" />
                         <span>Matched Dynamic Rule: {data.conditionMatched}</span>
                       </div>
                     )}
                     {data.destinationUrl && (
-                      <div className="text-zinc-400 truncate flex items-center gap-1">
-                        <span className="text-zinc-500">Redirected to:</span>
-                        <span className="text-zinc-300 font-mono underline">{data.destinationUrl}</span>
+                      <div className="text-muted-foreground truncate flex items-center gap-1">
+                        <span className="text-muted-foreground">Redirected to:</span>
+                        <span className="text-foreground font-mono underline">{data.destinationUrl}</span>
                       </div>
                     )}
                   </div>
                 )}
 
                 {event.eventType === "PAGE_VIEW" && (
-                  <div className="mt-2 text-xs space-y-1 bg-zinc-900/40 p-2.5 rounded-lg border border-zinc-850">
-                    <div className="flex items-center gap-1 text-zinc-300">
-                      <span className="text-zinc-500">Page:</span>
-                      <span className="font-mono text-sky-300">{data.page || "/"}</span>
+                  <div className="mt-2 text-xs space-y-1 bg-muted/40 p-2.5 rounded-lg border border-border/60">
+                    <div className="flex items-center gap-1 text-foreground">
+                      <span className="text-muted-foreground">Page:</span>
+                      <span className="font-mono text-sky-600 dark:text-sky-400">{data.page || "/"}</span>
                     </div>
-                    {data.title && <div className="text-zinc-400 text-[11px]">{data.title}</div>}
+                    {data.title && <div className="text-muted-foreground text-[11px]">{data.title}</div>}
                   </div>
                 )}
 
                 {(event.eventType === "BUTTON_CLICK" || event.eventType === "LINK_CLICK") && (
-                  <div className="mt-2 text-xs space-y-1 bg-zinc-900/40 p-2.5 rounded-lg border border-zinc-850">
-                    <div className="flex items-center gap-1 text-zinc-300">
-                      <span className="text-zinc-500">Clicked Element:</span>
-                      <span className="font-semibold text-purple-300">
+                  <div className="mt-2 text-xs space-y-1 bg-muted/40 p-2.5 rounded-lg border border-border/60">
+                    <div className="flex items-center gap-1 text-foreground">
+                      <span className="text-muted-foreground">Clicked Element:</span>
+                      <span className="font-semibold text-purple-600 dark:text-purple-400">
                         {data.target || data.buttonId || "Interactive Button"}
                       </span>
                     </div>
-                    {data.action && <div className="text-zinc-400 text-[11px]">Action: {data.action}</div>}
+                    {data.action && <div className="text-muted-foreground text-[11px]">Action: {data.action}</div>}
                   </div>
                 )}
 
                 {event.eventType === "CONVERSION" && (
-                  <div className="mt-2 text-xs space-y-1.5 bg-emerald-950/20 p-3 rounded-lg border border-emerald-500/30">
-                    <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                  <div className="mt-2 text-xs space-y-1.5 bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/30">
+                    <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
                       <Trophy className="h-4 w-4" />
                       <span>Conversion Goal: {data.goal || session.conversionEvent || "Completed"}</span>
                     </div>
                     {data.amount && (
-                      <div className="text-emerald-300/80 font-mono text-xs">
+                      <div className="text-emerald-600/80 dark:text-emerald-300/80 font-mono text-xs">
                         Value: ${Number(data.amount).toFixed(2)}
                       </div>
                     )}
                   </div>
                 )}
 
-                <div className="mt-2 text-[10px] text-zinc-400 font-mono text-right">
+                <div className="mt-2 text-[10px] text-muted-foreground font-mono text-right">
                   {new Date(event.timestamp).toLocaleTimeString()}
                 </div>
               </div>
@@ -295,21 +294,21 @@ export function JourneyDetailSheet({ session, open, onOpenChange }: JourneyDetai
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-md w-full bg-zinc-950 border-zinc-800 overflow-y-auto text-zinc-100">
-        <SheetHeader className="pb-2 border-b border-zinc-800">
-          <SheetTitle className="text-lg font-bold text-zinc-100 flex items-center gap-2">
-            <QrCode className="h-5 w-5 text-sky-400" />
+      <SheetContent className="sm:max-w-md w-full bg-card border-border overflow-y-auto text-foreground">
+        <SheetHeader className="pb-2 border-b border-border">
+          <SheetTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+            <QrCode className="h-5 w-5 text-sky-500" />
             <span>Scan Journey Explorer</span>
           </SheetTitle>
-          <SheetDescription className="text-zinc-400 text-xs font-mono">
+          <SheetDescription className="text-muted-foreground text-xs font-mono">
             Session: {session.id}
           </SheetDescription>
         </SheetHeader>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[250px] gap-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-sky-400 border-t-transparent" />
-            <span className="text-xs text-zinc-500 font-mono">Tracing visitor path...</span>
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <span className="text-xs text-muted-foreground font-mono">Tracing visitor path...</span>
           </div>
         ) : (
           <JourneyTimeline session={session} events={events} />
