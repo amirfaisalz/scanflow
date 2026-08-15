@@ -37,7 +37,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button size="sm" render={<Link href="/dashboard/qr-codes" />} className="gap-1.5 text-xs shadow-xs">
+          <Button size="sm" nativeButton={false} render={<Link href="/dashboard/qr-codes" />} className="gap-1.5 text-xs shadow-xs">
             <QrCode className="size-3.5" />
             Manage Dynamic QR Codes
             <ArrowRight className="size-3.5" />
