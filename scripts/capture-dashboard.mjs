@@ -119,6 +119,9 @@ async function main() {
     console.log(`Saved ${outputPath} (${buffer.length} bytes)`);
   };
 
+  // Capture Homepage & Routing Simulator
+  await capturePage("http://localhost:3323/", "/home/amirfaisalz/Documents/amir/QR/public/screenshot-home.png", 1440, 1100);
+
   // Capture Main Dashboard
   await capturePage("http://localhost:3323/dashboard", "/home/amirfaisalz/Documents/amir/QR/public/screenshot-dashboard.png", 1440, 1200);
 

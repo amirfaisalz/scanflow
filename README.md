@@ -25,6 +25,10 @@
 
 <br />
 
+<img src="public/screenshot-dashboard.png" alt="ScanFlow Multi-Tenant Analytics Dashboard" width="100%" />
+
+<br /><br />
+
 <img src="public/screenshot-home.png" alt="ScanFlow Landing Page & Dynamic Routing Console" width="100%" />
 
 </div>
