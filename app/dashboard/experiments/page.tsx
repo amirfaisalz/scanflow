@@ -32,11 +32,12 @@ import {
   ExperimentDialog,
 } from "@/components/experiments";
 import { cn } from "@/lib/utils";
+import { useCachedState } from "@/lib/client-cache";
 
 export default function ExperimentsDashboardPage() {
   // Experiments & Metrics state
-  const [experiments, setExperiments] = React.useState<ExperimentData[]>([]);
-  const [metrics, setMetrics] = React.useState<{
+  const [experiments, setExperiments, loading, setLoading] = useCachedState<ExperimentData[]>("/api/experiments/list", []);
+  const [metrics, setMetrics] = useCachedState<{
     totalExperiments: number;
     activeExperiments: number;
     totalVariants: number;
@@ -44,7 +45,7 @@ export default function ExperimentsDashboardPage() {
     totalSessions: number;
     overallConversionRate: number;
     significantWinnersCount: number;
-  }>({
+  }>("/api/experiments/metrics", {
     totalExperiments: 0,
     activeExperiments: 0,
     totalVariants: 0,
@@ -55,7 +56,6 @@ export default function ExperimentsDashboardPage() {
   });
 
   // Lifecycle states
-  const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
   // Search & Filter states
@@ -64,8 +64,8 @@ export default function ExperimentsDashboardPage() {
   const [qrFilter, setQrFilter] = React.useState<string>("all");
 
   // Options for dialog dropdowns & filter
-  const [qrOptions, setQrOptions] = React.useState<Array<{ id: string; name: string; destinationUrl?: string }>>([]);
-  const [campaignOptions, setCampaignOptions] = React.useState<Array<{ id: string; name: string }>>([]);
+  const [qrOptions, setQrOptions] = useCachedState<Array<{ id: string; name: string; destinationUrl?: string }>>("/api/qr-codes-options", []);
+  const [campaignOptions, setCampaignOptions] = useCachedState<Array<{ id: string; name: string }>>("/api/campaigns-options", []);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = React.useState(false);

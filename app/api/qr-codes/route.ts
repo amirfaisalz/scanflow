@@ -73,7 +73,10 @@ export async function GET(req: NextRequest) {
         .orderBy(desc(qrCodes.createdAt));
     }
 
-    return NextResponse.json({ data: userQrCodes });
+    return NextResponse.json(
+      { data: userQrCodes },
+      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=60" } }
+    );
   } catch (error) {
     console.error("Error fetching QR codes:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

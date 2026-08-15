@@ -72,18 +72,21 @@ export async function GET(request: NextRequest) {
       (e) => e.stats?.hasSignificantWinner || Boolean(e.winnerVariantId)
     ).length;
 
-    return NextResponse.json({
-      experiments: enrichedExperiments,
-      metrics: {
-        totalExperiments,
-        activeExperiments,
-        totalVariants,
-        totalConversions,
-        totalSessions,
-        overallConversionRate,
-        significantWinnersCount,
+    return NextResponse.json(
+      {
+        experiments: enrichedExperiments,
+        metrics: {
+          totalExperiments,
+          activeExperiments,
+          totalVariants,
+          totalConversions,
+          totalSessions,
+          overallConversionRate,
+          significantWinnersCount,
+        },
       },
-    });
+      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=60" } }
+    );
   } catch (error) {
     console.error("GET /api/experiments error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

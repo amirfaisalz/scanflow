@@ -33,10 +33,10 @@ import { CampaignCard, CampaignData } from "@/components/campaigns/campaign-card
 import { CampaignDialog } from "@/components/campaigns/campaign-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useCachedState } from "@/lib/client-cache";
 
 export default function CampaignsPage() {
-  const [campaigns, setCampaigns] = React.useState<CampaignData[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [campaigns, setCampaigns, loading, setLoading] = useCachedState<CampaignData[]>("/api/campaigns", []);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
 

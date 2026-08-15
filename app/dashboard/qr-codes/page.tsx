@@ -55,13 +55,15 @@ import { buildRedirectUrl } from "@/lib/qr";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { QRCode as QRCodeModel } from "@/lib/db/schema";
+import { useCachedState } from "@/lib/client-cache";
 
 export default function QRCodesPage() {
-  const [qrCodes, setQrCodes] = React.useState<QRCodeModel[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [viewMode, setViewMode] = React.useState<"grid" | "table">("grid");
+
+  const cacheKey = `/api/qr-codes?search=${searchQuery.trim()}&status=${statusFilter}`;
+  const [qrCodes, setQrCodes, isLoading, setIsLoading] = useCachedState<QRCodeModel[]>(cacheKey, []);
 
   // Dialog states
   const [builderOpen, setBuilderOpen] = React.useState(false);

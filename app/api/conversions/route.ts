@@ -92,15 +92,18 @@ export async function GET(request: NextRequest) {
         ? Math.round((totalConversions / userSessions.length) * 1000) / 10
         : 0;
 
-    return NextResponse.json({
-      goals: enrichedGoals,
-      metrics: {
-        totalConversions,
-        totalRevenue,
-        activeGoalsCount,
-        overallConversionRate,
+    return NextResponse.json(
+      {
+        goals: enrichedGoals,
+        metrics: {
+          totalConversions,
+          totalRevenue,
+          activeGoalsCount,
+          overallConversionRate,
+        },
       },
-    });
+      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=60" } }
+    );
   } catch (error) {
     console.error("GET /api/conversions error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

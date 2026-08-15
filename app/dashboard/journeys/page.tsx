@@ -32,19 +32,26 @@ import {
 import { JourneysTable, JourneySession } from "@/components/journeys/journeys-table";
 import { JourneyDetailSheet } from "@/components/journeys/journey-detail-sheet";
 import { cn } from "@/lib/utils";
+import { useCachedState } from "@/lib/client-cache";
 
 export default function JourneysPage() {
-  const [journeys, setJourneys] = React.useState<JourneySession[]>([]);
-  const [metrics, setMetrics] = React.useState({
+  const [deviceFilter, setDeviceFilter] = React.useState("all");
+  const [convertedFilter, setConvertedFilter] = React.useState("all");
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const cacheKey = `/api/analytics/journeys?device=${deviceFilter}&converted=${convertedFilter}`;
+  const [journeys, setJourneys, loading, setLoading] = useCachedState<JourneySession[]>(`${cacheKey}-list`, []);
+  const [metrics, setMetrics] = useCachedState<{
+    totalSessions: number;
+    convertedCount: number;
+    conversionRate: number;
+    avgDuration: number;
+  }>(`${cacheKey}-metrics`, {
     totalSessions: 0,
     convertedCount: 0,
     conversionRate: 0,
     avgDuration: 0,
   });
-  const [loading, setLoading] = React.useState(true);
-  const [deviceFilter, setDeviceFilter] = React.useState("all");
-  const [convertedFilter, setConvertedFilter] = React.useState("all");
-  const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedJourney, setSelectedJourney] = React.useState<JourneySession | null>(null);
   const [sheetOpen, setSheetOpen] = React.useState(false);
 

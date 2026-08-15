@@ -41,7 +41,10 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ data: overviewData });
+    return NextResponse.json(
+      { data: overviewData },
+      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=60" } }
+    );
   } catch (error: any) {
     if (
       error?.digest?.startsWith("NEXT_") ||

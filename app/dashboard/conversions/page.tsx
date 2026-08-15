@@ -35,16 +35,17 @@ import {
   SnippetDialog,
 } from "@/components/conversions";
 import { cn } from "@/lib/utils";
+import { useCachedState } from "@/lib/client-cache";
 
 export default function ConversionsDashboardPage() {
   // Goals & Metrics state
-  const [goals, setGoals] = React.useState<ConversionGoalData[]>([]);
-  const [metrics, setMetrics] = React.useState<{
+  const [goals, setGoals, loading, setLoading] = useCachedState<ConversionGoalData[]>("/api/conversions/goals", []);
+  const [metrics, setMetrics] = useCachedState<{
     totalConversions: number;
     totalRevenue: number;
     activeGoalsCount: number;
     overallConversionRate: number;
-  }>({
+  }>("/api/conversions/metrics", {
     totalConversions: 0,
     totalRevenue: 0,
     activeGoalsCount: 0,
@@ -52,7 +53,6 @@ export default function ConversionsDashboardPage() {
   });
 
   // Lifecycle states
-  const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
   // Search & Filter states
@@ -62,8 +62,8 @@ export default function ConversionsDashboardPage() {
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
 
   // Options for modal dropdowns
-  const [qrOptions, setQrOptions] = React.useState<Array<{ id: string; name: string }>>([]);
-  const [campaignOptions, setCampaignOptions] = React.useState<Array<{ id: string; name: string }>>([]);
+  const [qrOptions, setQrOptions] = useCachedState<Array<{ id: string; name: string }>>("/api/qr-codes-options", []);
+  const [campaignOptions, setCampaignOptions] = useCachedState<Array<{ id: string; name: string }>>("/api/campaigns-options", []);
 
   // Dialog states
   const [conversionDialogOpen, setConversionDialogOpen] = React.useState(false);

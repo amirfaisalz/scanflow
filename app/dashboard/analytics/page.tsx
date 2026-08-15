@@ -24,6 +24,7 @@ import { AnalyticsTrendChart } from "@/components/analytics/analytics-trend-char
 import { AnalyticsBreakdowns } from "@/components/analytics/analytics-breakdowns";
 import { AnalyticsTopPerformers } from "@/components/analytics/analytics-top-performers";
 import type { AnalyticsOverviewData } from "@/lib/analytics/overview";
+import { useCachedState } from "@/lib/client-cache";
 
 /**
  * Constructs a comprehensive CSV report from the analytics overview data.
@@ -157,13 +158,13 @@ export default function AnalyticsDashboardPage() {
   const [campaignId, setCampaignId] = React.useState<string>("all");
   const [device, setDevice] = React.useState<string>("all");
 
-  // Option lists for dropdowns
-  const [qrOptions, setQrOptions] = React.useState<Array<{ id: string; name: string }>>([]);
-  const [campaignOptions, setCampaignOptions] = React.useState<Array<{ id: string; name: string }>>([]);
+  // Option lists for dropdowns (cached)
+  const [qrOptions, setQrOptions] = useCachedState<Array<{ id: string; name: string }>>("/api/qr-codes-options", []);
+  const [campaignOptions, setCampaignOptions] = useCachedState<Array<{ id: string; name: string }>>("/api/campaigns-options", []);
 
-  // Data & Lifecycle States
-  const [overviewData, setOverviewData] = React.useState<AnalyticsOverviewData | null>(null);
-  const [loading, setLoading] = React.useState<boolean>(true);
+  // Data & Lifecycle States (cached per filter combination)
+  const overviewCacheKey = `/api/analytics/overview?period=${period}&qrCodeId=${qrCodeId}&campaignId=${campaignId}&device=${device}`;
+  const [overviewData, setOverviewData, loading, setLoading] = useCachedState<AnalyticsOverviewData | null>(overviewCacheKey, null);
   const [error, setError] = React.useState<string | null>(null);
 
   // Fetch filter dropdown options on mount

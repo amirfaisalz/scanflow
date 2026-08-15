@@ -59,7 +59,10 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({ campaigns: enrichedCampaigns });
+    return NextResponse.json(
+      { campaigns: enrichedCampaigns },
+      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=60" } }
+    );
   } catch (error) {
     console.error("GET /api/campaigns error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

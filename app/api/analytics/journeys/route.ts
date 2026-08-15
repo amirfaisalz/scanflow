@@ -71,15 +71,18 @@ export async function GET(request: NextRequest) {
     const conversionRate =
       totalSessions > 0 ? Math.round((convertedCount / totalSessions) * 1000) / 10 : 0;
 
-    return NextResponse.json({
-      journeys,
-      metrics: {
-        totalSessions,
-        convertedCount,
-        conversionRate,
-        avgDuration,
+    return NextResponse.json(
+      {
+        journeys,
+        metrics: {
+          totalSessions,
+          convertedCount,
+          conversionRate,
+          avgDuration,
+        },
       },
-    });
+      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=60" } }
+    );
   } catch (error: any) {
     if (
       error?.digest?.startsWith("NEXT_") ||
