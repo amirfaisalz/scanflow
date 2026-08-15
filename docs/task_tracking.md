@@ -8,9 +8,9 @@ This document tracks the implementation progress of all features outlined in [do
 
 | Phase | Total Features | Completed | In Progress | Pending |
 | :--- | :---: | :---: | :---: | :---: |
-| **Phase 1 (MVP)** | 12 | 8 | 0 | 4 |
+| **Phase 1 (MVP)** | 12 | 9 | 0 | 3 |
 | **Phase 2 (Advanced)** | 13 | 0 | 0 | 13 |
-| **Total** | **25** | **8** | **0** | **17** |
+| **Total** | **25** | **9** | **0** | **16** |
 
 ---
 
@@ -112,10 +112,13 @@ This document tracks the implementation progress of all features outlined in [do
 ---
 
 ### 9. Campaigns Management
-- **Status**: ⚪ Pending
+- **Status**: 🟢 Completed
 - **Tasks**:
-  - [ ] Campaign grouping and tagging for QR codes
-  - [ ] Campaign aggregate metrics and conversion comparisons
+  - [x] Multi-tenant Campaign CRUD REST API (`app/api/campaigns/route.ts` & `app/api/campaigns/[id]/route.ts`)
+  - [x] Campaign aggregate performance metrics (Total Scans, Sessions, Conversions, Conversion Rate, QR count)
+  - [x] QR code assignment & unassignment to marketing campaigns (`app/api/campaigns/[id]/assign/route.ts` & `components/qr/qr-builder-dialog.tsx`)
+  - [x] Dedicated Campaigns Management Dashboard page (`app/dashboard/campaigns/page.tsx`)
+  - [x] Campaign Cards & interactive creation/editing dialogs (`components/campaigns/campaign-card.tsx`, `components/campaigns/campaign-dialog.tsx`)
 
 ---
 
