@@ -25,13 +25,9 @@ function isValidHttpUrl(string: string) {
   }
 }
 
-function ExperimentFormContent({
-  experiment,
-  qrCodes = [],
-  campaigns = [],
-  onSave,
-  onClose,
-}: {
+export interface ExperimentDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   experiment?: ExperimentData | null;
   qrCodes?: Array<{ id: string; name: string; destinationUrl?: string }>;
   campaigns?: Array<{ id: string; name: string }>;
@@ -50,6 +46,15 @@ function ExperimentFormContent({
       isControl: boolean;
     }>;
   }) => Promise<void> | void;
+}
+
+function ExperimentFormContent({
+  experiment,
+  qrCodes = [],
+  campaigns = [],
+  onSave,
+  onClose,
+}: Omit<ExperimentDialogProps, "open" | "onOpenChange"> & {
   onClose: () => void;
 }) {
   const isEditing = Boolean(experiment?.id);
