@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X, Flame } from "lucide-react";
+import { Check, X, Sparkles } from "lucide-react";
 
 const comparisonRows = [
   {
@@ -86,7 +86,7 @@ export function ComparisonMatrix() {
                 </th>
                 <th className="p-4 sm:p-5 text-xs sm:text-sm font-bold text-fire bg-fire/10 text-center rounded-t-xl border-x border-fire/20">
                   <div className="flex items-center justify-center gap-1.5">
-                    <Flame className="size-4 fill-fire" />
+                    <Sparkles className="size-4 text-fire" />
                     <span>ScanFlow</span>
                   </div>
                 </th>

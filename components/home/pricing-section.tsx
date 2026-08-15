@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle2,
   ArrowRight,
-  Flame,
+  Sparkles,
+  Zap,
 } from "lucide-react";
 
 const tiers = [
@@ -78,7 +79,7 @@ export function PricingSection() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full border border-fire/25 bg-fire/5 dark:bg-fire/10 px-3.5 py-1 text-xs font-semibold text-fire mb-4">
-            <Flame className="size-3.5 fill-fire" />
+            <Sparkles className="size-3.5 text-fire" />
             <span>Transparent Pricing</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-950 dark:text-white text-balance">
@@ -131,7 +132,7 @@ export function PricingSection() {
                 {/* Featured Badge */}
                 {tier.featured && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 rounded-full bg-fire text-white px-3 py-0.5 text-xs font-bold shadow-md">
-                    <Flame className="size-3 fill-white" />
+                    <Sparkles className="size-3.5 text-fire" />
                     <span>{tier.badge}</span>
                   </div>
                 )}
@@ -193,6 +194,7 @@ export function PricingSection() {
                         : "bg-zinc-900 dark:bg-zinc-800 text-white hover:bg-zinc-800 dark:hover:bg-zinc-700"
                         }`}
                     >
+                      {tier.featured && <Zap className="size-3 fill-white" />}
                       <span>{tier.cta}</span>
                       <ArrowRight className="size-4" />
                     </Button>
