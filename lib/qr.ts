@@ -99,6 +99,9 @@ export function isValidUrl(url: string): boolean {
  * Construct full redirect URL for a slug.
  */
 export function buildRedirectUrl(slug: string, baseUrl?: string): string {
-  const base = baseUrl || (typeof window !== "undefined" ? window.location.origin : "https://scanflow.io");
+  const base =
+    baseUrl ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "https://scanflow.io";
   return `${base.replace(/\/+$/, "")}/r/${slug}`;
 }

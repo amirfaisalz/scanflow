@@ -1,4 +1,5 @@
 import { headers, cookies } from "next/headers";
+import { connection } from "next/server";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -10,15 +11,29 @@ import { eq, and, gt } from "drizzle-orm";
  * Returns null if the user is not authenticated.
  */
 export async function getCurrentSession(request?: Request | Headers | { headers?: Headers }) {
-  try {
-    let reqHeaders: Headers;
-    if (request instanceof Headers) {
-      reqHeaders = request;
-    } else if (request && "headers" in request && request.headers) {
-      reqHeaders = request.headers as Headers;
-    } else {
-      reqHeaders = await headers();
+  let reqHeaders: Headers;
+  if (request instanceof Headers) {
+    reqHeaders = request;
+  } else if (request && "headers" in request && request.headers) {
+    reqHeaders = request.headers as Headers;
+  } else {
+    try {
+      await connection();
+    } catch (e: any) {
+      if (
+        e?.digest?.startsWith("NEXT_") ||
+        e?.digest?.startsWith("DYNAMIC") ||
+        e?.digest === "HANGING_PROMISE_REJECTION" ||
+        e?.message?.includes("DYNAMIC_SERVER_USAGE") ||
+        e?.message?.includes("prerendering")
+      ) {
+        throw e;
+      }
     }
+    reqHeaders = await headers();
+  }
+
+  try {
 
     // 1. Try Better Auth's standard session retrieval
     try {
@@ -118,6 +133,19 @@ export async function getCurrentUser(request?: Request | Headers | { headers?: H
  * Redirects to /login if unauthenticated.
  */
 export async function requireAuth(returnUrl?: string) {
+  try {
+    await connection();
+  } catch (e: any) {
+    if (
+      e?.digest?.startsWith("NEXT_") ||
+      e?.digest?.startsWith("DYNAMIC") ||
+      e?.digest === "HANGING_PROMISE_REJECTION" ||
+      e?.message?.includes("DYNAMIC_SERVER_USAGE") ||
+      e?.message?.includes("prerendering")
+    ) {
+      throw e;
+    }
+  }
   const session = await getCurrentSession();
   if (!session?.user) {
     const loginUrl = returnUrl ? `/login?callbackUrl=${encodeURIComponent(returnUrl)}` : "/login";

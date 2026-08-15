@@ -35,6 +35,11 @@ export function AnalyticsTrendChart({
   period,
 }: AnalyticsTrendChartProps) {
   const [activeMetric, setActiveMetric] = React.useState<"all" | "scans" | "sessions" | "conversions">("all");
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const isEmpty = !timeSeries || timeSeries.length === 0;
 
@@ -117,9 +122,17 @@ export function AnalyticsTrendChart({
               Generate QR scans to visualize time series curves and conversion trends.
             </p>
           </div>
+        ) : !isMounted ? (
+          <div className="h-72 w-full pt-2 min-h-[288px] min-w-0 animate-pulse bg-muted/20 rounded-xl" />
         ) : (
-          <div className="h-72 w-full pt-2">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-72 w-full pt-2 min-h-[288px] min-w-0">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              minWidth={0}
+              minHeight={0}
+              initialDimension={{ width: 500, height: 288 }}
+            >
               <AreaChart data={timeSeries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="scansGradient" x1="0" y1="0" x2="0" y2="1">

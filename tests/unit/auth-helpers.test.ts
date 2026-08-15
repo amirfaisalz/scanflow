@@ -4,6 +4,12 @@ import { getCurrentSession, getCurrentUser, requireAuth } from "@/lib/auth-helpe
 // Mock next/headers
 vi.mock("next/headers", () => ({
   headers: vi.fn(),
+  cookies: vi.fn().mockReturnValue({ get: vi.fn() }),
+}));
+
+// Mock next/server
+vi.mock("next/server", () => ({
+  connection: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock next/navigation
