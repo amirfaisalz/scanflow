@@ -5,6 +5,7 @@ import { qrCodes } from "@/lib/db/schema";
 import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { z } from "zod";
 import { isValidSlug, isValidUrl, sanitizeSlug } from "@/lib/qr";
+import { ensureUserDemoData } from "@/lib/db/seed-user";
 
 const createQrCodeSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -57,11 +58,20 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const userQrCodes = await db
+    let userQrCodes = await db
       .select()
       .from(qrCodes)
       .where(and(...conditions))
       .orderBy(desc(qrCodes.createdAt));
+
+    if (userQrCodes.length === 0 && !search && !status && !campaignId) {
+      await ensureUserDemoData(user.id, user.email);
+      userQrCodes = await db
+        .select()
+        .from(qrCodes)
+        .where(and(...conditions))
+        .orderBy(desc(qrCodes.createdAt));
+    }
 
     return NextResponse.json({ data: userQrCodes });
   } catch (error) {

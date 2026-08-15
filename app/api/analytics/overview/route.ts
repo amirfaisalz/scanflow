@@ -23,12 +23,23 @@ export async function GET(request: NextRequest) {
         ? (rawPeriod as Period)
         : "24h";
 
-    const overviewData = await getAnalyticsOverview(user.id, {
+    let overviewData = await getAnalyticsOverview(user.id, {
       period,
       qrCodeId,
       campaignId,
       device,
     });
+
+    if (overviewData.kpis.totalScans === 0 && !qrCodeId && !campaignId) {
+      const { ensureUserDemoData } = await import("@/lib/db/seed-user");
+      await ensureUserDemoData(user.id, user.email);
+      overviewData = await getAnalyticsOverview(user.id, {
+        period,
+        qrCodeId,
+        campaignId,
+        device,
+      });
+    }
 
     return NextResponse.json({ data: overviewData });
   } catch (error) {

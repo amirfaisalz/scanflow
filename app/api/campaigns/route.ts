@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth-helpers";
 import { db } from "@/lib/db";
 import { campaigns } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { ensureUserDemoData } from "@/lib/db/seed-user";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userCampaigns = await db.query.campaigns.findMany({
+    let userCampaigns = await db.query.campaigns.findMany({
       where: eq(campaigns.userId, user.id),
       orderBy: [desc(campaigns.createdAt)],
       with: {
@@ -20,6 +21,18 @@ export async function GET(request: NextRequest) {
         sessions: true,
       },
     });
+
+    if (userCampaigns.length === 0) {
+      await ensureUserDemoData(user.id, user.email);
+      userCampaigns = await db.query.campaigns.findMany({
+        where: eq(campaigns.userId, user.id),
+        orderBy: [desc(campaigns.createdAt)],
+        with: {
+          qrCodes: true,
+          sessions: true,
+        },
+      });
+    }
 
     const enrichedCampaigns = userCampaigns.map((camp) => {
       const qrList = camp.qrCodes || [];
