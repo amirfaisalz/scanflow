@@ -47,6 +47,8 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
   const [name, setName] = React.useState(initialData?.name || "");
   const [destinationUrl, setDestinationUrl] = React.useState(initialData?.destinationUrl || (isEditing ? "" : "https://"));
   const [slug, setSlug] = React.useState(initialData?.slug || "");
+  const [campaignId, setCampaignId] = React.useState<string | null>(initialData?.campaignId || null);
+  const [availableCampaigns, setAvailableCampaigns] = React.useState<{ id: string; name: string }[]>([]);
   const [status, setStatus] = React.useState<"active" | "paused" | "archived">(
     (initialData?.status as "active" | "paused" | "archived") || "active"
   );
@@ -55,6 +57,17 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
   const [ecc, setEcc] = React.useState<"L" | "M" | "Q" | "H">("M");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [autoSlug, setAutoSlug] = React.useState(!isEditing && !initialData?.slug);
+
+  React.useEffect(() => {
+    fetch("/api/campaigns")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.campaigns) {
+          setAvailableCampaigns(data.campaigns);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
@@ -97,6 +110,7 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
         name: name.trim(),
         destinationUrl: destinationUrl.trim(),
         slug: slug.trim(),
+        campaignId: campaignId || null,
         status,
         foregroundColor,
         backgroundColor,
@@ -230,16 +244,43 @@ function QRBuilderForm({ initialData, onCancel, onSuccess }: FormProps) {
               </p>
             </div>
 
-            {/* Status Selector */}
+            {/* Marketing Campaign */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">QR Status</Label>
+              <Label htmlFor="qr-campaign" className="text-xs font-medium">
+                Marketing Campaign (Optional)
+              </Label>
+              <Select
+                value={campaignId || "none"}
+                onValueChange={(val) => setCampaignId(val === "none" ? null : val)}
+              >
+                <SelectTrigger id="qr-campaign" className="h-9 text-xs">
+                  <SelectValue placeholder="No Campaign (Standalone QR)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none" className="text-xs">
+                    No Campaign (Standalone QR)
+                  </SelectItem>
+                  {availableCampaigns.map((camp) => (
+                    <SelectItem key={camp.id} value={camp.id} className="text-xs">
+                      📁 {camp.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Initial Status */}
+            <div className="space-y-1.5">
+              <Label htmlFor="qr-status" className="text-xs font-medium">
+                Initial Status
+              </Label>
               <Select
                 value={status}
                 onValueChange={(val) => {
                   if (val) setStatus(val as "active" | "paused" | "archived");
                 }}
               >
-                <SelectTrigger className="h-9 text-xs">
+                <SelectTrigger id="qr-status" className="h-9 text-xs">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
