@@ -6,6 +6,8 @@ import {
   QrCode,
   FolderGit2,
   ArrowUpRight,
+  BarChart3,
+  Compass,
 } from "lucide-react";
 import {
   Card,
@@ -23,6 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export interface AnalyticsTopPerformersProps {
   topPerformers: {
@@ -44,9 +47,15 @@ export interface AnalyticsTopPerformersProps {
       conversionRate: number;
     }>;
   };
+  onSelectQrCode?: (qrCodeId: string) => void;
+  onSelectCampaign?: (campaignId: string) => void;
 }
 
-export function AnalyticsTopPerformers({ topPerformers }: AnalyticsTopPerformersProps) {
+export function AnalyticsTopPerformers({
+  topPerformers,
+  onSelectQrCode,
+  onSelectCampaign,
+}: AnalyticsTopPerformersProps) {
   const qrCodes = topPerformers?.qrCodes ?? [];
   const campaigns = topPerformers?.campaigns ?? [];
 
@@ -86,7 +95,7 @@ export function AnalyticsTopPerformers({ topPerformers }: AnalyticsTopPerformers
                     <TableHead className="text-right text-xs font-semibold text-muted-foreground">Scans</TableHead>
                     <TableHead className="text-right text-xs font-semibold text-muted-foreground">Sessions</TableHead>
                     <TableHead className="text-right text-xs font-semibold text-muted-foreground">Conv. Rate</TableHead>
-                    <TableHead className="w-12 text-center text-xs font-semibold text-muted-foreground"></TableHead>
+                    <TableHead className="w-24 text-right text-xs font-semibold text-muted-foreground pr-4">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -99,14 +108,19 @@ export function AnalyticsTopPerformers({ topPerformers }: AnalyticsTopPerformers
                         {idx + 1}
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-medium text-foreground line-clamp-1">
+                        <button
+                          type="button"
+                          onClick={() => onSelectQrCode?.(qr.id)}
+                          className="flex flex-col text-left group/item cursor-pointer focus:outline-hidden"
+                          title="Drill-down into QR analytics"
+                        >
+                          <span className="font-medium text-foreground line-clamp-1 group-hover/item:text-primary transition-colors">
                             {qr.name}
                           </span>
                           <span className="font-mono text-[11px] text-muted-foreground truncate">
-                            {qr.slug}
+                            /r/{qr.slug}
                           </span>
-                        </div>
+                        </button>
                       </TableCell>
                       <TableCell className="text-right font-mono text-xs font-semibold text-foreground">
                         {qr.scans.toLocaleString()}
@@ -126,14 +140,32 @@ export function AnalyticsTopPerformers({ topPerformers }: AnalyticsTopPerformers
                           {qr.conversionRate}%
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-center">
-                        <Link
-                          href="/dashboard/qr-codes"
-                          className="inline-flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                          title="View QR Code"
-                        >
-                          <ArrowUpRight className="size-3.5" />
-                        </Link>
+                      <TableCell className="text-right pr-4">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="size-7 text-muted-foreground hover:text-sky-500 hover:bg-sky-500/10"
+                            onClick={() => onSelectQrCode?.(qr.id)}
+                            title="Drill-down Analytics"
+                          >
+                            <BarChart3 className="size-3.5" />
+                          </Button>
+                          <Link
+                            href={`/dashboard/journeys?qrCodeId=${qr.id}`}
+                            title="View Visitor Journeys"
+                            className="inline-flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-amber-500/10 hover:text-amber-500"
+                          >
+                            <Compass className="size-3.5" />
+                          </Link>
+                          <Link
+                            href="/dashboard/qr-codes"
+                            title="View in QR Codes"
+                            className="inline-flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          >
+                            <ArrowUpRight className="size-3.5" />
+                          </Link>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -178,7 +210,7 @@ export function AnalyticsTopPerformers({ topPerformers }: AnalyticsTopPerformers
                     <TableHead className="text-right text-xs font-semibold text-muted-foreground">Scans</TableHead>
                     <TableHead className="text-right text-xs font-semibold text-muted-foreground">Sessions</TableHead>
                     <TableHead className="text-right text-xs font-semibold text-muted-foreground">Conv. Rate</TableHead>
-                    <TableHead className="w-12 text-center text-xs font-semibold text-muted-foreground"></TableHead>
+                    <TableHead className="w-20 text-right text-xs font-semibold text-muted-foreground pr-4">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -191,9 +223,16 @@ export function AnalyticsTopPerformers({ topPerformers }: AnalyticsTopPerformers
                         {idx + 1}
                       </TableCell>
                       <TableCell>
-                        <span className="font-medium text-foreground line-clamp-1">
-                          {camp.name}
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => onSelectCampaign?.(camp.id)}
+                          className="text-left group/item cursor-pointer focus:outline-hidden"
+                          title="Drill-down into Campaign analytics"
+                        >
+                          <span className="font-medium text-foreground line-clamp-1 group-hover/item:text-primary transition-colors">
+                            {camp.name}
+                          </span>
+                        </button>
                       </TableCell>
                       <TableCell className="text-right font-mono text-xs font-semibold text-foreground">
                         {camp.scans.toLocaleString()}
@@ -213,14 +252,25 @@ export function AnalyticsTopPerformers({ topPerformers }: AnalyticsTopPerformers
                           {camp.conversionRate}%
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-center">
-                        <Link
-                          href="/dashboard/campaigns"
-                          className="inline-flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                          title="View Campaign"
-                        >
-                          <ArrowUpRight className="size-3.5" />
-                        </Link>
+                      <TableCell className="text-right pr-4">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="size-7 text-muted-foreground hover:text-purple-500 hover:bg-purple-500/10"
+                            onClick={() => onSelectCampaign?.(camp.id)}
+                            title="Drill-down Analytics"
+                          >
+                            <BarChart3 className="size-3.5" />
+                          </Button>
+                          <Link
+                            href="/dashboard/campaigns"
+                            title="View Campaign"
+                            className="inline-flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          >
+                            <ArrowUpRight className="size-3.5" />
+                          </Link>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

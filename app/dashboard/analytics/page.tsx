@@ -97,12 +97,36 @@ function AnalyticsSkeleton() {
   );
 }
 
-async function AnalyticsDataLoader() {
+interface AnalyticsPageProps {
+  searchParams?: Promise<{
+    period?: "24h" | "7d" | "30d" | "90d" | "all";
+    qrCodeId?: string;
+    campaignId?: string;
+    device?: string;
+  }>;
+}
+
+async function AnalyticsDataLoader({
+  initialPeriod = "24h",
+  initialQrCodeId = "all",
+  initialCampaignId = "all",
+  initialDevice = "all",
+}: {
+  initialPeriod?: "24h" | "7d" | "30d" | "90d" | "all";
+  initialQrCodeId?: string;
+  initialCampaignId?: string;
+  initialDevice?: string;
+}) {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  // 1. Fetch initial overview (24h) directly on the server
-  const initialOverview = await getAnalyticsOverview(user.id, { period: "24h" });
+  // 1. Fetch initial overview directly on the server with requested filters
+  const initialOverview = await getAnalyticsOverview(user.id, {
+    period: initialPeriod,
+    qrCodeId: initialQrCodeId && initialQrCodeId !== "all" ? initialQrCodeId : undefined,
+    campaignId: initialCampaignId && initialCampaignId !== "all" ? initialCampaignId : undefined,
+    device: initialDevice && initialDevice !== "all" ? initialDevice : undefined,
+  });
 
   // 2. Fetch dropdown filter options on the server
   const [userQrCodes, userCampaigns] = await Promise.all([
@@ -125,14 +149,24 @@ async function AnalyticsDataLoader() {
       initialData={initialOverview}
       qrOptions={qrOptions}
       campaignOptions={campaignOptions}
+      initialPeriod={initialPeriod}
+      initialQrCodeId={initialQrCodeId}
+      initialCampaignId={initialCampaignId}
+      initialDevice={initialDevice}
     />
   );
 }
 
-export default function AnalyticsDashboardPage() {
+export default async function AnalyticsDashboardPage({ searchParams }: AnalyticsPageProps) {
+  const params = searchParams ? await searchParams : {};
   return (
     <Suspense fallback={<AnalyticsSkeleton />}>
-      <AnalyticsDataLoader />
+      <AnalyticsDataLoader
+        initialPeriod={params?.period}
+        initialQrCodeId={params?.qrCodeId}
+        initialCampaignId={params?.campaignId}
+        initialDevice={params?.device}
+      />
     </Suspense>
   );
 }

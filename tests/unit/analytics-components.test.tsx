@@ -309,7 +309,7 @@ describe("Analytics UI Components", () => {
 
       expect(screen.getByText(/Top Performing QR Codes/i)).toBeInTheDocument();
       expect(screen.getByText("Main Entrance QR")).toBeInTheDocument();
-      expect(screen.getByText("entrance-qr")).toBeInTheDocument();
+      expect(screen.getByText("/r/entrance-qr")).toBeInTheDocument();
       expect(screen.getByText("1,250")).toBeInTheDocument();
       expect(screen.getByText("14.8%")).toBeInTheDocument();
 
@@ -333,15 +333,43 @@ describe("Analytics UI Components", () => {
       expect(screen.getByText(/No campaigns found/i)).toBeInTheDocument();
     });
 
-    it("renders direct navigation links for QR codes and campaigns", () => {
-      render(<AnalyticsTopPerformers topPerformers={mockTopPerformers} />);
+    it("renders direct relational navigation links and handles drilldown selection", async () => {
+      const onSelectQrCode = vi.fn();
+      const onSelectCampaign = vi.fn();
 
-      const qrLinks = screen.getAllByTitle("View QR Code");
-      expect(qrLinks[0]).toHaveAttribute("href", "/dashboard/qr-codes");
-      expect(qrLinks[1]).toHaveAttribute("href", "/dashboard/qr-codes");
+      render(
+        <AnalyticsTopPerformers
+          topPerformers={mockTopPerformers}
+          onSelectQrCode={onSelectQrCode}
+          onSelectCampaign={onSelectCampaign}
+        />
+      );
 
-      const campaignLink = screen.getByTitle("View Campaign");
-      expect(campaignLink).toHaveAttribute("href", "/dashboard/campaigns");
+      // Check QR Manager Links
+      const qrManagerLinks = screen.getAllByTitle("View in QR Codes");
+      expect(qrManagerLinks[0]).toHaveAttribute("href", "/dashboard/qr-codes");
+
+      // Check Visitor Journey Links with relation ID
+      const journeyLinks = screen.getAllByTitle("View Visitor Journeys");
+      expect(journeyLinks[0]).toHaveAttribute("href", "/dashboard/journeys?qrCodeId=qr-1");
+      expect(journeyLinks[1]).toHaveAttribute("href", "/dashboard/journeys?qrCodeId=qr-2");
+
+      // Check Campaign Link
+      const campaignManagerLinks = screen.getAllByTitle("View Campaign");
+      expect(campaignManagerLinks[0]).toHaveAttribute("href", "/dashboard/campaigns");
+
+      // Test QR Drilldown Click
+      const qrDrilldownBtns = screen.getAllByTitle("Drill-down Analytics");
+      fireEvent.click(qrDrilldownBtns[0]);
+      expect(onSelectQrCode).toHaveBeenCalledWith("qr-1");
+
+      // Test QR name button click
+      fireEvent.click(screen.getByText("Main Entrance QR"));
+      expect(onSelectQrCode).toHaveBeenCalledWith("qr-1");
+
+      // Test Campaign name button click
+      fireEvent.click(screen.getByText("Summer Restaurant Promo"));
+      expect(onSelectCampaign).toHaveBeenCalledWith("camp-1");
     });
   });
 

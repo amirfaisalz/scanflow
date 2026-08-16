@@ -153,23 +153,51 @@ interface AnalyticsViewProps {
   initialData: AnalyticsOverviewData;
   qrOptions: Array<{ id: string; name: string }>;
   campaignOptions: Array<{ id: string; name: string }>;
+  initialPeriod?: "24h" | "7d" | "30d" | "90d" | "all";
+  initialQrCodeId?: string;
+  initialCampaignId?: string;
+  initialDevice?: string;
 }
 
 export function AnalyticsView({
   initialData,
   qrOptions,
   campaignOptions,
+  initialPeriod = "24h",
+  initialQrCodeId = "all",
+  initialCampaignId = "all",
+  initialDevice = "all",
 }: AnalyticsViewProps) {
   // Filter States
-  const [period, setPeriod] = React.useState<"24h" | "7d" | "30d" | "90d" | "all">("24h");
-  const [qrCodeId, setQrCodeId] = React.useState<string>("all");
-  const [campaignId, setCampaignId] = React.useState<string>("all");
-  const [device, setDevice] = React.useState<string>("all");
+  const [period, setPeriod] = React.useState<"24h" | "7d" | "30d" | "90d" | "all">(initialPeriod);
+  const [qrCodeId, setQrCodeId] = React.useState<string>(initialQrCodeId);
+  const [campaignId, setCampaignId] = React.useState<string>(initialCampaignId);
+  const [device, setDevice] = React.useState<string>(initialDevice);
 
   // Data & Lifecycle States
   const [overviewData, setOverviewData] = React.useState<AnalyticsOverviewData | null>(initialData);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Synchronize URL search parameters
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (qrCodeId && qrCodeId !== "all") url.searchParams.set("qrCodeId", qrCodeId);
+      else url.searchParams.delete("qrCodeId");
+
+      if (campaignId && campaignId !== "all") url.searchParams.set("campaignId", campaignId);
+      else url.searchParams.delete("campaignId");
+
+      if (period && period !== "24h") url.searchParams.set("period", period);
+      else url.searchParams.delete("period");
+
+      if (device && device !== "all") url.searchParams.set("device", device);
+      else url.searchParams.delete("device");
+
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [qrCodeId, campaignId, period, device]);
 
   // Fetch Analytics Overview Data when filters change
   const fetchOverview = React.useCallback(async () => {
@@ -207,6 +235,20 @@ export function AnalyticsView({
     }
     fetchOverview();
   }, [fetchOverview]);
+
+  const handleSelectQrCode = React.useCallback((id: string) => {
+    setQrCodeId(id);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, []);
+
+  const handleSelectCampaign = React.useCallback((id: string) => {
+    setCampaignId(id);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, []);
 
   // Export handlers
   const handleExportCsv = React.useCallback(() => {
@@ -361,6 +403,8 @@ export function AnalyticsView({
       {/* Top Performers */}
       <AnalyticsTopPerformers
         topPerformers={overviewData?.topPerformers || defaultTopPerformers}
+        onSelectQrCode={handleSelectQrCode}
+        onSelectCampaign={handleSelectCampaign}
       />
     </div>
   );
