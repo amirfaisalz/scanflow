@@ -128,7 +128,7 @@ export function AnalyticsTopPerformers({ topPerformers }: AnalyticsTopPerformers
                       </TableCell>
                       <TableCell className="text-center">
                         <Link
-                          href={`/qr/${qr.id}`}
+                          href="/dashboard/qr-codes"
                           className="inline-flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                           title="View QR Code"
                         >
@@ -215,7 +215,7 @@ export function AnalyticsTopPerformers({ topPerformers }: AnalyticsTopPerformers
                       </TableCell>
                       <TableCell className="text-center">
                         <Link
-                          href={`/campaigns`}
+                          href="/dashboard/campaigns"
                           className="inline-flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                           title="View Campaign"
                         >

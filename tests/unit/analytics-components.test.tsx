@@ -337,11 +337,11 @@ describe("Analytics UI Components", () => {
       render(<AnalyticsTopPerformers topPerformers={mockTopPerformers} />);
 
       const qrLinks = screen.getAllByTitle("View QR Code");
-      expect(qrLinks[0]).toHaveAttribute("href", "/qr/qr-1");
-      expect(qrLinks[1]).toHaveAttribute("href", "/qr/qr-2");
+      expect(qrLinks[0]).toHaveAttribute("href", "/dashboard/qr-codes");
+      expect(qrLinks[1]).toHaveAttribute("href", "/dashboard/qr-codes");
 
       const campaignLink = screen.getByTitle("View Campaign");
-      expect(campaignLink).toHaveAttribute("href", "/campaigns");
+      expect(campaignLink).toHaveAttribute("href", "/dashboard/campaigns");
     });
   });
 
